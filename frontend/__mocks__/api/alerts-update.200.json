@@ -1,0 +1,41 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "updateAlertStatus",
+  "scenario": "Pausing an alert (spec §34 \"Farmer deactivates\").",
+  "request": {
+    "method": "PATCH",
+    "path": "/api/v1/alerts/00000000-0000-4000-8000-000000000c01",
+    "headers": {
+      "Authorization": "Bearer mock.farmer.token"
+    },
+    "body": {
+      "status": "PAUSED"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0040",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "id": "00000000-0000-4000-8000-000000000c01",
+      "alertType": "PRICE_ABOVE",
+      "status": "PAUSED",
+      "commodity": {
+        "id": "00000000-0000-4000-8000-000000000401",
+        "name": "Onion",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "market": {
+        "id": "00000000-0000-4000-8000-000000000702",
+        "name": "TEST Market B"
+      },
+      "thresholdValue": 3000,
+      "priceUnit": "Rs./Quintal",
+      "lastTriggeredAt": "2026-10-03T00:33:01Z"
+    }
+  }
+}

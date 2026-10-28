@@ -1,0 +1,31 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listAlerts",
+  "scenario": "Expired access token: the client refreshes once and retries (spec §29).",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/alerts",
+    "headers": {
+      "Authorization": "Bearer mock.expired.token"
+    }
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0037",
+      "Content-Type": "application/problem+json",
+      "WWW-Authenticate": "Bearer realm=\"agrinex\", error=\"invalid_token\""
+    },
+    "body": {
+      "type": "/problems/unauthorized",
+      "title": "Unauthorized",
+      "status": 401,
+      "detail": "The access token has expired.",
+      "code": "UNAUTHORIZED",
+      "correlationId": "mock-correlation-0037",
+      "errors": [],
+      "instance": "/api/v1/alerts"
+    }
+  }
+}

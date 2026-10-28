@@ -1,0 +1,28 @@
+# Local environment files hold secrets and are never committed (spec section 47 Q21; CLAUDE.md section K).
+# The templates infra/.env.example and .env.example stay tracked.
+.env
+infra/.env
+.env.*
+!.env.example
+# Any other environment file, for example an owner's prod.env copied here by mistake (pre-deployment review R12).
+*.env
+
+# MCP server configuration holds inline credentials until each one becomes a ${VAR} reference (ADR-0033 item 3;
+# RD-002). Remove this entry only after that conversion.
+.mcp.json
+
+# Local browser-automation artifacts (page snapshots and console logs from the Playwright MCP server).
+.playwright-mcp/
+
+# Large owner-supplied reference downloads (Survey of India boundaries, Agmarknet exports). The evidence the
+# migrations cite is copied to docs/data/raw/; see docs/database/SEED_AND_REFERENCE_DATA.md.
+local-reference-data/
+
+# Python bytecode and test caches (ml/forecasting).
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# IDE project files (IntelliJ IDEA); each developer's IDE generates its own.
+.idea/
+*.iml

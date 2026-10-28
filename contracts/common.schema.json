@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgriNex shared contract primitives",
+  "description": "Shared primitives and reference objects used by contracts/openapi.yaml and the other contracts/*.schema.json files. Hand-authored and authoritative for the API contract area (docs/00_SSOT_INDEX.md area 4). Conventions: docs/api/API_CONVENTIONS.md. Changes follow the Shared Contract Change Rule (spec §41).",
+  "x-agrinex-contract-version": "1.0.0",
+  "$defs": {
+    "Uuid": {
+      "description": "Identifier as a UUID string (ADR-0022). Responses always use lower case. Identifiers are opaque: clients must not derive meaning from them.",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    },
+    "CalendarDate": {
+      "description": "Calendar date in yyyy-MM-dd form (ADR-0022). Date rules (today, freshness, trend and alert windows) use the Asia/Kolkata calendar (ADR-0007). A calendar date carries no time zone.",
+      "type": "string",
+      "format": "date",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+    },
+    "Timestamp": {
+      "description": "Instant in RFC 3339 form with an offset (ADR-0022). The server emits UTC with the Z designator; clients must accept any RFC 3339 offset.",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,9})?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$"
+    },
+    "InrAmount": {
+      "description": "Computed total in Indian rupees (INR), an ESTIMATED value (spec §32, §49). Exact decimal arithmetic, rounded half-up to 2 decimal places (ADR-0008, ADR-0022). JSON number without exponent notation. May be negative where stated (net realization).",
+      "type": "number",
+      "x-agrinex-max-decimal-places": 2
+    },
+    "NonNegativeInrAmount": {
+      "description": "Computed total in Indian rupees (INR), never negative. Rounded half-up to 2 decimal places (ADR-0008, ADR-0022).",
+      "type": "number",
+      "minimum": 0,
+      "x-agrinex-max-decimal-places": 2
+    },
+    "DistanceKm": {
+      "description": "Straight-line (haversine) distance in kilometres from the origin (the selected district centroid) to the market coordinates (spec §16, FR-06). Always an approximation (spec §47 Q6). Rounded half-up to 2 decimal places; this rounded value is the one used in the transport formula (docs/api/API_CONVENTIONS.md, calculation precision).",
+      "type": "number",
+      "minimum": 0,
+      "x-agrinex-max-decimal-places": 2
+    },
+    "Latitude": {
+      "description": "WGS84 latitude in decimal degrees, at most 6 decimal places (numeric(9,6)).",
+      "type": "number",
+      "minimum": -90,
+      "maximum": 90,
+      "x-agrinex-max-decimal-places": 6
+    },
+    "Longitude": {
+      "description": "WGS84 longitude in decimal degrees, at most 6 decimal places (numeric(9,6)).",
+      "type": "number",
+      "minimum": -180,
+      "maximum": 180,
+      "x-agrinex-max-decimal-places": 6
+    },
+    "GeoPoint": {
+      "description": "A WGS84 coordinate pair.",
+      "type": "object",
+      "properties": {
+        "lat": { "$ref": "#/$defs/Latitude" },
+        "lon": { "$ref": "#/$defs/Longitude" }
+      },
+      "required": ["lat", "lon"],
+      "additionalProperties": false
+    },
+    "QuantityUnit": {
+      "description": "Unit of a farmer quantity (spec §16, §32; ADR-0023). Source prices are never converted; only the farmer quantity is converted to quintals (1 QUINTAL = 100 KG).",
+      "type": "string",
+      "enum": ["KG", "QUINTAL"]
+    },
+    "ReferenceName": {
+      "description": "Official or source name, whitespace-normalized (trimmed, internal runs collapsed). Shown as published (ADR-0015).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "LocalizedNameValue": {
+      "description": "Curated Hindi or Marathi name with recorded provenance (ADR-0015). null means no reviewed translation exists; clients then show the English `name`.",
+      "anyOf": [
+        { "type": "string", "minLength": 1, "maxLength": 200 },
+        { "type": "null" }
+      ]
+    },
+    "StateRef": {
+      "description": "A state. Phase 1 holds Maharashtra only (ADR-0006).",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/Uuid" },
+        "code": {
+          "description": "ISO 3166-2 subdivision code, for example IN-MH (ADR-0006).",
+          "type": "string",
+          "pattern": "^[A-Z]{2}-[A-Z0-9]{1,3}$"
+        },
+        "name": { "$ref": "#/$defs/ReferenceName" },
+        "nameHi": { "$ref": "#/$defs/LocalizedNameValue" },
+        "nameMr": { "$ref": "#/$defs/LocalizedNameValue" }
+      },
+      "required": ["id", "code", "name", "nameHi", "nameMr"],
+      "additionalProperties": false
+    },
+    "DistrictRef": {
+      "description": "A district, named as published by the Local Government Directory (ADR-0014). Districts have no localized names (ADR-0015).",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/Uuid" },
+        "name": { "$ref": "#/$defs/ReferenceName" }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    },
+    "MarketRef": {
+      "description": "A market (mandi), named as published (ADR-0014, ADR-0015).",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/Uuid" },
+        "name": { "$ref": "#/$defs/ReferenceName" }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    },
+    "MarketSummary": {
+      "description": "A market with its district and state, for display such as 'Market, District, State'.",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/Uuid" },
+        "name": { "$ref": "#/$defs/ReferenceName" },
+        "district": { "$ref": "#/$defs/DistrictRef" },
+        "state": { "$ref": "#/$defs/StateRef" }
+      },
+      "required": ["id", "name", "district", "state"],
+      "additionalProperties": false
+    },
+    "CommodityRef": {
+      "description": "A commodity from the official Agmarknet commodity master (ADR-0006), with curated localized names (ADR-0015).",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/Uuid" },
+        "name": { "$ref": "#/$defs/ReferenceName" },
+        "nameHi": { "$ref": "#/$defs/LocalizedNameValue" },
+        "nameMr": { "$ref": "#/$defs/LocalizedNameValue" }
+      },
+      "required": ["id", "name", "nameHi", "nameMr"],
+      "additionalProperties": false
+    },
+    "VarietyRef": {
+      "description": "A variety exactly as reported by the source, for example 'Other' or 'Red' (ADR-0006). Never renamed or merged.",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/Uuid" },
+        "name": { "$ref": "#/$defs/ReferenceName" }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    },
+    "GradeRef": {
+      "description": "A grade exactly as reported by the source, for example 'FAQ' or 'Local' (ADR-0006). Never renamed or merged.",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/Uuid" },
+        "name": { "$ref": "#/$defs/ReferenceName" }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    },
+    "PageMetadata": {
+      "description": "Pagination metadata (ADR-0022). `page` is zero-based. A page past the end returns an empty `items` array with the same metadata; it is not an error. An empty result has totalItems 0 and totalPages 0.",
+      "type": "object",
+      "properties": {
+        "page": { "type": "integer", "minimum": 0 },
+        "size": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "totalItems": { "type": "integer", "minimum": 0 },
+        "totalPages": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["page", "size", "totalItems", "totalPages"]
+    }
+  }
+}

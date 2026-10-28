@@ -1,0 +1,30 @@
+"Commodity-wise, Market-wise Daily Report (Weighted Average) on: 13-Oct-2026"
+
+Market Center,Arrivals,Unit of Arrivals,Variety,Minimum Price,Maximum Price,Modal Price,Unit of Price,Grade
+Commodity Group Name : Oils and Fats
+Coconut Oil
+State/UT Name : Keralam
+Kanjangadu Market,1.0,Metric Tonnes,Other,27000.0,27600.0,27300.0,Rs./Quintal,FAQ
+Kannur Market,24.0,Metric Tonnes,Other,27000.0,28000.0,27500.0,Rs./Quintal,Grade Range-1
+Kuthuparambu Market,0.1,Metric Tonnes,Other,25500.0,27000.0,26000.0,Rs./Quintal,FAQ
+Kuttoor Market,0.25,Metric Tonnes,Other,28100.0,28500.0,28300.0,Rs./Quintal,Local
+Neeleswaram Market,2.0,Metric Tonnes,Copra Oil,28000.0,30000.0,29000.0,Rs./Quintal,FAQ
+Thalasserry Market,8.0,Metric Tonnes,Other,24800.0,25800.0,25200.0,Rs./Quintal,FAQ
+Thodupuzha Market,0.5,Metric Tonnes,Other,26400.0,26600.0,26600.0,Rs./Quintal,Grade Range-1
+Total,35.85,Metric Tonnes,,,,27053.7,Rs./Quintal,
+Grand Total,35.85,Metric Tonnes,,,,27053.7,Rs./Quintal,
+Mustard Oil
+State/UT Name : Assam
+Fancy Bazaar APMC,10.5,Metric Tonnes,Mustard Oil,17000.00085,19000.00095,17666.667550000002,Rs./Quintal,FAQ
+Total,10.5,Metric Tonnes,,,,17666.67,Rs./Quintal,
+State/UT Name : West Bengal
+Balarampur APMC,3.0,Metric Tonnes,Other,19200.0,19800.0,19600.0,Rs./Quintal,FAQ
+Birbhum APMC,24.0,Metric Tonnes,Mustard Oil,18700.0,18900.0,18800.0,Rs./Quintal,FAQ
+Durgapur APMC,5.0,Metric Tonnes,Other,17500.0,19000.0,18500.0,Rs./Quintal,FAQ
+Purulia APMC,10.0,Metric Tonnes,Mustard Oil,18900.0,19600.0,19400.0,Rs./Quintal,FAQ
+Sainthia APMC,22.0,Metric Tonnes,Mustard Oil,18600.0,18700.0,18650.0,Rs./Quintal,FAQ
+Total,64.0,Metric Tonnes,,,,18856.25,Rs./Quintal,
+Grand Total,74.5,Metric Tonnes,,,,18688.59,Rs./Quintal,
+
+Note:
+Weighted Average Price = ∑(arrival quantity * modal price) / ∑arrival quantity

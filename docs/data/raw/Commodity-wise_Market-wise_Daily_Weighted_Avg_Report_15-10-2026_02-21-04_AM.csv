@@ -1,0 +1,54 @@
+"Commodity-wise, Market-wise Daily Report (Weighted Average) on: 13-Oct-2026"
+
+Market Center,Arrivals,Unit of Arrivals,Variety,Minimum Price,Maximum Price,Modal Price,Unit of Price,Grade
+Commodity Group Name : Dry Fruits
+Almond(Badam)
+State/UT Name : Maharashtra
+APMC Mumbai ,30.9,Metric Tonnes,Other,75000.0,120000.0,97500.0,Rs./Quintal,Local
+Total,30.9,Metric Tonnes,,,,97500.0,Rs./Quintal,
+Grand Total,30.9,Metric Tonnes,,,,97500.0,Rs./Quintal,
+Cashewnuts
+State/UT Name : Andhra Pradesh
+Chodavaram APMC,0.1,Metric Tonnes,Local(Raw),8000.0,12000.0,10000.0,Rs./Quintal,Local
+Madugula APMC,0.1,Metric Tonnes,Local,8000.0,12000.0,10000.0,Rs./Quintal,Local
+Palasa APMC,0.1,Metric Tonnes,320 Counts,14000.0,14000.0,14000.0,Rs./Quintal,Local
+Tuni APMC,0.1,Metric Tonnes,Local(Raw),13000.0,13000.0,13000.0,Rs./Quintal,FAQ
+Total,0.4,Metric Tonnes,,,,11750.0,Rs./Quintal,
+State/UT Name : Keralam
+Kasargod Market,0.5,Metric Tonnes,Local(Raw),12000.0,12500.0,12200.0,Rs./Quintal,Local
+Total,0.5,Metric Tonnes,,,,12200.0,Rs./Quintal,
+State/UT Name : Maharashtra
+APMC Mumbai ,159.7,Metric Tonnes,Other,80000.0,140000.0,110000.0,Rs./Quintal,Local
+Total,159.7,Metric Tonnes,,,,110000.0,Rs./Quintal,
+Grand Total,160.6,Metric Tonnes,,,,109450.81,Rs./Quintal,
+Dry Grapes
+State/UT Name : Karnataka
+Vijayapura APMC,141.8,Metric Tonnes,Dry Grapes,10000.0,39100.0,27800.0,Rs./Quintal,Local
+Total,141.8,Metric Tonnes,,,,27800.0,Rs./Quintal,
+Grand Total,141.8,Metric Tonnes,,,,27800.0,Rs./Quintal,
+Makhana(Foxnut)
+State/UT Name : Uttar Pradesh
+Bareilly APMC,3.2,Metric Tonnes,Other,35000.0,35000.0,35000.0,Rs./Quintal,FAQ
+Ghaziabad APMC,4.75,Metric Tonnes,Other,35000.0,35000.0,35000.0,Rs./Quintal,FAQ
+Lucknow APMC,11.643,Metric Tonnes,Other,40000.0,48311.7,41958.23,Rs./Quintal,FAQ
+Mathura APMC,0.4,Metric Tonnes,Other,81972.93,81972.93,81972.93,Rs./Quintal,FAQ
+Noida APMC,0.739,Metric Tonnes,Other,106059.72,106059.72,106059.72,Rs./Quintal,FAQ
+Prayagraj APMC,4.796,Metric Tonnes,Other,40000.0,45000.0,43686.41,Rs./Quintal,FAQ
+Total,25.53,Metric Tonnes,,,,42598.6,Rs./Quintal,
+Grand Total,25.53,Metric Tonnes,,,,42598.6,Rs./Quintal,
+Walnut
+State/UT Name : Jammu and Kashmir
+Bumhama Kupwara (F&V),15.0,Metric Tonnes,Other,90000.0,100000.0,95000.0,Rs./Quintal,Grade Range-1
+Bumhama Kupwara (F&V),5.0,Metric Tonnes,Walnut,25000.0,35000.0,30000.0,Rs./Quintal,Grade Range-1
+Bumhama Kupwara (F&V),20.0,Metric Tonnes,Other,50000.0,70000.0,60000.0,Rs./Quintal,Grade Range-2
+Bumhama Kupwara (F&V),7.0,Metric Tonnes,Walnut,10000.0,20000.0,15000.0,Rs./Quintal,Grade Range-2
+Total,47.0,Metric Tonnes,,,,61276.6,Rs./Quintal,
+Grand Total,47.0,Metric Tonnes,,,,61276.6,Rs./Quintal,
+Water chestnut
+State/UT Name : Madhya Pradesh
+Kailaras APMC,1.85,Metric Tonnes,Water chestnut,3000.0,3000.0,3000.0,Rs./Quintal,FAQ
+Total,1.85,Metric Tonnes,,,,3000.0,Rs./Quintal,
+Grand Total,1.85,Metric Tonnes,,,,3000.0,Rs./Quintal,
+
+Note:
+Weighted Average Price = ∑(arrival quantity * modal price) / ∑arrival quantity

@@ -1,0 +1,20 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "markAlertEventRead",
+  "scenario": "Marking an event read; the alert stays ACTIVE (spec §34).",
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/alerts/events/00000000-0000-4000-8000-000000000d01/read",
+    "headers": {
+      "Authorization": "Bearer mock.farmer.token"
+    }
+  },
+  "response": {
+    "status": 204,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0042"
+    },
+    "body": null
+  }
+}

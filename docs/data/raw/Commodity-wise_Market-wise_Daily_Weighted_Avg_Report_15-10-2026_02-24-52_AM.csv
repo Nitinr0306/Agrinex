@@ -1,0 +1,80 @@
+"Commodity-wise, Market-wise Daily Report (Weighted Average) on: 13-Oct-2026"
+
+Market Center,Arrivals,Unit of Arrivals,Variety,Minimum Price,Maximum Price,Modal Price,Unit of Price,Grade
+"Commodity Group Name : Live Stock,Poultry,Fisheries"
+Cock
+State/UT Name : Tripura
+Bachaibari APMC,180.0,Nos,Other,360.0,650.0,500.0,Rs./Unit,Local
+Masli,90.0,Nos,Boiler/Firm(White),170.0,200.0,180.0,Rs./Unit,Local
+Melaghar APMC,200.0,Nos,Local,500.0,550.0,525.0,Rs./Unit,Local
+Total,470.0,Nos,,,,449.36,Rs./Unit,
+Grand Total,470.0,Nos,,,,449.36,Rs./Unit,
+Cow
+State/UT Name : Maharashtra
+APMC Kalyan ,3.0,Nos,Other,55000.0,70000.0,60000.0,Rs./Unit,Local
+Total,3.0,Nos,,,,60000.0,Rs./Unit,
+Grand Total,3.0,Nos,,,,60000.0,Rs./Unit,
+Fish
+State/UT Name : Andhra Pradesh
+Mummidivaram APMC,21.0,Metric Tonnes,Katla (Small),9900.0,10000.0,9900.0,Rs./Quintal,FAQ
+Total,21.0,Metric Tonnes,,,,9900.0,Rs./Quintal,
+State/UT Name : Odisha
+Karanjia APMC,0.04000000000000001,Metric Tonnes,Other,19000.0,20000.0,20000.0,Rs./Quintal,Local
+Total,0.04,Metric Tonnes,,,,20000.0,Rs./Quintal,
+State/UT Name : Tripura
+Bachaibari APMC,0.30000000000000004,Metric Tonnes,Fish,25000.0,40000.0,30000.0,Rs./Quintal,Local
+Kulai APMC,8.0,Metric Tonnes,Katla(Big),37000.0,38000.0,37500.0,Rs./Quintal,Grade Range-2
+Manubazar,0.4,Metric Tonnes,Katla(Big),38000.0,40000.0,39000.0,Rs./Quintal,FAQ
+Manubazar,0.5,Metric Tonnes,Rahu(Andhra),20000.0,22000.0,21000.0,Rs./Quintal,FAQ
+Manubazar,0.5,Metric Tonnes,Rahu(Local),28000.0,30000.0,29000.0,Rs./Quintal,FAQ
+Masli,0.30000000000000004,Metric Tonnes,Bata Putti,17000.0,20000.0,18000.0,Rs./Quintal,Local
+Melaghar APMC,0.2,Metric Tonnes,Katla(Big),33000.0,35000.0,34000.0,Rs./Quintal,Local
+Melaghar APMC,0.2,Metric Tonnes,Rahu(Local),31000.0,33000.0,32000.0,Rs./Quintal,Local
+Teliamura APMC,0.1,Metric Tonnes,Katla(Big),2800.0,28200.0,28100.0,Rs./Quintal,Grade Range-2
+Teliamura APMC,0.1,Metric Tonnes,Rahu(Andhra),18800.0,19000.0,18900.0,Rs./Quintal,Grade Range-2
+Total,10.6,Metric Tonnes,,,,35179.25,Rs./Quintal,
+State/UT Name : Uttar Pradesh
+Ahirora APMC,0.65,Metric Tonnes,Other,5000.0,5000.0,5000.0,Rs./Quintal,FAQ
+Auraiya APMC,1.9,Metric Tonnes,Other,6000.0,6000.0,6000.0,Rs./Quintal,FAQ
+Bindki APMC,2.0,Metric Tonnes,Other,1800.0,1800.0,1800.0,Rs./Quintal,FAQ
+Gorakhpur APMC,2.4,Metric Tonnes,Other,5000.0,5000.0,5000.0,Rs./Quintal,FAQ
+Jangipura APMC,4.0,Metric Tonnes,Other,2000.0,2000.0,2000.0,Rs./Quintal,FAQ
+Jaunpur APMC,12.0,Metric Tonnes,Other,5000.0,5000.0,5000.0,Rs./Quintal,FAQ
+Jhansi APMC,1.25,Metric Tonnes,Other,8000.0,8000.0,8000.0,Rs./Quintal,FAQ
+Prayagraj APMC,1.5,Metric Tonnes,Other,3000.0,3000.0,3000.0,Rs./Quintal,FAQ
+Salon APMC,48.0,Metric Tonnes,Other,3500.0,3500.0,3500.0,Rs./Quintal,FAQ
+Sirsa APMC,1.0,Metric Tonnes,Other,3200.0,3200.0,3200.0,Rs./Quintal,FAQ
+Total,74.7,Metric Tonnes,,,,3801.2,Rs./Quintal,
+Grand Total,106.34,Metric Tonnes,,,,8139.46,Rs./Quintal,
+Goat
+State/UT Name : Maharashtra
+APMC Nandurbar ,0.8,Nos,Goat,4500.0,5500.0,5000.0,Rs./Unit,Local
+APMC Palus ,47.0,Nos,Goat,4300.0,14000.0,9000.0,Rs./Unit,Local
+Total,47.8,Nos,,,,8933.05,Rs./Unit,
+State/UT Name : Odisha
+Chuliaposi APMC,426.0,Nos,Goat,5600.0,22300.0,8500.0,Rs./Unit,Local
+Total,426.0,Nos,,,,8500.0,Rs./Unit,
+State/UT Name : Tripura
+Bachaibari APMC,165.0,Nos,Other,4000.0,7000.0,5600.0,Rs./Unit,Local
+Kulai APMC,45.0,Nos,Goat,5000.0,6800.0,5500.0,Rs./Unit,Grade Range-2
+Masli,75.0,Nos,Goat,4000.0,5000.0,4500.0,Rs./Unit,Local
+Total,285.0,Nos,,,,5294.74,Rs./Unit,
+Grand Total,758.8,Nos,,,,7323.41,Rs./Unit,
+Hen
+State/UT Name : Maharashtra
+APMC Palus ,19.6,Nos,Other,200.0,600.0,350.0,Rs./Unit,Local
+Total,19.6,Nos,,,,350.0,Rs./Unit,
+Grand Total,19.6,Nos,,,,350.0,Rs./Unit,
+Prawn
+State/UT Name : Andhra Pradesh
+Mummidivaram APMC,4.0,Metric Tonnes,Prawn-White Prawn,20000.0,21000.0,20000.0,Rs./Quintal,FAQ
+Total,4.0,Metric Tonnes,,,,20000.0,Rs./Quintal,
+Grand Total,4.0,Metric Tonnes,,,,20000.0,Rs./Quintal,
+She Buffalo
+State/UT Name : Maharashtra
+APMC Kalyan ,3.0,Nos,Other,85000.0,104000.0,100000.0,Rs./Unit,Local
+Total,3.0,Nos,,,,100000.0,Rs./Unit,
+Grand Total,3.0,Nos,,,,100000.0,Rs./Unit,
+
+Note:
+Weighted Average Price = ∑(arrival quantity * modal price) / ∑arrival quantity

@@ -1,0 +1,159 @@
+# AgriNex production-shaped stack (spec §45, F1.25; ADR-0021 item 2): Nginx, frontend, backend, PostgreSQL and
+# Redis on one host. Only Nginx publishes ports (80 and 443); every other service is reachable only inside the
+# "agrinex" network. The optional ML job (ADR-0030) is not part of this file until the ML track is authorized.
+#
+# On the deployment host (docs/operations/DEPLOYMENT_GUIDE.md), from /opt/agrinex, with /opt/agrinex/.env (mode 600,
+# never committed; ADR-0020 item 4) created by infra/deploy/create_server_env.sh from infra/deploy/production.env.example:
+#   docker compose up -d --build
+# Local full-stack run without TLS: see infra/docker-compose.dev.yml.
+#
+# Images are pinned to the approved baseline (docs/architecture/CURRENT_TECHNOLOGY_BASELINE.md; ADR-0002).
+# Containers receive only the variables they need, never the whole .env file. The profile is pinned to "prod" here,
+# not read from .env, so a copied development template can never start the public server in development mode; the
+# public origin is derived from AGRINEX_DOMAIN, the one place the public host name is configured.
+name: agrinex
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  agrinex-db:
+    image: postgres:16.15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-agrinex}
+      POSTGRES_USER: ${POSTGRES_USER:-agrinex}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      # Named volume: data survives container restarts and redeployments (FR-16; ADR-0021 item 6).
+      - agrinex-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    networks: [agrinex]
+    logging: *logging
+
+  agrinex-redis:
+    image: redis:7.4.11-alpine
+    restart: unless-stopped
+    # ADR-0018 item 3: no persistence, a maxmemory limit with allkeys-lru eviction, and a password.
+    command:
+      - sh
+      - -c
+      - exec redis-server --save '' --appendonly no --maxmemory "$${REDIS_MAXMEMORY}" --maxmemory-policy allkeys-lru --requirepass "$${REDIS_PASSWORD}"
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}
+      REDIS_MAXMEMORY: ${REDIS_MAXMEMORY:-128mb}
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=\"$${REDIS_PASSWORD}\" redis-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [agrinex]
+    logging: *logging
+
+  agrinex-backend:
+    build:
+      context: ./backend
+    image: agrinex-backend:local
+    restart: unless-stopped
+    depends_on:
+      agrinex-db:
+        condition: service_healthy
+      agrinex-redis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      POSTGRES_HOST: agrinex-db
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-agrinex}
+      POSTGRES_USER: ${POSTGRES_USER:-agrinex}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      REDIS_HOST: agrinex-redis
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      AGRINEX_DOMAIN: ${AGRINEX_DOMAIN:?set AGRINEX_DOMAIN in .env}
+      AGRINEX_PUBLIC_ORIGIN: https://${AGRINEX_DOMAIN:?set AGRINEX_DOMAIN in .env}
+      AGRINEX_BOOTSTRAP_ADMIN_EMAIL: ${AGRINEX_BOOTSTRAP_ADMIN_EMAIL:-}
+      AGRINEX_BOOTSTRAP_ADMIN_PASSWORD: ${AGRINEX_BOOTSTRAP_ADMIN_PASSWORD:-}
+      DATA_GOV_API_KEY: ${DATA_GOV_API_KEY:-}
+      AGRINEX_EMAIL_PROVIDER: resend
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      AGRINEX_EMAIL_FROM: ${AGRINEX_EMAIL_FROM:-}
+      # The client IP comes from X-Forwarded-For only when the request comes from the Nginx container's fixed
+      # address (ADR-0017 item 5). Spring Boot environment form of server.tomcat.remoteip.internal-proxies.
+      SERVER_TOMCAT_REMOTEIP_INTERNALPROXIES: '172\.30\.0\.10'
+    mem_limit: 2g
+    healthcheck:
+      # Readiness includes the database only (ADR-0018, ADR-0021 item 7); never published.
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health/readiness > /dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 180s
+    networks:
+      agrinex:
+        # Fixed, so that Nginx, which resolves its upstreams once at start, keeps reaching a recreated backend.
+        ipv4_address: 172.30.0.20
+    logging: *logging
+
+  agrinex-frontend:
+    build:
+      context: ./frontend
+    image: agrinex-frontend:local
+    restart: unless-stopped
+    mem_limit: 768m
+    healthcheck:
+      # spec §45: /api/health answers {"status":"ok"}.
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+    networks:
+      agrinex:
+        ipv4_address: 172.30.0.21
+    logging: *logging
+
+  agrinex-nginx:
+    image: nginx:1.30.5
+    restart: unless-stopped
+    depends_on:
+      agrinex-backend:
+        condition: service_healthy
+      agrinex-frontend:
+        condition: service_healthy
+    environment:
+      AGRINEX_DOMAIN: ${AGRINEX_DOMAIN:?set AGRINEX_DOMAIN in .env}
+      NGINX_ENVSUBST_FILTER: AGRINEX_
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/nginx/templates:/etc/nginx/templates:ro
+      # certbot runs on the host (ADR-0021 item 4): certificates read-only, the ACME webroot it writes to.
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    networks:
+      agrinex:
+        ipv4_address: 172.30.0.10
+    logging: *logging
+
+networks:
+  agrinex:
+    ipam:
+      config:
+        # Fixed addresses (Nginx .10, backend .20, frontend .21) stay below the range Docker assigns automatically.
+        - subnet: 172.30.0.0/24
+          gateway: 172.30.0.1
+          ip_range: 172.30.0.128/25
+
+volumes:
+  agrinex-pgdata:

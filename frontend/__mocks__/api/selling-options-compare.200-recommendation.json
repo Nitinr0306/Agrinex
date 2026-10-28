@@ -1,0 +1,292 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "compareSellingOptions",
+  "scenario": "Hero flow: the highest price is at TEST Market B, but TEST Market C ranks first on the composite score, so rankingsDisagree is true. Two markets in range are excluded for lack of recent data. TEST Market A's observation is STALE but inside the 7-day recent window, so its trend is defined.",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/selling-options/compare",
+    "body": {
+      "commodityId": "00000000-0000-4000-8000-000000000401",
+      "quantity": 500,
+      "quantityUnit": "KG",
+      "originLat": 20.104532,
+      "originLon": 73.918274,
+      "maxDistanceKm": 150
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0014",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "recommendationId": "00000000-0000-4000-8000-000000000901",
+      "generatedAt": "2026-10-03T04:12:09Z",
+      "scenario": {
+        "kind": "COMPARISON",
+        "persisted": true,
+        "userOverrides": null
+      },
+      "commodity": {
+        "id": "00000000-0000-4000-8000-000000000401",
+        "name": "Onion",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "variety": null,
+      "grade": null,
+      "priceUnit": "Rs./Quintal",
+      "quantity": 500,
+      "quantityUnit": "KG",
+      "quantityInQuintal": 5,
+      "origin": {
+        "lat": 20.104532,
+        "lon": 73.918274
+      },
+      "maxDistanceKm": 150,
+      "transportAssumptions": {
+        "versionId": "00000000-0000-4000-8000-000000000a01",
+        "ratePerKm": 8,
+        "minimumTripCharge": 300,
+        "vehicleCapacityKg": 1000,
+        "appliedRatePerKm": 8,
+        "ratePerKmSource": "CONFIGURED"
+      },
+      "decisionBasis": {
+        "rankingMethod": "DETERMINISTIC_COMPOSITE_SCORE",
+        "weightsVersionId": "00000000-0000-4000-8000-000000000b01",
+        "mlContributed": false
+      },
+      "priceOnlyWinnerId": "00000000-0000-4000-8000-000000000702",
+      "netRealizationWinnerId": "00000000-0000-4000-8000-000000000703",
+      "rankingsDisagree": true,
+      "options": [
+        {
+          "rank": 1,
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000703",
+            "name": "TEST Market C",
+            "district": {
+              "id": "00000000-0000-4000-8000-000000000201",
+              "name": "Test District North"
+            },
+            "state": {
+              "id": "00000000-0000-4000-8000-000000000101",
+              "code": "IN-MH",
+              "name": "Maharashtra",
+              "nameHi": null,
+              "nameMr": null
+            }
+          },
+          "distanceKm": 42,
+          "approximateMarketLocation": false,
+          "price": {
+            "observationId": "00000000-0000-4000-8000-000000000802",
+            "reportDate": "2026-10-02",
+            "variety": {
+              "id": "00000000-0000-4000-8000-000000000502",
+              "name": "Other"
+            },
+            "grade": {
+              "id": "00000000-0000-4000-8000-000000000601",
+              "name": "FAQ"
+            },
+            "minPrice": 2800,
+            "maxPrice": 3150,
+            "modalPrice": 3000,
+            "priceUnit": "Rs./Quintal",
+            "sourceDataset": "CURRENT_PRICE",
+            "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+            "ingestedAt": "2026-10-02T00:32:05Z",
+            "freshnessStatus": "FRESH",
+            "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+          },
+          "estimates": {
+            "trips": 1,
+            "estimatedTransportCost": 336,
+            "estimatedGrossValue": 15000,
+            "estimatedNetRealization": 14664,
+            "currency": "INR"
+          },
+          "trendDirection": "RISING",
+          "changePercent7Day": 4,
+          "reasonCodes": [
+            "POSITIVE_TREND",
+            "RECENT_DATA",
+            "SUITABLE_DISTANCE"
+          ]
+        },
+        {
+          "rank": 2,
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000702",
+            "name": "TEST Market B",
+            "district": {
+              "id": "00000000-0000-4000-8000-000000000202",
+              "name": "Test District South"
+            },
+            "state": {
+              "id": "00000000-0000-4000-8000-000000000101",
+              "code": "IN-MH",
+              "name": "Maharashtra",
+              "nameHi": null,
+              "nameMr": null
+            }
+          },
+          "distanceKm": 128,
+          "approximateMarketLocation": false,
+          "price": {
+            "observationId": "00000000-0000-4000-8000-000000000801",
+            "reportDate": "2026-10-03",
+            "variety": {
+              "id": "00000000-0000-4000-8000-000000000501",
+              "name": "Red"
+            },
+            "grade": {
+              "id": "00000000-0000-4000-8000-000000000601",
+              "name": "FAQ"
+            },
+            "minPrice": 2900,
+            "maxPrice": 3300,
+            "modalPrice": 3100,
+            "priceUnit": "Rs./Quintal",
+            "sourceDataset": "CURRENT_PRICE",
+            "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+            "ingestedAt": "2026-10-03T00:32:05Z",
+            "freshnessStatus": "FRESH",
+            "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+          },
+          "estimates": {
+            "trips": 1,
+            "estimatedTransportCost": 1024,
+            "estimatedGrossValue": 15500,
+            "estimatedNetRealization": 14476,
+            "currency": "INR"
+          },
+          "trendDirection": "FALLING",
+          "changePercent7Day": -8.5,
+          "reasonCodes": [
+            "PRICE_ADVANTAGE",
+            "RECENT_DATA",
+            "NEGATIVE_TREND"
+          ]
+        },
+        {
+          "rank": 3,
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000701",
+            "name": "TEST Market A",
+            "district": {
+              "id": "00000000-0000-4000-8000-000000000201",
+              "name": "Test District North"
+            },
+            "state": {
+              "id": "00000000-0000-4000-8000-000000000101",
+              "code": "IN-MH",
+              "name": "Maharashtra",
+              "nameHi": null,
+              "nameMr": null
+            }
+          },
+          "distanceKm": 15,
+          "approximateMarketLocation": false,
+          "price": {
+            "observationId": "00000000-0000-4000-8000-000000000803",
+            "reportDate": "2026-09-28",
+            "variety": {
+              "id": "00000000-0000-4000-8000-000000000501",
+              "name": "Red"
+            },
+            "grade": {
+              "id": "00000000-0000-4000-8000-000000000602",
+              "name": "Local"
+            },
+            "minPrice": 2500,
+            "maxPrice": 3000,
+            "modalPrice": 2800,
+            "priceUnit": "Rs./Quintal",
+            "sourceDataset": "HISTORICAL_PRICE",
+            "sourceResourceId": "35985678-0d79-46b4-9ed6-6f13308a1d24",
+            "ingestedAt": "2026-09-29T00:33:40Z",
+            "freshnessStatus": "STALE",
+            "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+          },
+          "estimates": {
+            "trips": 1,
+            "estimatedTransportCost": 300,
+            "estimatedGrossValue": 14000,
+            "estimatedNetRealization": 13700,
+            "currency": "INR"
+          },
+          "trendDirection": "STABLE",
+          "changePercent7Day": 1.2,
+          "reasonCodes": [
+            "LOWER_TRANSPORT",
+            "STABLE_TREND",
+            "SUITABLE_DISTANCE",
+            "STALE_DATA"
+          ]
+        }
+      ],
+      "excludedMarkets": [
+        {
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000704",
+            "name": "TEST Market D",
+            "district": {
+              "id": "00000000-0000-4000-8000-000000000202",
+              "name": "Test District South"
+            },
+            "state": {
+              "id": "00000000-0000-4000-8000-000000000101",
+              "code": "IN-MH",
+              "name": "Maharashtra",
+              "nameHi": null,
+              "nameMr": null
+            }
+          },
+          "distanceKm": 98.49,
+          "approximateMarketLocation": true,
+          "reason": "NO_RECENT_PRICE_DATA"
+        },
+        {
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000705",
+            "name": "TEST Market E",
+            "district": {
+              "id": "00000000-0000-4000-8000-000000000202",
+              "name": "Test District South"
+            },
+            "state": {
+              "id": "00000000-0000-4000-8000-000000000101",
+              "code": "IN-MH",
+              "name": "Maharashtra",
+              "nameHi": null,
+              "nameMr": null
+            }
+          },
+          "distanceKm": 131.52,
+          "approximateMarketLocation": false,
+          "reason": "NO_RECENT_PRICE_DATA"
+        }
+      ],
+      "noDataReason": null,
+      "sourceStatus": {
+        "sourceDataset": "CURRENT_PRICE",
+        "lastSuccessfulSyncAt": "2026-10-03T00:32:40Z",
+        "latestSyncFailed": false
+      }
+    }
+  }
+}

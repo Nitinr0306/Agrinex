@@ -1,0 +1,30 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getSystemStatus",
+  "scenario": "A FARMER token on an ADMIN operation (spec §28).",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/admin/system/status",
+    "headers": {
+      "Authorization": "Bearer mock.farmer.token"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0049",
+      "Content-Type": "application/problem+json"
+    },
+    "body": {
+      "type": "/problems/forbidden",
+      "title": "Forbidden",
+      "status": 403,
+      "detail": "This operation needs the ADMIN role.",
+      "code": "FORBIDDEN",
+      "correlationId": "mock-correlation-0049",
+      "errors": [],
+      "instance": "/api/v1/admin/system/status"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "pauseScheduledIngestion",
+  "scenario": "Pausing scheduled CURRENT_PRICE runs during announced source maintenance; manual triggers still work (ADR-0020).",
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/admin/ingestion/datasets/CURRENT_PRICE/pause",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    },
+    "body": {
+      "reason": "Announced data.gov.in maintenance window (synthetic example)"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0057",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "datasetType": "CURRENT_PRICE",
+      "paused": true,
+      "pausedReason": "Announced data.gov.in maintenance window (synthetic example)",
+      "updatedAt": "2026-10-03T05:00:00Z"
+    }
+  }
+}

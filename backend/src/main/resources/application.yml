@@ -1,0 +1,209 @@
+# AgriNex backend configuration shared by every profile. Secrets and environment-specific values come only from the
+# process environment (infra/.env.example is the contract; ADR-0020, ADR-0021). No secret value is ever stored here.
+#
+# This is the only configuration file. The first document below is shared by every profile; the documents after it
+# apply only to their profile (spring.config.activate.on-profile) and override the shared values.
+# Exactly one profile is selected with SPRING_PROFILES_ACTIVE (StartupProfileValidator refuses anything else):
+#   local - development on a developer machine: the "local" document (localhost defaults, the dev-server CORS origin);
+#   prod  - the public deployment: the "prod" document (every value required, validated before the context starts);
+#   test  - automated tests only (IntegrationTestSupport).
+spring:
+  application:
+    name: agrinex-backend
+  main:
+    banner-mode: off
+  profiles:
+    group:
+      # "dev" is the earlier name of the local profile; local environment files that still say "dev" keep working.
+      dev: local
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      # A database connection failure fails fast with 503 (RESILIENCE_ARCHITECTURE.md): wait at most 3 s for a
+      # connection instead of Hikari's default 30 s (found in Task 12). Milliseconds; validation must be shorter.
+      connection-timeout: 3000
+      validation-timeout: 2000
+  jpa:
+    open-in-view: false
+    hibernate:
+      # The schema changes only through Flyway migrations; Hibernate only checks the mapping.
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          # Batch the inserts of one delivery unit or one comparison (ADR-0011 item 7).
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+  flyway:
+    locations: classpath:db/migration
+  data:
+    redis:
+      # Redis holds rate-limit counters and the reference cache only, never repositories (ADR-0018).
+      repositories:
+        enabled: false
+      timeout: 500ms
+      connect-timeout: 500ms
+  cache:
+    type: redis
+    redis:
+      # Reference-data cache: one hour, evicted by the owning module on every write (ADR-0018).
+      time-to-live: 1h
+      cache-null-values: false
+      key-prefix: "agrinex:cache:"
+  mvc:
+    problemdetails:
+      enabled: false
+
+server:
+  port: 8080
+  # Client IP from X-Forwarded-For only when the request comes from a trusted proxy (ADR-0017 item 5).
+  forward-headers-strategy: native
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-components: always
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        # Readiness includes the database only: a Redis outage degrades, never stops, the service (ADR-0018).
+        readiness:
+          include: readinessState,db
+
+logging:
+  structured:
+    format:
+      console: ecs
+  level:
+    root: INFO
+    # Never log request details or SQL parameters (ADR-0042, SR-16).
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN
+
+agrinex:
+  # The one public origin (ADR-0017): CORS, the Origin check and the base of every emailed link (ADR-0048 item 2).
+  # Set by the profile documents below; empty here, so a run without a profile value stops at start (OriginProperties).
+  public-origin: ${AGRINEX_PUBLIC_ORIGIN:}
+  security:
+    jwt-secret: ${JWT_SECRET:}
+    access-token-ttl: 15m
+    refresh-token-ttl: 7d
+    bcrypt-strength: 12
+    email-verification-ttl: 24h
+    password-reset-ttl: 30m
+  # Rate limits are deployment configuration (ADR-0017 item 6, ADR-0048 item 6); defaults are the decided values.
+  rate-limits:
+    selling-options-per-minute: 60
+    login-per-minute: 10
+    register-per-minute: 10
+    refresh-per-minute: 10
+    failed-logins-per-identifier: 10
+    failed-login-window: 15m
+    password-reset-request-per-minute: 10
+    password-reset-confirm-per-minute: 10
+    email-verification-confirm-per-minute: 10
+    email-verification-resend-per-minute: 10
+    password-reset-requests-per-identifier: 3
+    verification-resends-per-account: 3
+    per-identifier-window: 1h
+  email:
+    provider: ${AGRINEX_EMAIL_PROVIDER:none}
+    resend-api-key: ${RESEND_API_KEY:}
+    from: ${AGRINEX_EMAIL_FROM:}
+    resend-base-url: https://api.resend.com
+    timeout: 10s
+  bootstrap-admin:
+    email: ${AGRINEX_BOOTSTRAP_ADMIN_EMAIL:}
+    password: ${AGRINEX_BOOTSTRAP_ADMIN_PASSWORD:}
+  retention:
+    # Daily purges of the owning modules (ADR-0029 item 1, ADR-0048 item 11). The time of day is an
+    # operational choice between the ingestion runs at 00, 06, 12 and 18 IST (ADR-0011 item 1).
+    purge-cron: "0 30 3 * * *"
+  ingestion:
+    api-key: ${DATA_GOV_API_KEY:}
+    base-url: https://api.data.gov.in/resource/
+    # Coverage and schedule are deployment configuration fixed by decisions (ADR-0006 item 1, ADR-0011 item 1).
+    coverage-states:
+      - Maharashtra
+    schedule-cron: "0 0 0,6,12,18 * * *"
+    historical-window-days-back: 3
+    page-size: 500
+    max-retries: 3
+    initial-backoff: 2s
+    connect-timeout: 10s
+    read-timeout: 60s
+    max-pages-per-unit: 1000
+    # Historical maintenance (ADR-0054): a daily gap check and a weekly re-fetch of recent report dates, in
+    # Asia/Kolkata, between the ingestion runs at 00, 06, 12 and 18 IST. Deployment configuration (ADR-0020 item 3).
+    maintenance:
+      gap-check-cron: "0 0 3 * * *"
+      reconciliation-cron: "0 0 4 * * SUN"
+      coverage-days: 366
+      max-dates-per-gap-run: 31
+      reconciliation-window-days: 14
+
+---
+# Profile "local" (also activated by its former name "dev", through the profile group above): development on a
+# developer machine, with the backing services of infra/docker-compose.yml and the frontend dev server
+# (docs/LOCAL_DEVELOPMENT_GUIDE.md). Values come from infra/.env; the defaults below exist only in this profile, never
+# in production.
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:agrinex}
+    username: ${POSTGRES_USER:agrinex}
+    password: ${POSTGRES_PASSWORD:}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+agrinex:
+  public-origin: ${AGRINEX_PUBLIC_ORIGIN:http://localhost:3000}
+  cors:
+    # ADR-0017 item 2: the development profile also allows the frontend dev server.
+    extra-origins:
+      - http://localhost:3000
+
+---
+# Profile "prod": the public deployment (ADR-0021, ADR-0055), started by the root docker-compose.yml, which pins
+# this profile. Every environment value is required: no localhost, development origin or provider default exists
+# here. StartupProfileValidator checks them before the application context, and so before any migration, is created.
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+agrinex:
+  # The public host name (ADR-0055); the public origin must be https:// followed by exactly this host.
+  domain: ${AGRINEX_DOMAIN}
+  public-origin: ${AGRINEX_PUBLIC_ORIGIN}
+  cors:
+    # The public origin only: no development origins (ADR-0017 item 2; Task 12 finding S12-1).
+    extra-origins: []
+  email:
+    provider: ${AGRINEX_EMAIL_PROVIDER}
+  security:
+    jwt-secret: ${JWT_SECRET}
+  ingestion:
+    api-key: ${DATA_GOV_API_KEY}

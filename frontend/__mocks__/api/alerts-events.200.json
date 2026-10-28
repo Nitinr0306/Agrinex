@@ -1,0 +1,83 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listAlertEvents",
+  "scenario": "Polling unread events; totalItems is the unread count.",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/alerts/events?unreadOnly=true&page=0&size=20",
+    "headers": {
+      "Authorization": "Bearer mock.farmer.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0041",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-4000-8000-000000000d01",
+          "alertId": "00000000-0000-4000-8000-000000000c01",
+          "alertType": "PRICE_ABOVE",
+          "thresholdValue": 3000,
+          "commodity": {
+            "id": "00000000-0000-4000-8000-000000000401",
+            "name": "Onion",
+            "nameHi": null,
+            "nameMr": null
+          },
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000702",
+            "name": "TEST Market B"
+          },
+          "triggeredAt": "2026-10-03T00:33:01Z",
+          "triggerValue": 3100,
+          "priceUnit": "Rs./Quintal",
+          "observation": {
+            "observationId": "00000000-0000-4000-8000-000000000801",
+            "reportDate": "2026-10-03",
+            "variety": {
+              "id": "00000000-0000-4000-8000-000000000501",
+              "name": "Red"
+            },
+            "grade": {
+              "id": "00000000-0000-4000-8000-000000000601",
+              "name": "FAQ"
+            },
+            "minPrice": 2900,
+            "maxPrice": 3300,
+            "modalPrice": 3100,
+            "priceUnit": "Rs./Quintal",
+            "sourceDataset": "CURRENT_PRICE",
+            "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+            "ingestedAt": "2026-10-03T00:32:05Z",
+            "freshnessStatus": "FRESH",
+            "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+          },
+          "readAt": null
+        }
+      ],
+      "page": 0,
+      "size": 20,
+      "totalItems": 1,
+      "totalPages": 1,
+      "sourceStatus": {
+        "sourceDataset": "CURRENT_PRICE",
+        "lastSuccessfulSyncAt": "2026-10-03T00:32:40Z",
+        "latestSyncFailed": false
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listLocalities",
+  "scenario": "Localities carry no coordinates in Phase 1.",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/geography/districts/00000000-0000-4000-8000-000000000201/localities"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0009",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-4000-8000-000000000301",
+          "districtId": "00000000-0000-4000-8000-000000000201",
+          "name": "Test Taluka East"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000302",
+          "districtId": "00000000-0000-4000-8000-000000000201",
+          "name": "Test Taluka West"
+        }
+      ]
+    }
+  }
+}

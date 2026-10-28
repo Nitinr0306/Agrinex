@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agrinex-forecasting"
+version = "0.1.0"
+description = "AgriNex optional ML track: short-horizon mandi price forecasting baselines (spec section 35; ADR-0030)."
+requires-python = ">=3.14,<3.15"
+# Every dependency is pinned exactly and justified in README.md.
+dependencies = [
+    "psycopg[binary]==3.3.6",
+    "jsonschema==4.26.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest==9.1.1",
+]
+
+[project.scripts]
+agrinex-forecasting = "agrinex_forecasting.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers -p no:cacheprovider"

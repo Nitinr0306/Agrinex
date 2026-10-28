@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listVarieties",
+  "scenario": "Unknown commodity id in the path.",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/commodities/00000000-0000-4000-8000-0000000004ff/varieties"
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0013",
+      "Content-Type": "application/problem+json"
+    },
+    "body": {
+      "type": "/problems/not-found",
+      "title": "Not found",
+      "status": 404,
+      "detail": "No commodity with this id.",
+      "code": "NOT_FOUND",
+      "correlationId": "mock-correlation-0013",
+      "errors": [],
+      "instance": "/api/v1/commodities/00000000-0000-4000-8000-0000000004ff/varieties"
+    }
+  }
+}

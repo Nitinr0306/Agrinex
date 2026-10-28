@@ -1,0 +1,463 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MarketComparisonResponse",
+  "description": "Selling-options contract of the recommendation module (spec §16, §17, §21, §30, §32; ADR-0023, ADR-0024, ADR-0025, ADR-0026). Spec §41: produced by Backend; consumed by Frontend and QA. The root schema is the response of POST /api/v1/selling-options/compare and POST /api/v1/selling-options/simulate; `$defs` holds the request schemas and the parts of the response. The result is fully deterministic: no ML output enters the comparison, the score or the ranking (spec P9, §16; ADR-0030; docs/architecture/ML_ARCHITECTURE.md §4.10). Observed government prices (each option's `price`), user-supplied hypothetical inputs (`scenario.userOverrides`), configured assumptions (`transportAssumptions`) and derived ESTIMATED values (`estimates`) are kept in separate, labelled places. Hand-authored and authoritative for the API contract area.",
+  "x-agrinex-contract-version": "1.0.0",
+  "$ref": "#/$defs/MarketComparisonResponse",
+  "$defs": {
+    "CompareRequest": {
+      "description": "Input of a market comparison (spec §16 INPUT, §21 step 4; ADR-0023). Optional properties may be omitted or sent as null; both mean 'not set'. Unknown properties are rejected (VALIDATION_FAILED, UNKNOWN_FIELD).",
+      "type": "object",
+      "properties": {
+        "commodityId": {
+          "description": "Commodity to compare. Its verified price unit must be 'Rs./Quintal', otherwise 422 UNSUPPORTED_PRICE_UNIT (ADR-0008). Unknown: 422 REFERENCE_NOT_FOUND.",
+          "$ref": "common.schema.json#/$defs/Uuid"
+        },
+        "varietyId": {
+          "description": "Optional variety of the commodity. When set, only observations of exactly this variety qualify; no other variety is substituted (ADR-0010 item 3). Must belong to commodityId, otherwise 422 REFERENCE_NOT_FOUND.",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/Uuid" },
+            { "type": "null" }
+          ]
+        },
+        "gradeId": {
+          "description": "Optional grade of the commodity, matched exactly like varietyId (ADR-0010 item 3).",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/Uuid" },
+            { "type": "null" }
+          ]
+        },
+        "quantity": {
+          "description": "Quantity to sell, in quantityUnit. Greater than 0 (ADR-0023); at most 9 integer and 3 fraction digits (selling_searches.quantity numeric(12,3)). No further limit applies; a quantity whose estimates exceed the stored precision answers 422 ESTIMATE_OUT_OF_RANGE (ADR-0040).",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 999999999.999,
+          "x-agrinex-max-decimal-places": 3
+        },
+        "quantityUnit": { "$ref": "common.schema.json#/$defs/QuantityUnit" },
+        "originLat": {
+          "description": "Latitude of the origin: the centroid of the district the farmer selected, exactly as listDistricts publishes it. Never an exact address (spec §21 step 3, §28; ADR-0023). The server accepts only a stored district centroid (6 decimal places); any other value answers 400 VALIDATION_FAILED with INVALID_VALUE on originLat and originLon (ADR-0039).",
+          "$ref": "common.schema.json#/$defs/Latitude"
+        },
+        "originLon": {
+          "description": "Longitude of the origin district centroid, exactly as listDistricts publishes it (ADR-0023; validated with originLat, ADR-0039).",
+          "$ref": "common.schema.json#/$defs/Longitude"
+        },
+        "maxDistanceKm": {
+          "description": "Search radius in whole kilometres. Default 150 when omitted or null (spec §16, F1.6). Greater than 0, with no further limit (ADR-0023).",
+          "anyOf": [
+            { "type": "integer", "minimum": 1, "maximum": 2147483647 },
+            { "type": "null" }
+          ]
+        }
+      },
+      "required": ["commodityId", "quantity", "quantityUnit", "originLat", "originLon"],
+      "additionalProperties": false
+    },
+    "SimulateRequest": {
+      "description": "Server-side What-If (spec §17; ADR-0026 item 3). The client uses it only when the maximum distance is raised above the original comparison radius; all other What-If changes are recalculated in the browser (spec §10). The server re-runs the comparison with the original run's weights and transport-assumption versions and these overrides, ranks by estimated net realization, and persists nothing (spec §32 'session-only'). Optional properties may be omitted or sent as null; both mean 'keep the original value'.",
+      "type": "object",
+      "properties": {
+        "recommendationId": {
+          "description": "The comparison run being explored, from MarketComparisonResponse.recommendationId. Unknown: 422 REFERENCE_NOT_FOUND.",
+          "$ref": "common.schema.json#/$defs/Uuid"
+        },
+        "quantity": {
+          "description": "Hypothetical quantity in KILOGRAMS (spec §17 quantity slider), 100 to 5,000 (ADR-0026 item 4).",
+          "anyOf": [
+            { "type": "number", "minimum": 100, "maximum": 5000, "x-agrinex-max-decimal-places": 3 },
+            { "type": "null" }
+          ]
+        },
+        "transportRatePerKm": {
+          "description": "Hypothetical transport rate in rupees per km per trip, 3 to 20 (spec §17; ADR-0026 item 4). Replaces the configured ratePerKm for this simulation only; system defaults never change (spec §32).",
+          "anyOf": [
+            { "type": "number", "minimum": 3, "maximum": 20, "x-agrinex-max-decimal-places": 2 },
+            { "type": "null" }
+          ]
+        },
+        "maxDistanceKm": {
+          "description": "Hypothetical search radius in whole kilometres, 25 to 300 (spec §17; ADR-0026 item 4).",
+          "anyOf": [
+            { "type": "integer", "minimum": 25, "maximum": 300 },
+            { "type": "null" }
+          ]
+        }
+      },
+      "required": ["recommendationId"],
+      "additionalProperties": false
+    },
+    "ReasonCode": {
+      "description": "Fixed-vocabulary explanation of a ranked option (spec §16, P2, F1.12; trigger rules ADR-0024 item 6), in the spec §16 order: PRICE_ADVANTAGE (modal price in the top 25 % of options), LOWER_TRANSPORT (transport cost in the bottom 25 %), POSITIVE_TREND (RISING), STABLE_TREND (STABLE), RECENT_DATA (FRESH), SUITABLE_DISTANCE (distanceKm < 50), NEGATIVE_TREND (FALLING), STALE_DATA (STALE). Clients localize them (spec §46, §47 Q18). The vocabulary is closed: a new code needs a specification change.",
+      "type": "string",
+      "enum": [
+        "PRICE_ADVANTAGE",
+        "LOWER_TRANSPORT",
+        "POSITIVE_TREND",
+        "STABLE_TREND",
+        "RECENT_DATA",
+        "SUITABLE_DISTANCE",
+        "NEGATIVE_TREND",
+        "STALE_DATA"
+      ]
+    },
+    "ExclusionReason": {
+      "description": "Why a market inside the radius is not ranked. NO_RECENT_PRICE_DATA: no stored observation dated within the active stale window matched the commodity (and the selected variety and grade) at that market (spec §16; ADR-0010, ADR-0023).",
+      "type": "string",
+      "enum": ["NO_RECENT_PRICE_DATA"]
+    },
+    "RankingMethod": {
+      "description": "How `options` are ranked. DETERMINISTIC_COMPOSITE_SCORE: the spec §16 composite score with the active weights, ties by higher estimated net realization, then shorter distance, then market name (ADR-0024). NET_REALIZATION: estimated net realization, ties by shorter distance, then market name; used by What-If simulations (spec §17; ADR-0026 item 2). Market names compare in code-point order, and market id breaks a remaining tie. Values may be added in a minor contract version; ML-based ranking would first need an approved specification change or decision (docs/architecture/ML_ARCHITECTURE.md §4.10).",
+      "type": "string",
+      "enum": ["DETERMINISTIC_COMPOSITE_SCORE", "NET_REALIZATION"],
+      "x-agrinex-extensible": true
+    },
+    "DecisionBasis": {
+      "description": "Declares how the result was produced, so clients never have to infer it.",
+      "type": "object",
+      "properties": {
+        "rankingMethod": { "$ref": "#/$defs/RankingMethod" },
+        "weightsVersionId": {
+          "description": "Identifier of the recommendation-weights version (weights and freshness thresholds) used: the active version for a COMPARISON, the original run's version for a SIMULATION (spec §20 recommendation_runs.weights_id; ADR-0026 item 3).",
+          "$ref": "common.schema.json#/$defs/Uuid"
+        },
+        "mlContributed": {
+          "description": "Whether any ML output contributed to this result. Always false in contract version 1: ML is optional and never an input to comparison, scoring or ranking (spec P9, §16; ADR-0030). Forecasts, when the optional ML track exists, are served separately by GET /api/v1/markets/{marketId}/forecast and are never mixed into this response.",
+          "type": "boolean",
+          "const": false
+        }
+      },
+      "required": ["rankingMethod", "weightsVersionId", "mlContributed"],
+      "additionalProperties": false
+    },
+    "UserOverrides": {
+      "description": "Hypothetical inputs the user supplied for a simulation (spec §17, §32). They change only the derived estimates and ranking of this response, never the observed prices or the configured assumptions. Only the overrides actually supplied are present.",
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "description": "Hypothetical quantity in kilograms.",
+          "type": "number",
+          "minimum": 100,
+          "maximum": 5000,
+          "x-agrinex-max-decimal-places": 3
+        },
+        "transportRatePerKm": {
+          "description": "Hypothetical rate in rupees per km per trip.",
+          "type": "number",
+          "minimum": 3,
+          "maximum": 20,
+          "x-agrinex-max-decimal-places": 2
+        },
+        "maxDistanceKm": {
+          "description": "Hypothetical radius in whole kilometres.",
+          "type": "integer",
+          "minimum": 25,
+          "maximum": 300
+        }
+      },
+      "additionalProperties": false
+    },
+    "Scenario": {
+      "description": "Distinguishes a recorded comparison from a hypothetical simulation.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "COMPARISON: computed from the request and the active configuration, and recorded for evaluation (spec §16 PERSIST, §36). SIMULATION: a What-If recomputation with user overrides; nothing is recorded (spec §32; ADR-0026).",
+          "type": "string",
+          "enum": ["COMPARISON", "SIMULATION"]
+        },
+        "persisted": {
+          "description": "true when the result was stored as a recommendation run (COMPARISON); false for SIMULATION.",
+          "type": "boolean"
+        },
+        "userOverrides": {
+          "description": "null for COMPARISON; the supplied overrides for SIMULATION (possibly an empty object).",
+          "anyOf": [
+            { "$ref": "#/$defs/UserOverrides" },
+            { "type": "null" }
+          ]
+        }
+      },
+      "required": ["kind", "persisted", "userOverrides"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "COMPARISON" } }, "required": ["kind"] },
+          "then": { "properties": { "persisted": { "const": true }, "userOverrides": { "type": "null" } } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "SIMULATION" } }, "required": ["kind"] },
+          "then": { "properties": { "persisted": { "const": false }, "userOverrides": { "type": "object" } } }
+        }
+      ]
+    },
+    "TransportAssumptionsApplied": {
+      "description": "The transport assumptions behind every estimate in the response (spec §32; ADR-0023 item 5, ADR-0026 item 1). The configured values come from the version the comparison run used. The client-side What-If recalculates with these values and the spec §32 formula (departure D-13). The mandatory transport label shows this rate: 'Estimated — based on ₹{appliedRatePerKm}/km assumption. Actual costs will vary.' A fixed ₹8/km is never shown when the applied rate differs (ADR-0038; departure D-14).",
+      "type": "object",
+      "properties": {
+        "versionId": {
+          "description": "Identifier of the configured transport-assumptions version (ADR-0026 item 1).",
+          "$ref": "common.schema.json#/$defs/Uuid"
+        },
+        "ratePerKm": {
+          "description": "Configured rate in rupees per km per trip of that version (spec §32 default ₹8.00).",
+          "type": "number",
+          "minimum": 0,
+          "x-agrinex-max-decimal-places": 2
+        },
+        "minimumTripCharge": {
+          "description": "Configured minimum charge in rupees per trip (spec §32 default ₹300).",
+          "type": "number",
+          "minimum": 0,
+          "x-agrinex-max-decimal-places": 2
+        },
+        "vehicleCapacityKg": {
+          "description": "Configured vehicle capacity in kilograms, used for the trip count (spec §32 default 1,000 kg).",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-agrinex-max-decimal-places": 2
+        },
+        "appliedRatePerKm": {
+          "description": "Rate actually used for the estimates in this response: ratePerKm, or the user's transportRatePerKm override in a simulation.",
+          "type": "number",
+          "minimum": 0,
+          "x-agrinex-max-decimal-places": 2
+        },
+        "ratePerKmSource": {
+          "description": "USER_OVERRIDE exactly when the simulation request supplied transportRatePerKm (even if it equals the configured rate); CONFIGURED otherwise, and then appliedRatePerKm equals ratePerKm.",
+          "type": "string",
+          "enum": ["CONFIGURED", "USER_OVERRIDE"]
+        }
+      },
+      "required": ["versionId", "ratePerKm", "minimumTripCharge", "vehicleCapacityKg", "appliedRatePerKm", "ratePerKmSource"],
+      "additionalProperties": false
+    },
+    "SellingEstimates": {
+      "description": "ESTIMATED economics of selling the whole quantity at this market (spec §32, FR-07 to FR-09, §49). Computed with exact decimal arithmetic from the observed modal price, the rounded distanceKm and the applied transport assumptions: trips = ceil(quantityInKg / vehicleCapacityKg); estimatedTransportCost = round2(max(minimumTripCharge, distanceKm x appliedRatePerKm) x trips); estimatedGrossValue = round2(modalPrice x quantityInQuintal); estimatedNetRealization = estimatedGrossValue - estimatedTransportCost. round2 rounds half-up to 2 decimal places (ADR-0008). These are estimates, never guarantees (spec §49).",
+      "type": "object",
+      "properties": {
+        "trips": {
+          "description": "Number of vehicle trips assumed.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "estimatedTransportCost": { "$ref": "common.schema.json#/$defs/NonNegativeInrAmount" },
+        "estimatedGrossValue": { "$ref": "common.schema.json#/$defs/NonNegativeInrAmount" },
+        "estimatedNetRealization": {
+          "description": "Gross value minus transport cost, in INR. Can be negative.",
+          "$ref": "common.schema.json#/$defs/InrAmount"
+        },
+        "currency": {
+          "description": "All estimates are totals in Indian rupees (ADR-0022 item 10).",
+          "type": "string",
+          "const": "INR"
+        }
+      },
+      "required": ["trips", "estimatedTransportCost", "estimatedGrossValue", "estimatedNetRealization", "currency"],
+      "additionalProperties": false
+    },
+    "SellingOptionResponse": {
+      "description": "One ranked market (spec §16, §30 SellingOptionResponse).",
+      "type": "object",
+      "properties": {
+        "rank": {
+          "description": "Position 1..N under decisionBasis.rankingMethod. options[] is ordered by rank.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "market": { "$ref": "common.schema.json#/$defs/MarketSummary" },
+        "distanceKm": { "$ref": "common.schema.json#/$defs/DistanceKm" },
+        "approximateMarketLocation": {
+          "description": "true when the market's coordinates are its district centroid (spec §16 is_approximate; ADR-0014), so the distance is coarser than usual. Every distance is approximate in any case (spec §47 Q6).",
+          "type": "boolean"
+        },
+        "price": {
+          "description": "The single observation this option was computed from, chosen by ADR-0010 (current-dataset precedence; exact variety and grade filter, otherwise the lower-median representative). A real, unmodified government-reported price with full provenance.",
+          "$ref": "price-observation.schema.json#/$defs/PriceQuote"
+        },
+        "estimates": { "$ref": "#/$defs/SellingEstimates" },
+        "trendDirection": {
+          "description": "Trend of this market and commodity (ADR-0025), on the variety- and grade-filtered daily series when a filter is set (ADR-0010 rules 3 and 7). Always INSUFFICIENT_DATA when price.reportDate is before today - 6, because the recent window is then empty.",
+          "$ref": "price-observation.schema.json#/$defs/TrendDirection"
+        },
+        "changePercent7Day": { "$ref": "price-observation.schema.json#/$defs/ChangePercent7Day" },
+        "reasonCodes": {
+          "description": "Reasons attached by the spec §16 rules, in the order of the ReasonCode enumeration. Possibly empty.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/ReasonCode" },
+          "uniqueItems": true,
+          "maxItems": 8
+        }
+      },
+      "required": ["rank", "market", "distanceKm", "approximateMarketLocation", "price", "estimates", "trendDirection", "changePercent7Day", "reasonCodes"],
+      "additionalProperties": false
+    },
+    "ExcludedMarket": {
+      "description": "A market inside the radius that was not ranked (ADR-0023 item 3). Excluded markets are never persisted.",
+      "type": "object",
+      "properties": {
+        "market": { "$ref": "common.schema.json#/$defs/MarketSummary" },
+        "distanceKm": { "$ref": "common.schema.json#/$defs/DistanceKm" },
+        "approximateMarketLocation": {
+          "description": "As in SellingOptionResponse.",
+          "type": "boolean"
+        },
+        "reason": { "$ref": "#/$defs/ExclusionReason" }
+      },
+      "required": ["market", "distanceKm", "approximateMarketLocation", "reason"],
+      "additionalProperties": false
+    },
+    "MarketComparisonResponse": {
+      "description": "Ranked, explained comparison of the markets within the radius (spec §16 RESPOND, §30). With options it identifies the price-only winner and the net-realization winner; with no eligible option it is still a 200 response with an empty options array (spec §29; ADR-0023). Spec §16 names `commodityName`: it is `commodity.name` here, because reference names are returned as name, nameHi and nameMr (ADR-0022 item 11).",
+      "type": "object",
+      "properties": {
+        "recommendationId": {
+          "description": "COMPARISON: identifier of the recorded run (spec §16). SIMULATION: the identifier of the run that was simulated; no new run is created.",
+          "$ref": "common.schema.json#/$defs/Uuid"
+        },
+        "generatedAt": {
+          "description": "When this result was computed.",
+          "$ref": "common.schema.json#/$defs/Timestamp"
+        },
+        "scenario": { "$ref": "#/$defs/Scenario" },
+        "commodity": { "$ref": "common.schema.json#/$defs/CommodityRef" },
+        "variety": {
+          "description": "The variety filter applied, or null.",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/VarietyRef" },
+            { "type": "null" }
+          ]
+        },
+        "grade": {
+          "description": "The grade filter applied, or null.",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/GradeRef" },
+            { "type": "null" }
+          ]
+        },
+        "priceUnit": {
+          "description": "Unit of every price in this response. Always 'Rs./Quintal': comparison accepts no other unit, and other units are rejected with 422 UNSUPPORTED_PRICE_UNIT (ADR-0008).",
+          "$ref": "price-observation.schema.json#/$defs/PriceUnit",
+          "const": "Rs./Quintal"
+        },
+        "quantity": {
+          "description": "The quantity used, in quantityUnit: the request value, or, when a simulation supplied a quantity override, that override in KG.",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-agrinex-max-decimal-places": 3
+        },
+        "quantityUnit": { "$ref": "common.schema.json#/$defs/QuantityUnit" },
+        "quantityInQuintal": {
+          "description": "quantity converted to quintals (spec §32: KG / 100). Exact; at most 5 decimal places.",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-agrinex-max-decimal-places": 5
+        },
+        "origin": {
+          "description": "The origin district centroid used.",
+          "$ref": "common.schema.json#/$defs/GeoPoint"
+        },
+        "maxDistanceKm": {
+          "description": "The search radius used, in whole kilometres.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "transportAssumptions": { "$ref": "#/$defs/TransportAssumptionsApplied" },
+        "decisionBasis": { "$ref": "#/$defs/DecisionBasis" },
+        "priceOnlyWinnerId": {
+          "description": "Market with the highest modal price among options; ties go to the higher estimated net realization, then the shorter distance, then the first market name in code-point order, then market id (ADR-0023 item 2). null when options is empty.",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/Uuid" },
+            { "type": "null" }
+          ]
+        },
+        "netRealizationWinnerId": {
+          "description": "The rank-1 option's market (spec §16 'rank 1 by composite score'; ADR-0023 item 2). In a SIMULATION, rank 1 by estimated net realization (ADR-0026 item 2). null when options is empty.",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/Uuid" },
+            { "type": "null" }
+          ]
+        },
+        "rankingsDisagree": {
+          "description": "true exactly when priceOnlyWinnerId and netRealizationWinnerId differ (spec §16, F1.13). Drives the WinnerCalloutBanner.",
+          "type": "boolean"
+        },
+        "options": {
+          "description": "Ranked options, ordered by rank.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/SellingOptionResponse" }
+        },
+        "excludedMarkets": {
+          "description": "Markets in range that were not ranked (ADR-0023 item 3), ordered by distanceKm, then market name (code-point order), then market id (contract-design order).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/ExcludedMarket" }
+        },
+        "noDataReason": {
+          "description": "NO_RECENT_PRICE_DATA exactly when options is empty (spec §29; ADR-0023); otherwise null.",
+          "anyOf": [
+            { "$ref": "price-observation.schema.json#/$defs/NoDataReason" },
+            { "type": "null" }
+          ]
+        },
+        "sourceStatus": { "$ref": "price-observation.schema.json#/$defs/SourceSyncStatus" }
+      },
+      "required": [
+        "recommendationId",
+        "generatedAt",
+        "scenario",
+        "commodity",
+        "variety",
+        "grade",
+        "priceUnit",
+        "quantity",
+        "quantityUnit",
+        "quantityInQuintal",
+        "origin",
+        "maxDistanceKm",
+        "transportAssumptions",
+        "decisionBasis",
+        "priceOnlyWinnerId",
+        "netRealizationWinnerId",
+        "rankingsDisagree",
+        "options",
+        "excludedMarkets",
+        "noDataReason",
+        "sourceStatus"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "options": { "maxItems": 0 } }, "required": ["options"] },
+          "then": {
+            "properties": {
+              "priceOnlyWinnerId": { "type": "null" },
+              "netRealizationWinnerId": { "type": "null" },
+              "rankingsDisagree": { "const": false },
+              "noDataReason": { "const": "NO_RECENT_PRICE_DATA" },
+              "excludedMarkets": { "minItems": 1 }
+            }
+          },
+          "else": {
+            "properties": {
+              "priceOnlyWinnerId": { "type": "string" },
+              "netRealizationWinnerId": { "type": "string" },
+              "noDataReason": { "type": "null" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "scenario": { "properties": { "userOverrides": { "type": "object", "required": ["quantity"] } }, "required": ["userOverrides"] } }, "required": ["scenario"] },
+          "then": { "properties": { "quantityUnit": { "const": "KG" } } }
+        },
+        {
+          "if": { "properties": { "scenario": { "properties": { "kind": { "const": "COMPARISON" } }, "required": ["kind"] } }, "required": ["scenario"] },
+          "then": { "properties": { "decisionBasis": { "properties": { "rankingMethod": { "const": "DETERMINISTIC_COMPOSITE_SCORE" } } } } }
+        },
+        {
+          "if": { "properties": { "scenario": { "properties": { "kind": { "const": "SIMULATION" } }, "required": ["kind"] } }, "required": ["scenario"] },
+          "then": { "properties": { "decisionBasis": { "properties": { "rankingMethod": { "const": "NET_REALIZATION" } } } } }
+        }
+      ]
+    }
+  }
+}

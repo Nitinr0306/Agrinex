@@ -1,0 +1,45 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "compareSellingOptions",
+  "scenario": "More than 60 compare or simulate requests in one minute from this IP (spec §28; ADR-0017).",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/selling-options/compare",
+    "body": {
+      "commodityId": "00000000-0000-4000-8000-000000000401",
+      "quantity": 500,
+      "quantityUnit": "KG",
+      "originLat": 20.104532,
+      "originLon": 73.918274,
+      "maxDistanceKm": 150
+    }
+  },
+  "response": {
+    "status": 429,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0023",
+      "Content-Type": "application/problem+json",
+      "Retry-After": "37"
+    },
+    "body": {
+      "type": "/problems/rate-limited",
+      "title": "Too many requests",
+      "status": 429,
+      "detail": "Try again in 37 seconds.",
+      "code": "RATE_LIMITED",
+      "correlationId": "mock-correlation-0023",
+      "errors": [],
+      "instance": "/api/v1/selling-options/compare"
+    }
+  }
+}

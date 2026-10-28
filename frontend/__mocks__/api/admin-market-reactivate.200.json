@@ -1,0 +1,46 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "reactivateMarket",
+  "scenario": "Returning the market to comparisons.",
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/admin/markets/00000000-0000-4000-8000-000000000705/reactivate",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0067",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "id": "00000000-0000-4000-8000-000000000705",
+      "name": "TEST Market E",
+      "slug": "test-market-e",
+      "district": {
+        "id": "00000000-0000-4000-8000-000000000202",
+        "name": "Test District South"
+      },
+      "state": {
+        "id": "00000000-0000-4000-8000-000000000101",
+        "code": "IN-MH",
+        "name": "Maharashtra",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "reviewStatus": "VERIFIED",
+      "active": true,
+      "mergedIntoMarketId": null,
+      "coordinates": {
+        "lat": 19.204411,
+        "lon": 74.73312,
+        "approximate": false,
+        "source": "DMI National Agriculture Market Atlas (synthetic example)"
+      },
+      "createdAt": "2026-09-01T06:00:00Z"
+    }
+  }
+}

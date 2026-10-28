@@ -1,0 +1,12 @@
+# Build context of the frontend image. Never send installed modules, build output, test reports or environment
+# files (ADR-0020 item 4; spec §47 Q21).
+node_modules/
+.next/
+test-results/
+playwright-report/
+coverage/
+tsconfig.tsbuildinfo
+.env
+.env.*
+*.env
+*.log

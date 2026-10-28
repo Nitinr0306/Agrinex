@@ -1,0 +1,101 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getMarketTrend",
+  "scenario": "Only 2 daily values in the last 14 days: INSUFFICIENT_DATA and a null change; the UI shows \"Insufficient historical data\" (spec §33).",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/markets/00000000-0000-4000-8000-000000000703/trends?commodityId=00000000-0000-4000-8000-000000000402&days=7"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0033",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "market": {
+        "id": "00000000-0000-4000-8000-000000000703",
+        "name": "TEST Market C"
+      },
+      "commodity": {
+        "id": "00000000-0000-4000-8000-000000000402",
+        "name": "Tomato",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "variety": null,
+      "grade": null,
+      "priceUnit": "Rs./Quintal",
+      "days": 7,
+      "window": {
+        "chartFrom": "2026-09-27",
+        "chartTo": "2026-10-03",
+        "recentFrom": "2026-09-27",
+        "recentTo": "2026-10-03",
+        "baselineFrom": "2026-09-20",
+        "baselineTo": "2026-09-26"
+      },
+      "trendDirection": "INSUFFICIENT_DATA",
+      "changePercent7Day": null,
+      "observations": [
+        {
+          "observationId": "00000000-0000-4000-8000-000000000812",
+          "reportDate": "2026-10-01",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000503",
+            "name": "Local"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 1600,
+          "maxPrice": 1900,
+          "modalPrice": 1750,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "CURRENT_PRICE",
+          "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+          "ingestedAt": "2026-10-01T00:32:05Z",
+          "freshnessStatus": "RECENT",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        },
+        {
+          "observationId": "00000000-0000-4000-8000-000000000813",
+          "reportDate": "2026-10-02",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000503",
+            "name": "Local"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 1650,
+          "maxPrice": 1950,
+          "modalPrice": 1790,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "CURRENT_PRICE",
+          "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+          "ingestedAt": "2026-10-02T00:32:05Z",
+          "freshnessStatus": "FRESH",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        }
+      ],
+      "sourceStatus": {
+        "sourceDataset": "CURRENT_PRICE",
+        "lastSuccessfulSyncAt": "2026-10-03T00:32:40Z",
+        "latestSyncFailed": false
+      }
+    }
+  }
+}

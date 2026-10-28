@@ -1,0 +1,4531 @@
+openapi: 3.1.0
+info:
+  title: AgriNex API
+  version: 1.1.0
+  summary: REST contract between the AgriNex frontend, backend and QA (Phase 1).
+  description: |
+    Authoritative, hand-authored REST contract of AgriNex Phase 1 (spec P5, §41; ADR-0022; departure D-11).
+    Code conforms to this document. A document generated from code is a build artifact used only to
+    detect drift; it never overwrites this file.
+
+    **Companion contract files** (same directory, referenced with `$ref`):
+    `common.schema.json`, `price-observation.schema.json`, `recommendation.schema.json`,
+    `error-response.schema.json`, `forecast-output.schema.json` (optional ML).
+    Explanations: `docs/api/` (start at `docs/api/API_INDEX.md`).
+
+    **Versioning.** The path carries the major version (`/api/v1`). `info.version` follows semantic
+    versioning: additive changes raise the minor version, breaking changes the major version
+    (ADR-0022 item 2). Changes follow the Shared Contract Change Rule (spec §41), and the mocks in
+    `frontend/__mocks__/api/` change in the same change. Compatibility rules:
+    `docs/api/API_CONVENTIONS.md` §2.
+
+    **Conventions** (ADR-0022; `docs/api/API_CONVENTIONS.md`):
+    - JSON bodies (`application/json`); errors are RFC 9457 `application/problem+json`
+      (`ApiErrorResponse`), never with stack traces (spec §10, §28).
+    - IDs are UUID strings; dates `yyyy-MM-dd` (Asia/Kolkata calendar, ADR-0007); instants RFC 3339,
+      emitted in UTC.
+    - Prices carry their verified unit (`priceUnit`, for example `Rs./Quintal`) and are never converted
+      (ADR-0008). Computed amounts are ESTIMATED INR totals rounded half-up to 2 decimal places.
+    - Every object that carries a price includes its observation ID, report date, freshness, dataset,
+      variety, grade, unit and the spec §31 RULE 7 attribution. Responses that serve price data also carry
+      `sourceStatus`, which drives the spec §29 synchronization banner (ADR-0022 item 9).
+    - Lists are wrapped in an object with `items`. Paged lists take `page` (zero-based) and `size`
+      (default 20, maximum 100) and return `PageMetadata` (ADR-0022 item 5).
+    - Request bodies are closed: unknown properties are rejected. Clients must ignore unknown response
+      properties and handle unknown values of enumerations marked `x-agrinex-extensible`.
+    - Every response carries `X-Correlation-Id`.
+
+    **Security.** JWT Bearer access tokens (15 minutes) and a rotating refresh token in an `HttpOnly`,
+    `Secure`, `SameSite=Strict` cookie scoped to `/api/v1/auth` (spec §28; ADR-0016, ADR-0017). Each
+    operation declares its `security` and its permitted roles (`x-agrinex-roles`). Only operations whose
+    `security` lists `bearerAuth` evaluate an `Authorization` header. There a missing (where required), invalid
+    or expired token, or a token whose account is inactive or no longer exists, answers 401; every such
+    operation resolves the caller's account (ADR-0042). Every other operation ignores the header. The refresh
+    cookie is `__Secure-agrinex_refresh` (ADR-0042). Frontend and API share one origin; the refresh and logout
+    operations also require a matching `Origin` header (ADR-0017). Email verification and password recovery use
+    single-use, time-limited links sent to the account's email, and their operations never reveal whether an
+    account exists (ADR-0047, ADR-0048). Security-sensitive: changes need explicit human review (CLAUDE.md
+    rule 16).
+
+    **Scope.** Phase 1 only. Phase 2 path groups (`/api/v1/listings`, `/bids`, `/transactions`,
+    `/ratings`, spec §30) are not defined until RD-012 and RD-025 are resolved after the Phase 1 freeze
+    (HARD RULE 1; ADR-0032). The forecast operation belongs to the optional ML track
+    (`x-agrinex-phase: OPTIONAL_ML`, ADR-0030): AgriNex works completely without it, and no other
+    operation depends on ML (spec P9, §35).
+
+    **Data honesty.** All prices are government-reported observations from data.gov.in (DMI), stored by
+    AgriNex. Nothing is fabricated, interpolated, averaged into a displayed price or relabelled as current
+    (spec P10, §31; ADR-0005, ADR-0010). Prices are "latest reported", never "real-time" (spec §31 RULE 4).
+  x-agrinex-contract-files:
+    common.schema.json: 1.0.0
+    price-observation.schema.json: 1.0.0
+    recommendation.schema.json: 1.0.0
+    error-response.schema.json: 1.0.0
+    forecast-output.schema.json: 1.0.0
+servers:
+  - url: /
+    description: >-
+      Same origin. Nginx routes /api/v1/ to the backend and every other path to the frontend; /actuator/
+      is not public (ADR-0017).
+tags:
+  - name: Auth
+    description: >-
+      Registration, login, token refresh, logout, email verification and password recovery (auth module; spec
+      §10, §30; ADR-0016, ADR-0017, ADR-0047, ADR-0048).
+  - name: Geography
+    description: State, district and locality reference data for the location wizard (geography module; F1.3).
+  - name: Commodities
+    description: Commodities, varieties and grades for the comparison wizard (commodity module; F1.4).
+  - name: Markets
+    description: Market detail, latest reported prices, trends and the optional forecast (price module; §30, §33).
+  - name: Selling options
+    description: Transport-aware market comparison and What-If simulation (recommendation module; §16, §17).
+  - name: Alerts
+    description: Farmer price alerts and their in-app events (alert module; §34; ADR-0019).
+  - name: Admin - System
+    description: Read-only system status for administrators (admin module; ADR-0020).
+  - name: Admin - Ingestion
+    description: Ingestion health, run history, errors, manual trigger, pause and resume (admin module; FR-18; ADR-0011, ADR-0020).
+  - name: Admin - Configuration
+    description: Versioned transport assumptions and recommendation weights (admin module; §30, §32; ADR-0020).
+  - name: Admin - Curation
+    description: Market, commodity and district-alias curation with evidence (admin module; ADR-0014, ADR-0020).
+paths:
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      operationId: registerFarmer
+      summary: Quick registration of a farmer with a mobile number and an email address
+      description: |
+        Creates a FARMER account and signs the farmer in (spec §25 "Quick phone registration (lightweight)";
+        ADR-0016 item 3, amended by ADR-0047: an email address is also required, departure D-15). There is no SMS
+        or OTP in Phase 1 (spec §39). The response sets the refresh-token cookie. The new account's email is
+        unverified; a verification link is sent to it after the response (ADR-0048), and a verified email is what
+        password recovery uses. ADMIN accounts are provisioned, never self-registered (ADR-0028); BUYER
+        registration is Phase 2 (ADR-0032).
+        Without OTP (spec §39; ADR-0016) the 409 response necessarily reveals that a number or an email is
+        registered; the register rate limit bounds such probing (ADR-0017). This residual risk is accepted for
+        Phase 1 and is revisited when Phase 2 brings OTP (ADR-0042, SR-01; extended to email by ADR-0048). A number
+        or email claimed by someone else is freed by the operator erasure procedure (ADR-0037).
+      x-agrinex-module: auth
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-rate-limit: 10 requests per minute per client IP (ADR-0017)
+      x-agrinex-trace: [spec §10, spec §25, spec §28, ADR-0016, ADR-0017, ADR-0047, ADR-0048]
+      security:
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Account created and signed in.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+            Set-Cookie:
+              $ref: '#/components/headers/Set-Cookie-Refresh'
+            Cache-Control:
+              $ref: '#/components/headers/Cache-Control-NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: >-
+            CONFLICT. The mobile number or the email address is already registered; errors[] names phoneNumber
+            or email (or both) with code ALREADY_EXISTS.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+        '422':
+          $ref: '#/components/responses/ReferenceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Sign in with one identifier and a password
+      description: |
+        Signs in with one `identifier` and the account's single password (ADR-0016 items 2 and 3; ADR-0047):
+        a FARMER uses the mobile number or the email address of the same account, and an ADMIN uses the email
+        address. The response sets the refresh-token cookie and returns a 15-minute access token. Wrong credentials, unknown identifiers and inactive accounts all answer 401
+        INVALID_CREDENTIALS, so the response does not reveal whether an account exists. To keep that true:
+        - the failed-login limit (10 per identifier per 15 minutes, ADR-0017) counts the normalized identifier
+          (trimmed; email in lower case; phone in E.164) and counts unknown identifiers exactly like known ones;
+          the mobile number and the email of one account are counted separately, so a response never reveals that
+          the two belong together (ADR-0048);
+        - while an identifier is over the limit, every login for it answers 429, even with the correct password;
+        - an unknown identifier still costs one BCrypt verification, so timing does not reveal existence;
+        - a password longer than 72 bytes in UTF-8 answers 400 VALIDATION_FAILED (TOO_LONG); it is never
+          truncated (ADR-0016 item 3).
+      x-agrinex-module: auth
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-rate-limit: 10 requests per minute per client IP; 10 failed logins per identifier per 15 minutes (ADR-0017)
+      x-agrinex-trace: [spec §10, spec §28, ADR-0016, ADR-0017, ADR-0047]
+      security:
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Signed in.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+            Set-Cookie:
+              $ref: '#/components/headers/Set-Cookie-Refresh'
+            Cache-Control:
+              $ref: '#/components/headers/Cache-Control-NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: INVALID_CREDENTIALS.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+            WWW-Authenticate:
+              $ref: '#/components/headers/WWW-Authenticate'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/InvalidCredentialsError'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/auth/refresh:
+    post:
+      tags: [Auth]
+      operationId: refreshSession
+      summary: Rotate the refresh token and issue a new access token
+      description: |
+        Exchanges the refresh-token cookie for a new access token and a rotated refresh token in the same
+        token family (ADR-0016 item 5). The request has no body. A missing, unknown, expired or revoked
+        token answers 401 REFRESH_TOKEN_INVALID; presenting a revoked token also revokes its whole family
+        (RFC 9700 §4.14.2). A token of an account that is inactive (spec §20 is_active) or no longer exists
+        answers the same 401 and its family is revoked, so a deactivated account cannot extend its session.
+        The client must then sign in again and must never retry the refresh.
+        The `Origin` header must equal the public origin (ADR-0017 item 3). Clients serialize refresh calls
+        so that parallel tabs do not trigger reuse detection.
+        A 429 is not a sign-out: the request was rejected before its token was processed, so the client waits
+        `Retry-After` seconds and retries once (ADR-0042, SR-14).
+      x-agrinex-module: auth
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-rate-limit: 10 requests per minute per client IP (ADR-0017)
+      x-agrinex-trace: [spec §10, spec §27, spec §28, spec §29, ADR-0016, ADR-0017]
+      security:
+        - refreshCookie: []
+      parameters:
+        - $ref: '#/components/parameters/OriginHeader'
+      responses:
+        '200':
+          description: Session refreshed.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+            Set-Cookie:
+              $ref: '#/components/headers/Set-Cookie-Refresh'
+            Cache-Control:
+              $ref: '#/components/headers/Cache-Control-NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: REFRESH_TOKEN_INVALID. The response also clears the refresh-token cookie.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+            WWW-Authenticate:
+              $ref: '#/components/headers/WWW-Authenticate'
+            Set-Cookie:
+              $ref: '#/components/headers/Set-Cookie-Clear'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenInvalidError'
+        '403':
+          $ref: '#/components/responses/OriginNotAllowed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      summary: Sign out and revoke the refresh-token family
+      description: |
+        Revokes the token family of the presented refresh-token cookie and clears the cookie (ADR-0016
+        item 5). Idempotent: without a valid cookie it still answers 204. The `Origin` header must equal the
+        public origin (ADR-0017). The client discards its in-memory access token, which expires within
+        15 minutes.
+      x-agrinex-module: auth
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §10, ADR-0016, ADR-0017]
+      security:
+        - refreshCookie: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/OriginHeader'
+      responses:
+        '204':
+          description: Signed out.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+            Set-Cookie:
+              $ref: '#/components/headers/Set-Cookie-Clear'
+        '403':
+          $ref: '#/components/responses/OriginNotAllowed'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/auth/password-reset/request:
+    post:
+      tags: [Auth]
+      operationId: requestPasswordReset
+      summary: Ask for a password-reset link by email
+      description: |
+        Starts password recovery (ADR-0047). The `identifier` is the account's mobile number or email address,
+        normalized like login's. The answer is always 202 with no body, whether or not an account exists, so the
+        response never reveals an account (ADR-0048):
+        - a reset link is sent only when the identifier belongs to an active account whose email is verified. It
+          goes to that verified email, never to an address taken from the request;
+        - the link carries a single-use token of 256 random bits, valid for 30 minutes. Only its SHA-256 hash is
+          stored, and a new request replaces any earlier link of the account;
+        - the email is sent after the response is returned, so the response time does not depend on whether a
+          link was sent;
+        - the per-identifier limit counts the normalized identifier and counts unknown identifiers exactly like
+          known ones; while an identifier is over it, every request for it answers 429.
+        No SMS or OTP is used (spec §39; ADR-0047).
+      x-agrinex-module: auth
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-rate-limit: 10 requests per minute per client IP; 3 requests per identifier per hour (ADR-0048)
+      x-agrinex-trace: [spec §28, spec §39, ADR-0016, ADR-0017, ADR-0047, ADR-0048]
+      security:
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        '202':
+          description: >-
+            Accepted. If an active account with a verified email matches the identifier, a reset link is on its way
+            to that email. The response is the same when nothing matches.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/auth/password-reset/confirm:
+    post:
+      tags: [Auth]
+      operationId: confirmPasswordReset
+      summary: Set a new password with the token from a reset link
+      description: |
+        Completes password recovery (ADR-0047, ADR-0048). The `token` comes from the reset link sent to the
+        account's verified email. On success, in one transaction:
+        - the password is replaced (BCrypt, ADR-0016) and the token is spent;
+        - every refresh-token family of the account is revoked, so every session must sign in again.
+
+        The response clears the refresh-token cookie, and a "password changed" notice is sent to the verified
+        email afterwards. The user is not signed in by this operation: they sign in with the new password.
+        An unknown, expired, spent or replaced token, or a token of an account that is no longer active, answers
+        422 PASSWORD_RESET_TOKEN_INVALID.
+        `newPassword` follows the account's rule (ADR-0016 item 3): 8 to 64 characters for FARMER, 15 to 64 for
+        ADMIN, never more than 72 bytes in UTF-8 and never truncated. Below the ADMIN minimum it answers 400
+        VALIDATION_FAILED with TOO_SHORT on `newPassword`.
+      x-agrinex-module: auth
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-rate-limit: 10 requests per minute per client IP (ADR-0048)
+      x-agrinex-trace: [spec §28, ADR-0016, ADR-0017, ADR-0047, ADR-0048]
+      security:
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+      responses:
+        '204':
+          description: Password changed. Every session of the account is signed out.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+            Set-Cookie:
+              $ref: '#/components/headers/Set-Cookie-Clear'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          description: >-
+            PASSWORD_RESET_TOKEN_INVALID. The token is unknown, expired, spent or replaced, or its account is no
+            longer active. The client offers to request a new link.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetTokenInvalidError'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/auth/email-verification/confirm:
+    post:
+      tags: [Auth]
+      operationId: confirmEmailVerification
+      summary: Confirm the account's email with the token from a verification link
+      description: |
+        Marks the account's email address as verified (ADR-0047, ADR-0048). The `token` comes from the
+        verification link sent after registration or on request. It holds 256 random bits, is valid for 24 hours
+        and is single-use; only its SHA-256 hash is stored. No sign-in is needed, so the link works on any device.
+        Password recovery sends reset links only to a verified email. An unknown, expired, spent or replaced
+        token, or a token of an account that is no longer active, answers 422 EMAIL_VERIFICATION_TOKEN_INVALID;
+        once an email is verified, its links are spent.
+      x-agrinex-module: auth
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-rate-limit: 10 requests per minute per client IP (ADR-0048)
+      x-agrinex-trace: [spec §28, ADR-0047, ADR-0048]
+      security:
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailVerificationConfirmRequest'
+      responses:
+        '204':
+          description: The email address is verified.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          description: >-
+            EMAIL_VERIFICATION_TOKEN_INVALID. The token is unknown, expired, spent or replaced, or its account is no
+            longer active. A signed-in user can ask for a new link (resendEmailVerification).
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/EmailVerificationTokenInvalidError'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/auth/email-verification/resend:
+    post:
+      tags: [Auth]
+      operationId: resendEmailVerification
+      summary: Send a new verification link to the signed-in account's email
+      description: |
+        Sends a new verification link to the caller's own email address while it is not verified, replacing any
+        earlier link (ADR-0048). The request has no body. The answer is 202 with no body; when the email is
+        already verified, nothing is sent. `AuthenticatedUser.emailVerified` tells the client whether to offer
+        this action.
+      x-agrinex-module: auth
+      x-agrinex-roles: [FARMER, ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-rate-limit: 10 requests per minute per client IP; 3 requests per account per hour (ADR-0048)
+      x-agrinex-trace: [spec §28, ADR-0047, ADR-0048]
+      security:
+        - bearerAuth: []
+      responses:
+        '202':
+          description: Accepted. A new link is on its way when the email is not yet verified.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/geography/states:
+    get:
+      tags: [Geography]
+      operationId: listStates
+      summary: List states
+      description: >-
+        States offered in the location wizard, ordered by name (code-point order, then id) (F1.3; spec §30 StateResponse). Phase 1 holds
+        Maharashtra only (ADR-0006). Not paginated (ADR-0022 item 5).
+      x-agrinex-module: geography
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec F1.3, spec §30, ADR-0006, ADR-0015, ADR-0022]
+      security:
+        - {}
+      responses:
+        '200':
+          description: The states.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StateListResponse'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/geography/states/{stateId}/districts:
+    get:
+      tags: [Geography]
+      operationId: listDistricts
+      summary: List the districts of a state
+      description: >-
+        Districts of the state, ordered by name (code-point order, then id), each with the centroid the frontend sends as the comparison
+        origin (spec §21 step 3, FR-06; ADR-0014). Names follow the Local Government Directory. Not
+        paginated.
+      x-agrinex-module: geography
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec F1.3, spec FR-06, spec §21, spec §30, ADR-0014]
+      security:
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/StateIdPath'
+      responses:
+        '200':
+          description: The districts; an empty items array when the state has none.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistrictListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/geography/districts/{districtId}/localities:
+    get:
+      tags: [Geography]
+      operationId: listLocalities
+      summary: List the localities of a district
+      description: >-
+        Localities (LGD sub-districts, talukas) of the district, ordered by name (code-point order, then id) (F1.3; ADR-0014). The
+        locality never changes the comparison origin, which is always the district centroid (ADR-0014 item 1),
+        so localities carry no coordinates. Not paginated.
+      x-agrinex-module: geography
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec F1.3, spec §25, spec §30, ADR-0014]
+      security:
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/DistrictIdPath'
+      responses:
+        '200':
+          description: The localities; an empty items array when the district has none.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalityListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/commodities:
+    get:
+      tags: [Commodities]
+      operationId: listCommodities
+      summary: List the commodities offered in the comparison wizard
+      description: |
+        The commodity selector lists the commodities that have recent observations in coverage, not the whole
+        known list of 605 (ADR-0006 consequences). A commodity is listed when at least one stored observation
+        of it, dated within the active stale window (today minus staleDays to today, Asia/Kolkata), exists at
+        a VERIFIED, active market with coordinates; that is, when a comparison can currently find data for it
+        (ADR-0010, ADR-0014). Ordered by name (code-point order, then id). Not paginated.
+        The commodity module obtains this filter through the read-only availability port that the price
+        module implements (ADR-0035).
+      x-agrinex-module: commodity
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec F1.4, spec §25, spec §30, ADR-0006, ADR-0008, ADR-0015, ADR-0035]
+      security:
+        - {}
+      responses:
+        '200':
+          description: The commodities; an empty items array when no commodity has recent observations.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommodityListResponse'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/commodities/{commodityId}/varieties:
+    get:
+      tags: [Commodities]
+      operationId: listVarieties
+      summary: List the varieties of a commodity
+      description: >-
+        Every variety registered for the commodity, exactly as the source reports it, ordered by name (code-point order, then id)
+        (F1.4; spec §30 VarietyResponse; ADR-0006). Not paginated.
+      x-agrinex-module: commodity
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec F1.4, spec §30, ADR-0006]
+      security:
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/CommodityIdPath'
+      responses:
+        '200':
+          description: The varieties.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VarietyListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/commodities/{commodityId}/grades:
+    get:
+      tags: [Commodities]
+      operationId: listGrades
+      summary: List the grades of a commodity
+      description: >-
+        Every grade registered for the commodity, exactly as the source reports it, ordered by name (code-point order, then id) (F1.4;
+        ADR-0006). Not paginated.
+      x-agrinex-module: commodity
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec F1.4, spec §20, ADR-0006]
+      security:
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/CommodityIdPath'
+      responses:
+        '200':
+          description: The grades.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GradeListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/markets/{marketId}:
+    get:
+      tags: [Markets]
+      operationId: getMarketDetail
+      summary: Market detail with its latest reported prices
+      description: |
+        Detail of one VERIFIED market and its freshest available prices (spec §10, §30 MarketDetailResponse).
+        PROVISIONAL and MERGED markets answer 404 (ADR-0014). For each commodity, the price is the
+        observation chosen by ADR-0010 within the active stale window: the latest qualifying report date,
+        current-dataset precedence, exact variety and grade when given, otherwise the lower-median
+        representative. Prices keep their own unit; this operation does not require 'Rs./Quintal'.
+        During a source outage the stored observations are served with their true dates and freshness, and
+        `sourceStatus.latestSyncFailed` is true (ADR-0005).
+      x-agrinex-module: price
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §10, spec §29, spec §30, spec §31, ADR-0005, ADR-0010, ADR-0014, ADR-0022]
+      security:
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/MarketIdPath'
+        - $ref: '#/components/parameters/CommodityIdQueryOptional'
+        - $ref: '#/components/parameters/VarietyIdQuery'
+        - $ref: '#/components/parameters/GradeIdQuery'
+      responses:
+        '200':
+          description: >-
+            The market. latestPrices is empty, with noDataReason NO_RECENT_PRICE_DATA, when nothing qualifies.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketDetailResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ReferenceNotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/markets/{marketId}/trends:
+    get:
+      tags: [Markets]
+      operationId: getMarketTrend
+      summary: Historical trend of a commodity at a market
+      description: |
+        Daily series and trend statistic of one commodity at one VERIFIED market (spec §21 steps 29-33, §33;
+        F1.15; ADR-0025). `observations` holds one selected real observation per date with data inside the chart
+        window (ADR-0010 rule 7); dates without data are absent, never interpolated. With a variety or grade
+        filter the series is the filtered one (ADR-0010 rules 3 and 7). The trend direction and the 7-day change
+        are the same for both chart windows; `days` changes only the chart window.
+        No data at all is a 200 response with empty `observations` and INSUFFICIENT_DATA (spec §33).
+      x-agrinex-module: price
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec F1.15, spec FR-14, spec §21, spec §33, ADR-0010, ADR-0025]
+      security:
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/MarketIdPath'
+        - $ref: '#/components/parameters/CommodityIdQueryRequired'
+        - $ref: '#/components/parameters/TrendDays'
+        - $ref: '#/components/parameters/VarietyIdQuery'
+        - $ref: '#/components/parameters/GradeIdQuery'
+      responses:
+        '200':
+          description: The trend.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrendResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ReferenceNotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/markets/{marketId}/forecast:
+    get:
+      tags: [Markets]
+      operationId: getMarketForecast
+      summary: Optional ML price forecast for a commodity at a market
+      description: |
+        OPTIONAL ML track (spec §35; ADR-0030). Implemented only when the ML track starts, after the
+        deterministic engine works end to end (HARD RULE 2); until then the frontend shows no forecast
+        section and does not call it.
+        Once implemented, it reads stored forecasts only and never calls the ML service. It answers 200 with
+        `available: false` and empty `forecasts` whenever no forecast dated today or later exists, including
+        when the ML job has failed, is stopped or was removed. ML problems never produce a 5xx response
+        (spec §29, §35). Forecasts are model predictions, never government-reported prices, and nothing in
+        this response affects comparison, ranking or alerts (ADR-0030).
+      x-agrinex-module: price
+      x-agrinex-roles: []
+      x-agrinex-phase: OPTIONAL_ML
+      x-agrinex-trace: [spec §29, spec §35, ADR-0029, ADR-0030]
+      security:
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/MarketIdPath'
+        - $ref: '#/components/parameters/CommodityIdQueryRequired'
+      responses:
+        '200':
+          description: The forecast, or available false.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForecastResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ReferenceNotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/selling-options/compare:
+    post:
+      tags: [Selling options]
+      operationId: compareSellingOptions
+      summary: Compare markets by estimated net realization
+      description: |
+        The hero flow (spec §16, §21; FR-06 to FR-13; ADR-0010, ADR-0023, ADR-0024). Anonymous callers are
+        allowed (F1.1, spec §28). With a valid FARMER or ADMIN access token the recorded search is linked to
+        the caller's farmer profile, when one exists; the response is the same. A sent token is resolved to its
+        account: an inactive or removed account answers 401 UNAUTHORIZED (ADR-0042, SR-04).
+        The origin must be the stored centroid of a district, exactly as `listDistricts` publishes it (6 decimal
+        places); any other coordinates answer 400 VALIDATION_FAILED with INVALID_VALUE on `originLat` and
+        `originLon`, and nothing is recorded (spec §28; ADR-0039).
+        Outcomes:
+        - 200 with ranked `options`, winners and reason codes;
+        - 200 with empty `options`, `noDataReason: NO_RECENT_PRICE_DATA` and `excludedMarkets` when markets
+          are in range but none has a recent observation (spec §29; ADR-0023);
+        - 422 NO_MARKETS_IN_RANGE when no VERIFIED, active market with coordinates lies within
+          maxDistanceKm (spec §16);
+        - 422 UNSUPPORTED_PRICE_UNIT when the commodity's verified unit is not 'Rs./Quintal' (ADR-0008);
+        - 422 ESTIMATE_OUT_OF_RANGE when an estimate of any option would exceed the stored precision
+          (absolute value above 999999999999.99 INR); nothing is recorded, and no quantity limit applies
+          (ADR-0023 item 1; ADR-0040).
+        Every 200 result is recorded as a recommendation run, including zero-option results (ADR-0023 item 4).
+        Only stored data is used; the government API is never called on this path (spec §31 RULE 1).
+      x-agrinex-module: recommendation
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-rate-limit: 60 requests per minute per client IP, shared with simulate (spec §28; ADR-0017)
+      x-agrinex-trace: [spec §16, spec §21, spec §28, spec §29, spec §30, spec §32, ADR-0010, ADR-0022, ADR-0023, ADR-0024, ADR-0025, ADR-0026, ADR-0039, ADR-0040, ADR-0042]
+      security:
+        - {}
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './recommendation.schema.json#/$defs/CompareRequest'
+      responses:
+        '200':
+          description: The comparison.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketComparisonResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/CompareUnprocessable'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/selling-options/simulate:
+    post:
+      tags: [Selling options]
+      operationId: simulateSellingOptions
+      summary: Server-side What-If simulation
+      description: |
+        Re-runs a comparison with hypothetical overrides (spec §17; ADR-0026). The client calls it only when
+        the maximum distance is raised above the original radius; every other What-If change is recalculated
+        in the browser with the spec §32 formula and the comparison response's transportAssumptions (spec §10;
+        ADR-0026 items 1 and 3; departure D-13). The server uses the original run's weights and
+        transport-assumption versions, selects observations again at simulation time (ADR-0010), ranks by
+        estimated net realization and persists nothing (spec §32 "session-only"). The response is a
+        MarketComparisonResponse with `scenario.kind: SIMULATION` and the overrides in `scenario.userOverrides`.
+        Overrides never alter an observed price, but re-selection can show newer observations than the original
+        comparison; the client then uses this response as its new base.
+        The client sends only the values the user changed: an omitted value keeps the original, so an original
+        quantity outside the simulator range (spec §17) is never sent as an override.
+        The recommendationId is an unguessable identifier returned only to the caller of the comparison; whoever
+        holds it can simulate that run and sees its origin district centroid and quantity. Because the origin is
+        always a validated district centroid (ADR-0039), this is accepted (ADR-0042, SR-02). A sent token is
+        resolved to its account; an inactive or removed account answers 401 UNAUTHORIZED (ADR-0042, SR-04).
+      x-agrinex-module: recommendation
+      x-agrinex-roles: []
+      x-agrinex-phase: '1'
+      x-agrinex-rate-limit: 60 requests per minute per client IP, shared with compare (spec §28; ADR-0017)
+      x-agrinex-trace: [spec §10, spec §17, spec §30, spec §32, ADR-0026]
+      security:
+        - {}
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './recommendation.schema.json#/$defs/SimulateRequest'
+      responses:
+        '200':
+          description: The simulation.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketComparisonResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ComparisonUnprocessable'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/alerts:
+    get:
+      tags: [Alerts]
+      operationId: listAlerts
+      summary: List the caller's price alerts
+      description: >-
+        The caller's own alerts (spec §34), most recently triggered first (never-triggered alerts last), then
+        by id ascending. Paginated.
+      x-agrinex-module: alert
+      x-agrinex-roles: [FARMER, ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §28, spec §30, spec §34, ADR-0016, ADR-0019, ADR-0022]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AlertStatusQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: A page of alerts.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    post:
+      tags: [Alerts]
+      operationId: createAlert
+      summary: Create a price alert
+      description: |
+        Creates an ACTIVE alert for a commodity and, optionally, one market (spec §25, §34). The commodity's
+        verified unit must be 'Rs./Quintal' (ADR-0008); a given market must be VERIFIED (ADR-0014).
+        Alerts are evaluated after each ingestion run that changes observations, only over VERIFIED, active
+        markets; INSUFFICIENT_DATA never triggers a percentage alert (ADR-0019). An ADMIN's alerts are owned
+        by a farmer profile created on first use (ADR-0016 item 6).
+      x-agrinex-module: alert
+      x-agrinex-roles: [FARMER, ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §25, spec §28, spec §34, ADR-0008, ADR-0014, ADR-0016, ADR-0019]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAlertRequest'
+      responses:
+        '201':
+          description: The created alert.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/AlertUnprocessable'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/alerts/{alertId}:
+    patch:
+      tags: [Alerts]
+      operationId: updateAlertStatus
+      summary: Pause or resume an alert
+      description: >-
+        Sets the alert to PAUSED (spec §34 "Farmer deactivates") or back to ACTIVE. Type, commodity, market
+        and threshold cannot change; create a new alert instead. Setting the current status again is a no-op
+        that returns the alert. Another user's alert answers 404.
+      x-agrinex-module: alert
+      x-agrinex-roles: [FARMER, ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §30, spec §34]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AlertIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAlertStatusRequest'
+      responses:
+        '200':
+          description: The updated alert.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    delete:
+      tags: [Alerts]
+      operationId: deleteAlert
+      summary: Delete an alert and its events
+      description: >-
+        Deletes the alert; its events are deleted with it (spec §34 lifecycle step 5). Another user's alert
+        answers 404.
+      x-agrinex-module: alert
+      x-agrinex-roles: [FARMER, ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §30, spec §34, ADR-0029]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AlertIdPath'
+      responses:
+        '204':
+          description: Deleted.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/alerts/events:
+    get:
+      tags: [Alerts]
+      operationId: listAlertEvents
+      summary: Poll the caller's alert events
+      description: |
+        In-app delivery by polling (spec §34; ADR-0019 item 5): the caller's events, newest first (triggeredAt descending, then id ascending).
+        `unreadOnly=true` returns only unread events, and its totalItems is the unread count. The frontend
+        polls when the page gains focus and while it is open. Events are kept for 180 days (ADR-0029).
+      x-agrinex-module: alert
+      x-agrinex-roles: [FARMER, ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §34, ADR-0019, ADR-0022, ADR-0029]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UnreadOnlyQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: A page of events.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertEventPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/alerts/events/{eventId}/read:
+    post:
+      tags: [Alerts]
+      operationId: markAlertEventRead
+      summary: Mark an alert event as read
+      description: >-
+        Records that the caller viewed or dismissed the event (ADR-0019 item 5). Idempotent: an event already
+        read keeps its first readAt. The alert stays ACTIVE and can trigger again after a later run (spec §34
+        lifecycle step 3). Another user's event answers 404. No request body and no response body; the next
+        poll of listAlertEvents returns the event with its readAt.
+      x-agrinex-module: alert
+      x-agrinex-roles: [FARMER, ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §34, ADR-0019]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EventIdPath'
+      responses:
+        '204':
+          description: The event is read.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/system/status:
+    get:
+      tags: [Admin - System]
+      operationId: getSystemStatus
+      summary: Read-only system status
+      description: |
+        What ADMIN may view but never change at runtime (ADR-0020 items 2 and 3): database and Redis health,
+        whether the government API key is configured (never its value), the configured schedule, coverage
+        states and source datasets. Changing any of these is a redeployment, and coverage or schedule changes
+        also need a decision entry.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §27, spec §28, ADR-0011, ADR-0018, ADR-0020]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: The status.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemStatusResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/ingestion/health:
+    get:
+      tags: [Admin - Ingestion]
+      operationId: getIngestionHealth
+      summary: Ingestion health per dataset
+      description: |
+        The admin data-health view (F1.20, FR-18, spec §30 IngestionHealthResponse, §46): per dataset the
+        schedule state, the running run, the latest completed run with its counters and completeness, the
+        last run that loaded data, the count of consecutive FAILED runs (the admin alert, ADR-0019 item 7) and
+        the newest stored report date; plus the freshness of the VERIFIED, active markets. Every count equals
+        the database exactly (spec §48).
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec F1.20, spec FR-18, spec §30, spec §46, spec §48, ADR-0011, ADR-0012, ADR-0019, ADR-0020]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: The health view.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestionHealthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/ingestion/historical-coverage:
+    get:
+      tags: [Admin - Ingestion]
+      operationId: getHistoricalCoverage
+      summary: Coverage of the historical report dates
+      description: |
+        Historical maintenance view (ADR-0054 item 6): the status of each HISTORICAL_PRICE report date over the
+        covered dates (the last 366 report dates up to today, Asia/Kolkata), computed from the report-date ledger;
+        the incomplete dates, newest first; the progress of a running HISTORICAL_PRICE run; and the next daily gap
+        check and weekly reconciliation. Read-only. Counts equal the database exactly (spec §48).
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec FR-17, spec FR-18, spec §10, spec §15, ADR-0011, ADR-0054]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: The coverage view.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalCoverageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/ingestion/runs:
+    get:
+      tags: [Admin - Ingestion]
+      operationId: listIngestionRuns
+      summary: Ingestion run history
+      description: Runs newest first (startedAt descending, then id ascending), with every audit counter (FR-17, FR-18; ADR-0012).
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec FR-17, spec FR-18, spec §30, spec §46, ADR-0011, ADR-0012]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DatasetTypeQuery'
+        - $ref: '#/components/parameters/RunStatusQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: A page of runs.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestionRunPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/ingestion/runs/{runId}:
+    get:
+      tags: [Admin - Ingestion]
+      operationId: getIngestionRun
+      summary: One ingestion run
+      description: One run with every counter. Used to follow a triggered run until it completes.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec FR-18, spec §30, ADR-0011, ADR-0012]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RunIdPath'
+      responses:
+        '200':
+          description: The run.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestionRunResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/ingestion/runs/{runId}/errors:
+    get:
+      tags: [Admin - Ingestion]
+      operationId: listIngestionRunErrors
+      summary: Errors of an ingestion run
+      description: >-
+        The run's rejected records, conflicts and failures in the order recorded (createdAt ascending, then id ascending), with a
+        raw-payload excerpt (FR-18; ADR-0008, ADR-0009, ADR-0011, ADR-0020). Errors are kept for 180 days
+        (ADR-0029). Payloads never contain the API key (spec §47 Q21).
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec FR-18, spec §15, spec §37, ADR-0008, ADR-0009, ADR-0011, ADR-0020, ADR-0029]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RunIdPath'
+        - $ref: '#/components/parameters/ErrorTypeQuery'
+        - $ref: '#/components/parameters/ErrorCodeQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: A page of errors.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestionErrorPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/ingestion/trigger:
+    post:
+      tags: [Admin - Ingestion]
+      operationId: triggerIngestion
+      summary: Start a manual ingestion run
+      description: |
+        Starts a MANUAL run in the background (spec §15, §45; UC18; ADR-0011 item 3). For HISTORICAL_PRICE an
+        optional fromDate/toDate range of at most 366 report dates (inclusive) selects the dates (bootstrap and
+        outage backfill); without it the trailing window today minus 3 to today (Asia/Kolkata) is used. Works while
+        the dataset's schedule is paused (ADR-0020). Answers 409 CONFLICT while a run of the same dataset is
+        RUNNING (ADR-0011 item 4). Audited as INGESTION_TRIGGERED.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: INGESTION_TRIGGERED
+      x-agrinex-trace: [spec §15, spec §30, spec §45, ADR-0006, ADR-0011, ADR-0020]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerIngestionRequest'
+      responses:
+        '202':
+          description: The run started. Follow it with getIngestionRun.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+            Location:
+              $ref: '#/components/headers/Location'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/ingestion/datasets/{datasetType}/pause:
+    post:
+      tags: [Admin - Ingestion]
+      operationId: pauseScheduledIngestion
+      summary: Pause scheduled runs of a dataset
+      description: >-
+        Stops scheduled runs of the dataset, for example during known source maintenance (ADR-0020); manual
+        triggers still work. 409 CONFLICT when already paused. Audited as INGESTION_PAUSED.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: INGESTION_PAUSED
+      x-agrinex-trace: [ADR-0011, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DatasetTypePath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PauseScheduleRequest'
+      responses:
+        '200':
+          description: The dataset is paused.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetScheduleState'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/ingestion/datasets/{datasetType}/resume:
+    post:
+      tags: [Admin - Ingestion]
+      operationId: resumeScheduledIngestion
+      summary: Resume scheduled runs of a dataset
+      description: >-
+        Resumes scheduled runs (ADR-0020). 409 CONFLICT when not paused. Audited as INGESTION_RESUMED. No
+        request body.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: INGESTION_RESUMED
+      x-agrinex-trace: [ADR-0011, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DatasetTypePath'
+      responses:
+        '200':
+          description: The dataset is resumed.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetScheduleState'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/config/transport-assumptions:
+    get:
+      tags: [Admin - Configuration]
+      operationId: getTransportAssumptions
+      summary: Active transport assumptions
+      description: The version new comparisons use (spec §32; UC19).
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §30, spec §32, ADR-0020]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: The active version.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransportAssumptionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    put:
+      tags: [Admin - Configuration]
+      operationId: updateTransportAssumptions
+      summary: Replace the transport assumptions with a new version
+      description: >-
+        Inserts a new version and makes it active; earlier versions stay unchanged so that every
+        recommendation run keeps the values it used (spec §30 PUT /admin/config/*; ADR-0020). All values must
+        be greater than 0. Audited as TRANSPORT_ASSUMPTIONS_UPDATED.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: TRANSPORT_ASSUMPTIONS_UPDATED
+      x-agrinex-trace: [spec §30, spec §32, UC19, ADR-0020]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransportAssumptionsUpdateRequest'
+      responses:
+        '200':
+          description: The new active version.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransportAssumptionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/config/transport-assumptions/versions:
+    get:
+      tags: [Admin - Configuration]
+      operationId: listTransportAssumptionVersions
+      summary: Transport-assumption versions
+      description: Every version, newest first (createdAt descending, then id ascending) (ADR-0020 item 2).
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: A page of versions.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransportAssumptionPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/config/recommendation-weights:
+    get:
+      tags: [Admin - Configuration]
+      operationId: getRecommendationWeights
+      summary: Active recommendation weights and freshness thresholds
+      description: The version new comparisons use (spec §16; UC20; ADR-0024).
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §16, spec §30, ADR-0020, ADR-0024]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: The active version.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeightsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    put:
+      tags: [Admin - Configuration]
+      operationId: updateRecommendationWeights
+      summary: Replace the weights and freshness thresholds with a new version
+      description: >-
+        Inserts a new version and makes it active (spec §30; UC20; ADR-0020). Each weight lies between 0 and
+        1, and freshDays <= recentDays <= staleDays. Audited as RECOMMENDATION_WEIGHTS_UPDATED.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: RECOMMENDATION_WEIGHTS_UPDATED
+      x-agrinex-trace: [spec §16, spec §30, UC20, ADR-0020, ADR-0024]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeightsUpdateRequest'
+      responses:
+        '200':
+          description: The new active version.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeightsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/config/recommendation-weights/versions:
+    get:
+      tags: [Admin - Configuration]
+      operationId: listRecommendationWeightVersions
+      summary: Recommendation-weight versions
+      description: Every version, newest first (createdAt descending, then id ascending) (ADR-0020 item 2).
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: A page of versions.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeightsPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/markets:
+    get:
+      tags: [Admin - Curation]
+      operationId: listAdminMarkets
+      summary: Markets for curation
+      description: >-
+        All markets, including PROVISIONAL and MERGED ones, ordered by name (code-point order), then id ascending (ADR-0014, ADR-0020).
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [ADR-0014, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReviewStatusQuery'
+        - $ref: '#/components/parameters/ActiveQuery'
+        - $ref: '#/components/parameters/DistrictIdQuery'
+        - $ref: '#/components/parameters/SearchQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: A page of markets.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMarketPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ReferenceNotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/markets/{marketId}:
+    get:
+      tags: [Admin - Curation]
+      operationId: getAdminMarket
+      summary: One market with its source aliases
+      description: Any market, with every source spelling mapped to it and its evidence (ADR-0014).
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §47 Q4, ADR-0014, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MarketIdPath'
+      responses:
+        '200':
+          description: The market.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMarketDetailResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/markets/{marketId}/verify:
+    post:
+      tags: [Admin - Curation]
+      operationId: verifyMarket
+      summary: Verify a PROVISIONAL market
+      description: >-
+        The market becomes VERIFIED: a comparison and alert candidate and visible on the public market
+        endpoints (ADR-0014 item 4). 409 CONFLICT unless PROVISIONAL. Audited as MARKET_VERIFIED. No request
+        body.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: MARKET_VERIFIED
+      x-agrinex-trace: [ADR-0014, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MarketIdPath'
+      responses:
+        '200':
+          description: The verified market.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMarketResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/markets/{marketId}/merge:
+    post:
+      tags: [Admin - Curation]
+      operationId: mergeMarket
+      summary: Merge a market into another, with evidence
+      description: |
+        Declares the market the same as the target market, with a mandatory evidence note (ADR-0014 item 4).
+        Its aliases move to the target and its observations are re-pointed under the ADR-0009 identity rules:
+        an identical copy is dropped, and a conflicting copy keeps the target's value, with the dropped values
+        recorded in the audit event. The merged market becomes MERGED and inactive, pointing at the target.
+        Never automatic; no fuzzy matching. 409 CONFLICT when the market is already MERGED, or the target is
+        the market itself or a MERGED market. Audited as MARKET_MERGED.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: MARKET_MERGED
+      x-agrinex-trace: [spec §47 Q4, ADR-0009, ADR-0014, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MarketIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergeMarketRequest'
+      responses:
+        '200':
+          description: The merged (source) market.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMarketResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ReferenceNotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/markets/{marketId}/deactivate:
+    post:
+      tags: [Admin - Curation]
+      operationId: deactivateMarket
+      summary: Withdraw a market from comparisons
+      description: >-
+        Sets the market inactive, so it is no longer a comparison or alert candidate (spec §16 is_active;
+        ADR-0020). Its observations stay stored. 409 CONFLICT when MERGED or already inactive. Audited as
+        MARKET_DEACTIVATED. No request body.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: MARKET_DEACTIVATED
+      x-agrinex-trace: [spec §16, spec §20, ADR-0014, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MarketIdPath'
+      responses:
+        '200':
+          description: The market.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMarketResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/markets/{marketId}/reactivate:
+    post:
+      tags: [Admin - Curation]
+      operationId: reactivateMarket
+      summary: Return a market to comparisons
+      description: >-
+        Sets an inactive market active again. 409 CONFLICT when MERGED or already active. Audited as
+        MARKET_REACTIVATED. No request body.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: MARKET_REACTIVATED
+      x-agrinex-trace: [spec §16, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MarketIdPath'
+      responses:
+        '200':
+          description: The market.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMarketResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/markets/{marketId}/coordinates:
+    put:
+      tags: [Admin - Curation]
+      operationId: setMarketCoordinates
+      summary: Set exact market coordinates from an identified source
+      description: >-
+        Replaces the market coordinates and clears the approximate flag. Allowed only with an identified
+        source, for example the DMI National Agriculture Market Atlas (ADR-0014 item 4); no geocoding service
+        is used. 409 CONFLICT when MERGED. Audited as MARKET_COORDINATES_SET.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: MARKET_COORDINATES_SET
+      x-agrinex-trace: [spec §16, ADR-0014, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MarketIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetMarketCoordinatesRequest'
+      responses:
+        '200':
+          description: The market.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMarketResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/commodities:
+    get:
+      tags: [Admin - Curation]
+      operationId: listAdminCommodities
+      summary: The commodity known list
+      description: >-
+        Every commodity of the known list with its unit evidence, ordered by name (code-point order), then id ascending (ADR-0006,
+        ADR-0008). `unitVerified=false` lists the commodities whose records ingestion rejects as
+        UNIT_UNVERIFIED.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [ADR-0006, ADR-0008, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UnitVerifiedQuery'
+        - $ref: '#/components/parameters/SearchQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: A page of commodities.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCommodityPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    post:
+      tags: [Admin - Curation]
+      operationId: addCommodity
+      summary: Add a commodity with official evidence
+      description: >-
+        Adds a commodity to the known list, with an official source reference and its verified price unit
+        with evidence (ADR-0006 item 2, ADR-0008, ADR-0020). Ingestion never creates commodities. 409 CONFLICT
+        when the name exists (errors[] names name with ALREADY_EXISTS). Audited as COMMODITY_ADDED; the source
+        reference is kept in the audit details.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: COMMODITY_ADDED
+      x-agrinex-trace: [spec §14, ADR-0006, ADR-0008, ADR-0020]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCommodityRequest'
+      responses:
+        '201':
+          description: The added commodity.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCommodityResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/commodities/{commodityId}/price-unit:
+    put:
+      tags: [Admin - Curation]
+      operationId: verifyCommodityPriceUnit
+      summary: Record the verified price unit of a commodity
+      description: >-
+        Records the unit and its official evidence for a commodity that has none yet (ADR-0008 item 1). A
+        verified unit is never changed, because stored observations keep the unit they were loaded with
+        (ADR-0008, ADR-0009): 409 CONFLICT when a unit is already recorded. Audited as COMMODITY_UNIT_VERIFIED.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: COMMODITY_UNIT_VERIFIED
+      x-agrinex-trace: [spec §31 RULE 3, ADR-0008, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CommodityIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyPriceUnitRequest'
+      responses:
+        '200':
+          description: The commodity.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCommodityResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/commodities/{commodityId}/names:
+    put:
+      tags: [Admin - Curation]
+      operationId: updateCommodityNames
+      summary: Set the Hindi and Marathi names of a commodity
+      description: >-
+        Replaces both localized names, with a provenance note: an official publication, or a team translation
+        reviewed by a named native speaker (ADR-0015, ADR-0020). null removes a translation, so the English
+        name is shown. Audited as COMMODITY_NAMES_UPDATED.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: COMMODITY_NAMES_UPDATED
+      x-agrinex-trace: [spec F1.2, spec §20, ADR-0015, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CommodityIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCommodityNamesRequest'
+      responses:
+        '200':
+          description: The commodity.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCommodityResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/district-aliases:
+    get:
+      tags: [Admin - Curation]
+      operationId: listDistrictAliases
+      summary: District source aliases
+      description: >-
+        Mappings of source state and district spellings to LGD districts, with evidence (ADR-0014 item 3),
+        ordered by source state, then source district (code-point order), then id ascending.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [ADR-0014, ADR-0020]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DistrictIdQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: A page of aliases.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistrictAliasPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ReferenceNotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    post:
+      tags: [Admin - Curation]
+      operationId: addDistrictAlias
+      summary: Map a source district spelling to an LGD district
+      description: >-
+        Adds a mapping with a mandatory evidence note, for example the government notification of a rename
+        (ADR-0014 item 3). Later ingestion resolves the spelling through it. 409 CONFLICT when the spelling is
+        already mapped. Audited as DISTRICT_ALIAS_ADDED.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-audit-action: DISTRICT_ALIAS_ADDED
+      x-agrinex-trace: [ADR-0014, ADR-0020]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddDistrictAliasRequest'
+      responses:
+        '201':
+          description: The mapping.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistrictAliasResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ReferenceNotFound'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/v1/admin/audit-events:
+    get:
+      tags: [Admin - System]
+      operationId: listAdminAuditEvents
+      summary: Admin audit log
+      description: >-
+        Every audited admin action, newest first (createdAt descending, then id ascending), with masked before and
+        after details (ADR-0020 item 6). Kept indefinitely (ADR-0029). Details never contain secrets.
+      x-agrinex-module: admin
+      x-agrinex-roles: [ADMIN]
+      x-agrinex-phase: '1'
+      x-agrinex-trace: [spec §27, ADR-0020, ADR-0029]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AuditActionQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: A page of audit events.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAuditEventPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >-
+        Access token from AuthResponse: an HS256 JWT valid for 15 minutes with the claims sub (user id),
+        role, iat, exp and iss=agrinex (spec §28; ADR-0016). Kept in memory only, never in Web Storage
+        (ADR-0017). On 401 UNAUTHORIZED the client refreshes once and retries (spec §29).
+    refreshCookie:
+      type: apiKey
+      in: cookie
+      name: __Secure-agrinex_refresh
+      description: >-
+        Opaque 256-bit refresh token, valid 7 days, rotated on every refresh with reuse detection (spec §28;
+        ADR-0016). Set and read only by the server; HttpOnly, Secure, SameSite=Strict, Path=/api/v1/auth
+        (ADR-0017). The `__Secure-` prefix is part of the name, and the server reads only the full name
+        (ADR-0042). It never appears in a response body. Only its SHA-256 hash is stored.
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      description: Zero-based page number (ADR-0022 item 5).
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 2147483647
+        default: 0
+    Size:
+      name: size
+      in: query
+      required: false
+      description: Page size, 1 to 100 (ADR-0022 item 5). Larger values are rejected, not clamped.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    OriginHeader:
+      name: Origin
+      in: header
+      required: false
+      description: >-
+        Must equal the configured public origin (ADR-0017 item 3); browsers send it automatically. It is
+        checked before the refresh cookie is read: an absent, `null` or different Origin answers 403
+        ORIGIN_NOT_ALLOWED, never 400.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 255
+    StateIdPath:
+      name: stateId
+      in: path
+      required: true
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    DistrictIdPath:
+      name: districtId
+      in: path
+      required: true
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    CommodityIdPath:
+      name: commodityId
+      in: path
+      required: true
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    MarketIdPath:
+      name: marketId
+      in: path
+      required: true
+      description: >-
+        Market id. Public operations serve VERIFIED markets only; PROVISIONAL and MERGED markets answer 404
+        there (ADR-0014). Admin operations accept any market.
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    AlertIdPath:
+      name: alertId
+      in: path
+      required: true
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    EventIdPath:
+      name: eventId
+      in: path
+      required: true
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    RunIdPath:
+      name: runId
+      in: path
+      required: true
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    DatasetTypePath:
+      name: datasetType
+      in: path
+      required: true
+      schema:
+        $ref: './price-observation.schema.json#/$defs/SourceDataset'
+    CommodityIdQueryRequired:
+      name: commodityId
+      in: query
+      required: true
+      description: Commodity. Unknown answers 422 REFERENCE_NOT_FOUND.
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    CommodityIdQueryOptional:
+      name: commodityId
+      in: query
+      required: false
+      description: >-
+        Restricts the result to one commodity. Required when varietyId or gradeId is given. Unknown answers
+        422 REFERENCE_NOT_FOUND.
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    VarietyIdQuery:
+      name: varietyId
+      in: query
+      required: false
+      description: >-
+        Exact variety filter (ADR-0010 item 3); must belong to commodityId, otherwise 422 REFERENCE_NOT_FOUND.
+        No other variety is substituted.
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    GradeIdQuery:
+      name: gradeId
+      in: query
+      required: false
+      description: Exact grade filter (ADR-0010 item 3); must belong to commodityId.
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    TrendDays:
+      name: days
+      in: query
+      required: true
+      description: Chart window in days, 7 or 30 (F1.15, spec §21; ADR-0025). The trend statistic does not depend on it.
+      schema:
+        type: integer
+        enum: [7, 30]
+    AlertStatusQuery:
+      name: status
+      in: query
+      required: false
+      description: Only alerts with this status.
+      schema:
+        $ref: '#/components/schemas/AlertStatus'
+    UnreadOnlyQuery:
+      name: unreadOnly
+      in: query
+      required: false
+      description: true returns only events with readAt null.
+      schema:
+        type: boolean
+        default: false
+    DatasetTypeQuery:
+      name: datasetType
+      in: query
+      required: false
+      description: Only runs of this dataset.
+      schema:
+        $ref: './price-observation.schema.json#/$defs/SourceDataset'
+    RunStatusQuery:
+      name: status
+      in: query
+      required: false
+      description: Only runs with this status.
+      schema:
+        $ref: '#/components/schemas/IngestionRunStatus'
+    ErrorTypeQuery:
+      name: errorType
+      in: query
+      required: false
+      description: Only errors of this type.
+      schema:
+        $ref: '#/components/schemas/IngestionErrorType'
+    ErrorCodeQuery:
+      name: errorCode
+      in: query
+      required: false
+      description: Only errors with this code, for example UNKNOWN_COMMODITY.
+      schema:
+        $ref: '#/components/schemas/IngestionErrorCode'
+    ReviewStatusQuery:
+      name: reviewStatus
+      in: query
+      required: false
+      description: Only markets with this review status.
+      schema:
+        $ref: '#/components/schemas/MarketReviewStatus'
+    ActiveQuery:
+      name: active
+      in: query
+      required: false
+      description: Only active (true) or inactive (false) markets.
+      schema:
+        type: boolean
+    DistrictIdQuery:
+      name: districtId
+      in: query
+      required: false
+      description: Only items of this district. Unknown answers 422 REFERENCE_NOT_FOUND.
+      schema:
+        $ref: './common.schema.json#/$defs/Uuid'
+    SearchQuery:
+      name: search
+      in: query
+      required: false
+      description: Case-insensitive substring of the name.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    UnitVerifiedQuery:
+      name: unitVerified
+      in: query
+      required: false
+      description: true returns commodities with a verified unit; false those without.
+      schema:
+        type: boolean
+    AuditActionQuery:
+      name: action
+      in: query
+      required: false
+      description: Only events with this action.
+      schema:
+        $ref: '#/components/schemas/AdminAuditAction'
+  headers:
+    X-Correlation-Id:
+      description: >-
+        Server-generated identifier of the request, written to the structured logs (spec §27) and repeated as
+        correlationId in error bodies. A value sent by the client is ignored.
+      required: true
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9-]{8,100}$'
+    Set-Cookie-Refresh:
+      description: >-
+        Sets the refresh-token cookie: __Secure-agrinex_refresh=<opaque token>; Max-Age=604800;
+        Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict (ADR-0016, ADR-0017, ADR-0042).
+      required: true
+      schema:
+        type: string
+        pattern: '^__Secure-agrinex_refresh=[^;]+; Max-Age=604800; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict$'
+    Set-Cookie-Clear:
+      description: 'Clears the refresh-token cookie: __Secure-agrinex_refresh=; Max-Age=0; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict.'
+      required: true
+      schema:
+        type: string
+        pattern: '^__Secure-agrinex_refresh=; Max-Age=0; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict$'
+    Cache-Control-NoStore:
+      description: Responses that carry tokens are never cached.
+      required: true
+      schema:
+        type: string
+        const: no-store
+    WWW-Authenticate:
+      description: >-
+        Authentication challenge required on every 401 (RFC 9110 §15.5.2): Bearer realm="agrinex", with
+        error="invalid_token" when a presented access token was rejected (RFC 6750 §3).
+      required: true
+      schema:
+        type: string
+        pattern: '^Bearer realm="agrinex"'
+    Retry-After:
+      description: Seconds until the client may retry (ADR-0017 item 6).
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    Location:
+      description: Path of the created or started resource.
+      required: true
+      schema:
+        type: string
+        format: uri-reference
+  responses:
+    BadRequest:
+      description: >-
+        MALFORMED_REQUEST (the body is not valid JSON or not an object) or VALIDATION_FAILED (errors[] lists
+        each field problem). Data-independent request checks; ADR-0022 item 4.
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    Unauthorized:
+      description: >-
+        UNAUTHORIZED. The access token is missing, malformed, expired or invalid, or its account is inactive or
+        no longer exists: every operation that evaluates the token resolves the caller's account (alerts, admin,
+        and compare or simulate when a token is sent; ADR-0042, SR-04). The client refreshes once and retries
+        (spec §29); after REFRESH_TOKEN_INVALID it retries operations that also allow anonymous access without
+        the token.
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+        WWW-Authenticate:
+          $ref: '#/components/headers/WWW-Authenticate'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    Forbidden:
+      description: FORBIDDEN. The caller's role is not permitted (spec §28, FR-20).
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
+    OriginNotAllowed:
+      description: ORIGIN_NOT_ALLOWED. The Origin header does not equal the public origin (ADR-0017).
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/OriginNotAllowedError'
+    NotFound:
+      description: >-
+        NOT_FOUND. The resource in the path does not exist or is not visible to the caller (another user's
+        alert or event; a PROVISIONAL or MERGED market on a public operation).
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+    Conflict:
+      description: CONFLICT. The request conflicts with the current state; detail explains it (ADR-0011 item 4).
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ConflictError'
+    ReferenceNotFound:
+      description: >-
+        REFERENCE_NOT_FOUND. A well-formed id in the body or query names nothing that exists or qualifies;
+        errors[] names each such field with code NOT_FOUND.
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ReferenceNotFoundError'
+    ComparisonUnprocessable:
+      description: |
+        Valid request that the data cannot satisfy (ADR-0022 item 4):
+        - NO_MARKETS_IN_RANGE, title "Insufficient data": no VERIFIED, active market with coordinates lies
+          within maxDistanceKm (spec §16; ADR-0023). The client offers to increase the distance (spec §25).
+        - UNSUPPORTED_PRICE_UNIT: the commodity's verified unit is not 'Rs./Quintal' or is unverified (ADR-0008).
+        - REFERENCE_NOT_FOUND: an id in the request names nothing that exists.
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ComparisonUnprocessableError'
+    CompareUnprocessable:
+      description: |
+        Valid comparison request that the data cannot satisfy (ADR-0022 item 4):
+        - NO_MARKETS_IN_RANGE, title "Insufficient data": no VERIFIED, active market with coordinates lies
+          within maxDistanceKm (spec §16; ADR-0023). The client offers to increase the distance (spec §25).
+        - UNSUPPORTED_PRICE_UNIT: the commodity's verified unit is not 'Rs./Quintal' or is unverified (ADR-0008).
+        - REFERENCE_NOT_FOUND: an id in the request names nothing that exists.
+        - ESTIMATE_OUT_OF_RANGE, title "Estimate out of range": an estimate would exceed the stored precision
+          (ADR-0040); `errors[]` names `quantity` with OUT_OF_RANGE, and nothing is recorded.
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/CompareUnprocessableError'
+    AlertUnprocessable:
+      description: >-
+        UNSUPPORTED_PRICE_UNIT (the commodity's unit is not 'Rs./Quintal', ADR-0008) or REFERENCE_NOT_FOUND
+        (unknown commodity, or a market that is unknown or not VERIFIED).
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/AlertUnprocessableError'
+    RateLimited:
+      description: >-
+        RATE_LIMITED. The client IP exceeded the operation's fixed one-minute window, too many failed logins
+        were made for one identifier (ADR-0017 item 6), or a password-reset or verification-link limit per
+        identifier or per account was reached (ADR-0048). The limits also hold when Redis is unavailable
+        (ADR-0018).
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+        Retry-After:
+          $ref: '#/components/headers/Retry-After'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/RateLimitedError'
+    UnexpectedError:
+      description: >-
+        Any other problem, in the same ApiErrorResponse format: METHOD_NOT_ALLOWED (405), NOT_ACCEPTABLE (406),
+        UNSUPPORTED_MEDIA_TYPE (415), INTERNAL_ERROR (500) or SERVICE_UNAVAILABLE (503, for example when the
+        database is unavailable, spec §29). Never a stack trace (spec §28).
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+  schemas:
+    ApiErrorResponse:
+      $ref: './error-response.schema.json'
+    BadRequestError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          enum: [MALFORMED_REQUEST, VALIDATION_FAILED]
+    UnauthorizedError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          const: UNAUTHORIZED
+    InvalidCredentialsError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          const: INVALID_CREDENTIALS
+    RefreshTokenInvalidError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          const: REFRESH_TOKEN_INVALID
+    ForbiddenError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          const: FORBIDDEN
+    OriginNotAllowedError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          const: ORIGIN_NOT_ALLOWED
+    NotFoundError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          const: NOT_FOUND
+    ConflictError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          const: CONFLICT
+    ReferenceNotFoundError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          const: REFERENCE_NOT_FOUND
+    ComparisonUnprocessableError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          enum: [NO_MARKETS_IN_RANGE, UNSUPPORTED_PRICE_UNIT, REFERENCE_NOT_FOUND]
+    CompareUnprocessableError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          enum: [NO_MARKETS_IN_RANGE, UNSUPPORTED_PRICE_UNIT, REFERENCE_NOT_FOUND, ESTIMATE_OUT_OF_RANGE]
+    AlertUnprocessableError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          enum: [UNSUPPORTED_PRICE_UNIT, REFERENCE_NOT_FOUND]
+    PasswordResetTokenInvalidError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          const: PASSWORD_RESET_TOKEN_INVALID
+    EmailVerificationTokenInvalidError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          const: EMAIL_VERIFICATION_TOKEN_INVALID
+    RateLimitedError:
+      allOf:
+        - $ref: './error-response.schema.json'
+      properties:
+        code:
+          const: RATE_LIMITED
+    Role:
+      description: >-
+        Account role (spec §28). Exactly one per account. BUYER accounts exist only from Phase 2; Phase 1 never
+        issues them.
+      type: string
+      enum: [FARMER, BUYER, ADMIN]
+    RegisterRequest:
+      type: object
+      properties:
+        phoneNumber:
+          description: >-
+            Indian mobile number in E.164 form, +91 followed by 10 digits starting with 6 to 9 (ADR-0016 item
+            1). It becomes the login identifier. The frontend normalizes what the farmer types.
+          type: string
+          pattern: '^\+91[6-9][0-9]{9}$'
+        email:
+          description: >-
+            Email address of the account (ADR-0047). Required. Trimmed and stored in lower case; unique across
+            accounts. It is a second login identifier for the same account and password, and the only channel of
+            password recovery once verified: a verification link is sent to it after registration (ADR-0048).
+            Personal data: never logged.
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 254
+          pattern: '^[^@\s]+@[^@\s]+$'
+        password:
+          description: >-
+            8 to 64 characters and at most 72 bytes in UTF-8, with no composition rules (FARMER rule, ADR-0016
+            item 3). Stored only as a BCrypt hash; never returned or logged.
+          type: string
+          format: password
+          writeOnly: true
+          minLength: 8
+          maxLength: 64
+        displayName:
+          description: Optional name shown to the farmer. Trimmed; 1 to 100 characters.
+          anyOf:
+            - type: string
+              minLength: 1
+              maxLength: 100
+            - type: 'null'
+        defaultDistrictId:
+          description: Optional default district for the wizard (spec §20). Unknown answers 422 REFERENCE_NOT_FOUND.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Uuid'
+            - type: 'null'
+      required: [phoneNumber, email, password]
+      additionalProperties: false
+    LoginRequest:
+      type: object
+      properties:
+        identifier:
+          description: >-
+            The account's mobile number in E.164 form (+91 and 10 digits) or its email address (ADR-0016 item 2;
+            ADR-0047). A FARMER may use either; an ADMIN uses the email address. Both name the same account and
+            the same password. Surrounding whitespace is trimmed and an email is compared in lower case.
+          type: string
+          minLength: 1
+          maxLength: 254
+        password:
+          type: string
+          format: password
+          writeOnly: true
+          minLength: 1
+          maxLength: 64
+      required: [identifier, password]
+      additionalProperties: false
+    AuthenticatedUser:
+      description: The signed-in account. Personal data is limited to what the client needs (spec §28).
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        role:
+          $ref: '#/components/schemas/Role'
+        displayName:
+          description: The farmer profile's display name, or null.
+          anyOf:
+            - type: string
+              minLength: 1
+              maxLength: 100
+            - type: 'null'
+        defaultDistrictId:
+          description: The farmer profile's default district, or null.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Uuid'
+            - type: 'null'
+        emailVerified:
+          description: >-
+            Whether the account's email address is verified (ADR-0047, ADR-0048). Password recovery needs a verified
+            email, so while this is false the client offers resendEmailVerification. The address itself is not
+            returned.
+          type: boolean
+      required: [id, role, displayName, defaultDistrictId, emailVerified]
+      additionalProperties: false
+    PasswordResetRequest:
+      description: Start of password recovery (ADR-0047, ADR-0048).
+      type: object
+      properties:
+        identifier:
+          description: >-
+            The account's mobile number in E.164 form or its email address, normalized like login's identifier.
+            The response never reveals whether it names an account.
+          type: string
+          minLength: 1
+          maxLength: 254
+      required: [identifier]
+      additionalProperties: false
+    PasswordResetConfirmRequest:
+      description: Completion of password recovery with the token from the reset link (ADR-0048).
+      type: object
+      properties:
+        token:
+          description: >-
+            The single-use token from the reset link: 256 random bits in base64url without padding. Never logged.
+          type: string
+          writeOnly: true
+          pattern: '^[A-Za-z0-9_-]{43}$'
+        newPassword:
+          description: >-
+            The new password: 8 to 64 characters for FARMER, 15 to 64 for ADMIN, never more than 72 bytes in UTF-8,
+            no composition rules (ADR-0016 item 3). Stored only as a BCrypt hash; never returned or logged.
+          type: string
+          format: password
+          writeOnly: true
+          minLength: 8
+          maxLength: 64
+      required: [token, newPassword]
+      additionalProperties: false
+    EmailVerificationConfirmRequest:
+      description: Confirmation of the account's email with the token from the verification link (ADR-0048).
+      type: object
+      properties:
+        token:
+          description: >-
+            The single-use token from the verification link: 256 random bits in base64url without padding. Never
+            logged.
+          type: string
+          writeOnly: true
+          pattern: '^[A-Za-z0-9_-]{43}$'
+      required: [token]
+      additionalProperties: false
+    AuthResponse:
+      description: >-
+        Spec §30 AuthResponse. The refresh token is never in the body: it is set as the HttpOnly cookie
+        (ADR-0017).
+      type: object
+      properties:
+        accessToken:
+          description: >-
+            HS256 JWT (ADR-0016 item 4). Keep it in memory only. Clients use `user` and `expiresIn` instead of
+            decoding it.
+          type: string
+          pattern: '^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$'
+        tokenType:
+          type: string
+          const: Bearer
+        expiresIn:
+          description: Lifetime of the access token in seconds; 900 (15 minutes, spec §28).
+          type: integer
+          minimum: 1
+        user:
+          $ref: '#/components/schemas/AuthenticatedUser'
+      required: [accessToken, tokenType, expiresIn, user]
+      additionalProperties: false
+    StateResponse:
+      description: A state (spec §30 StateResponse).
+      $ref: './common.schema.json#/$defs/StateRef'
+    DistrictResponse:
+      description: A district with its centroid (spec §30 DistrictResponse).
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        stateId:
+          $ref: './common.schema.json#/$defs/Uuid'
+        name:
+          $ref: './common.schema.json#/$defs/ReferenceName'
+        centroid:
+          description: >-
+            District centroid computed from the Survey of India district boundary (ADR-0014 item 2). The
+            frontend sends it as originLat and originLon (spec §21 step 3).
+          $ref: './common.schema.json#/$defs/GeoPoint'
+      required: [id, stateId, name, centroid]
+      additionalProperties: false
+    LocalityResponse:
+      description: An LGD sub-district (taluka), without coordinates in Phase 1 (spec §30 LocalityResponse; ADR-0014).
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        districtId:
+          $ref: './common.schema.json#/$defs/Uuid'
+        name:
+          $ref: './common.schema.json#/$defs/ReferenceName'
+      required: [id, districtId, name]
+      additionalProperties: false
+    StateListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StateResponse'
+      required: [items]
+      additionalProperties: false
+    DistrictListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DistrictResponse'
+      required: [items]
+      additionalProperties: false
+    LocalityListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocalityResponse'
+      required: [items]
+      additionalProperties: false
+    CommodityResponse:
+      description: A commodity offered in the comparison wizard (spec §30 CommodityResponse).
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        name:
+          $ref: './common.schema.json#/$defs/ReferenceName'
+        nameHi:
+          $ref: './common.schema.json#/$defs/LocalizedNameValue'
+        nameMr:
+          $ref: './common.schema.json#/$defs/LocalizedNameValue'
+        category:
+          description: Official Agmarknet commodity group, for example Vegetables (ADR-0006 item 4), or null.
+          anyOf:
+            - type: string
+              minLength: 1
+              maxLength: 100
+            - type: 'null'
+        priceUnit:
+          description: >-
+            The commodity's verified price unit (ADR-0008). Comparison and alerts accept only 'Rs./Quintal';
+            clients do not offer a commodity with another unit for comparison.
+          $ref: './price-observation.schema.json#/$defs/PriceUnit'
+      required: [id, name, nameHi, nameMr, category, priceUnit]
+      additionalProperties: false
+    VarietyResponse:
+      description: A variety of a commodity (spec §30 VarietyResponse).
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        commodityId:
+          $ref: './common.schema.json#/$defs/Uuid'
+        name:
+          $ref: './common.schema.json#/$defs/ReferenceName'
+      required: [id, commodityId, name]
+      additionalProperties: false
+    GradeResponse:
+      description: A grade of a commodity (spec §20 GRADES).
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        commodityId:
+          $ref: './common.schema.json#/$defs/Uuid'
+        name:
+          $ref: './common.schema.json#/$defs/ReferenceName'
+      required: [id, commodityId, name]
+      additionalProperties: false
+    CommodityListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommodityResponse'
+      required: [items]
+      additionalProperties: false
+    VarietyListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/VarietyResponse'
+      required: [items]
+      additionalProperties: false
+    GradeListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/GradeResponse'
+      required: [items]
+      additionalProperties: false
+    PriceQuote:
+      description: Exported name for code generators; operations reference the contract file directly.
+      $ref: './price-observation.schema.json#/$defs/PriceQuote'
+    PriceObservation:
+      description: >-
+        Exported name of the self-contained observation (spec §41 price-observation contract) for consumers such
+        as QA fixtures; no operation returns it directly.
+      $ref: './price-observation.schema.json'
+    SourceSyncStatus:
+      description: Exported name for code generators; operations reference the contract file directly.
+      $ref: './price-observation.schema.json#/$defs/SourceSyncStatus'
+    MarketLatestPrice:
+      description: The latest qualifying observation of one commodity at the market (ADR-0010).
+      type: object
+      properties:
+        commodity:
+          $ref: './common.schema.json#/$defs/CommodityRef'
+        price:
+          $ref: './price-observation.schema.json#/$defs/PriceQuote'
+      required: [commodity, price]
+      additionalProperties: false
+    MarketDetailResponse:
+      description: Spec §30 MarketDetailResponse.
+      type: object
+      properties:
+        market:
+          $ref: './common.schema.json#/$defs/MarketSummary'
+        active:
+          description: false when an admin has withdrawn the market from comparisons (spec §16 is_active).
+          type: boolean
+        approximateMarketLocation:
+          description: true when the market's coordinates are its district centroid (ADR-0014).
+          type: boolean
+        latestPrices:
+          description: One entry per commodity with a qualifying observation, ordered by commodity name (code-point order, then id).
+          type: array
+          items:
+            $ref: '#/components/schemas/MarketLatestPrice'
+        noDataReason:
+          description: NO_RECENT_PRICE_DATA exactly when latestPrices is empty; otherwise null.
+          anyOf:
+            - $ref: './price-observation.schema.json#/$defs/NoDataReason'
+            - type: 'null'
+        sourceStatus:
+          $ref: './price-observation.schema.json#/$defs/SourceSyncStatus'
+      required: [market, active, approximateMarketLocation, latestPrices, noDataReason, sourceStatus]
+      additionalProperties: false
+    TrendWindow:
+      description: >-
+        Window bounds as Asia/Kolkata calendar dates (ADR-0025). recent = today minus 6 to today; baseline =
+        today minus 13 to today minus 7; chart = the last `days` days ending today.
+      type: object
+      properties:
+        chartFrom:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        chartTo:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        recentFrom:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        recentTo:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        baselineFrom:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        baselineTo:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+      required: [chartFrom, chartTo, recentFrom, recentTo, baselineFrom, baselineTo]
+      additionalProperties: false
+    TrendResponse:
+      description: Spec §30 TrendResponse (spec §21 step 32; ADR-0025 item 3).
+      type: object
+      properties:
+        market:
+          $ref: './common.schema.json#/$defs/MarketRef'
+        commodity:
+          $ref: './common.schema.json#/$defs/CommodityRef'
+        variety:
+          description: The variety filter applied, or null.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/VarietyRef'
+            - type: 'null'
+        grade:
+          description: The grade filter applied, or null.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/GradeRef'
+            - type: 'null'
+        priceUnit:
+          description: Unit of every price in `observations`; null only when the commodity has no verified unit (then `observations` is empty).
+          anyOf:
+            - $ref: './price-observation.schema.json#/$defs/PriceUnit'
+            - type: 'null'
+        days:
+          type: integer
+          enum: [7, 30]
+        window:
+          $ref: '#/components/schemas/TrendWindow'
+        trendDirection:
+          $ref: './price-observation.schema.json#/$defs/TrendDirection'
+        changePercent7Day:
+          $ref: './price-observation.schema.json#/$defs/ChangePercent7Day'
+        observations:
+          description: >-
+            The daily series (spec §21 step 32 `observations`): one selected real observation per date with data
+            inside the chart window, ascending by reportDate. Dates without data are absent (spec §31 RULE 5).
+          type: array
+          items:
+            $ref: './price-observation.schema.json#/$defs/PriceQuote'
+        sourceStatus:
+          $ref: './price-observation.schema.json#/$defs/SourceSyncStatus'
+      required: [market, commodity, variety, grade, priceUnit, days, window, trendDirection, changePercent7Day, observations, sourceStatus]
+      additionalProperties: false
+    ForecastSeries:
+      description: >-
+        The latest generation for one horizon, limited to points dated today or later (Asia/Kolkata; ADR-0030
+        item 4). Field names follow the spec §35 output; every value is exactly as the ML job wrote it.
+      type: object
+      properties:
+        forecastHorizonDays:
+          description: 3 or 7 (spec §35).
+          type: integer
+          enum: [3, 7]
+        modelName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        modelVersion:
+          type: string
+          minLength: 1
+          maxLength: 50
+        generatedAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+        trainingDataThrough:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        mae:
+          description: Validation MAE reported by the ML job for this model version, in the price unit, or null (spec §35, §36).
+          anyOf:
+            - type: number
+              minimum: 0
+              x-agrinex-max-decimal-places: 4
+            - type: 'null'
+        rmse:
+          description: Validation RMSE reported by the ML job for this model version, in the price unit, or null.
+          anyOf:
+            - type: number
+              minimum: 0
+              x-agrinex-max-decimal-places: 4
+            - type: 'null'
+        forecast:
+          description: Predicted points dated today or later, ascending by date (spec §35 forecast[]).
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ForecastPointResponse'
+      required: [forecastHorizonDays, modelName, modelVersion, generatedAt, trainingDataThrough, mae, rmse, forecast]
+      additionalProperties: false
+    ForecastPointResponse:
+      description: >-
+        One predicted point as served to clients (spec §35 forecast[] item). Defined here, not by reference to
+        forecast-output.schema.json, so that a change of the ML output never changes the public response
+        without consumer review (spec §41).
+      type: object
+      properties:
+        date:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        predictedPrice:
+          description: Predicted modal price in priceUnit, as the model produced it.
+          type: number
+          x-agrinex-max-decimal-places: 2
+        lowerBound:
+          description: Lower bound as the model produced it, or null. No coverage level is recorded, so it is never a confidence percentage.
+          anyOf:
+            - type: number
+              x-agrinex-max-decimal-places: 2
+            - type: 'null'
+        upperBound:
+          description: Upper bound as the model produced it, or null.
+          anyOf:
+            - type: number
+              x-agrinex-max-decimal-places: 2
+            - type: 'null'
+      required: [date, predictedPrice, lowerBound, upperBound]
+      additionalProperties: false
+    ForecastResponse:
+      description: |
+        Spec §29 and §35 ForecastResponse. `available: false` is the normal state without ML: it carries no
+        prediction, and clients show "Forecast unavailable." only in the optional forecast section (spec §29).
+        When available, the response is clearly a model prediction (`kind: ML_FORECAST`), built on the
+        representative daily series of government-reported observations (ADR-0030 item 5). It never replaces
+        or changes an observed price, and no confidence percentage exists: only the bounds the model produced.
+      type: object
+      properties:
+        available:
+          type: boolean
+        kind:
+          description: Marks every value in this response as an ML prediction, not a reported price.
+          type: string
+          const: ML_FORECAST
+        inputBasis:
+          description: The input the model was trained on (ADR-0030 item 5).
+          type: string
+          const: REPRESENTATIVE_DAILY_SERIES
+        market:
+          $ref: './common.schema.json#/$defs/MarketRef'
+        commodity:
+          $ref: './common.schema.json#/$defs/CommodityRef'
+        priceUnit:
+          description: Unit of every predicted price and bound; the commodity's verified unit, or null when unverified.
+          anyOf:
+            - $ref: './price-observation.schema.json#/$defs/PriceUnit'
+            - type: 'null'
+        forecasts:
+          description: One entry per available horizon, ordered by forecastHorizonDays. Empty exactly when available is false.
+          type: array
+          items:
+            $ref: '#/components/schemas/ForecastSeries'
+      required: [available, kind, inputBasis, market, commodity, priceUnit, forecasts]
+      additionalProperties: false
+      allOf:
+        - if:
+            properties:
+              available:
+                const: false
+            required: [available]
+          then:
+            properties:
+              forecasts:
+                maxItems: 0
+          else:
+            properties:
+              forecasts:
+                minItems: 1
+    MarketComparisonResponse:
+      $ref: './recommendation.schema.json'
+    AlertType:
+      description: >-
+        Spec §34: PRICE_ABOVE (latest modal price >= threshold), PRICE_BELOW (<= threshold), PERCENTAGE_RISE
+        (changePercent7Day >= threshold), PERCENTAGE_FALL (changePercent7Day <= -threshold). Percentage
+        conditions use the unrounded 7-day change, as the trend classification does (ADR-0019 item 2, ADR-0025
+        item 1); the trend operations display it to 1 decimal place.
+      type: string
+      enum: [PRICE_ABOVE, PRICE_BELOW, PERCENTAGE_RISE, PERCENTAGE_FALL]
+    AlertStatus:
+      description: ACTIVE alerts are evaluated after each ingestion run; PAUSED alerts are not (spec §34).
+      type: string
+      enum: [ACTIVE, PAUSED]
+    ThresholdValue:
+      description: >-
+        For PRICE_ABOVE and PRICE_BELOW, a price in the commodity's unit ('Rs./Quintal'). For PERCENTAGE_RISE
+        and PERCENTAGE_FALL, a positive percentage magnitude, for example 5.0 for 5 % (spec §34). Greater than
+        0; at most 10 integer and 4 fraction digits (price_alerts.threshold_value numeric(14,4)).
+      type: number
+      exclusiveMinimum: 0
+      maximum: 9999999999.9999
+      x-agrinex-max-decimal-places: 4
+    CreateAlertRequest:
+      type: object
+      properties:
+        alertType:
+          $ref: '#/components/schemas/AlertType'
+        commodityId:
+          $ref: './common.schema.json#/$defs/Uuid'
+        marketId:
+          description: >-
+            Optional market (spec §25 "marketId optional"). Without one, the alert covers every VERIFIED,
+            active market, and an event names the market with the most extreme qualifying value (ADR-0019
+            item 3).
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Uuid'
+            - type: 'null'
+        thresholdValue:
+          $ref: '#/components/schemas/ThresholdValue'
+      required: [alertType, commodityId, thresholdValue]
+      additionalProperties: false
+    UpdateAlertStatusRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/AlertStatus'
+      required: [status]
+      additionalProperties: false
+    AlertResponse:
+      description: Spec §30 AlertResponse.
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        alertType:
+          $ref: '#/components/schemas/AlertType'
+        status:
+          $ref: '#/components/schemas/AlertStatus'
+        commodity:
+          $ref: './common.schema.json#/$defs/CommodityRef'
+        market:
+          description: The market, or null for an alert over all markets.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/MarketRef'
+            - type: 'null'
+        thresholdValue:
+          $ref: '#/components/schemas/ThresholdValue'
+        priceUnit:
+          description: Unit of a price threshold and of price trigger values; the commodity's verified unit.
+          $ref: './price-observation.schema.json#/$defs/PriceUnit'
+        lastTriggeredAt:
+          description: Time of the latest event, or null.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Timestamp'
+            - type: 'null'
+      required: [id, alertType, status, commodity, market, thresholdValue, priceUnit, lastTriggeredAt]
+      additionalProperties: false
+    AlertPage:
+      allOf:
+        - $ref: './common.schema.json#/$defs/PageMetadata'
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlertResponse'
+      required: [items]
+      unevaluatedProperties: false
+    AlertEventResponse:
+      description: >-
+        One trigger of an alert by an ingestion run (ADR-0019 item 4): the market that met the condition and
+        the observation behind the trigger value, with full provenance.
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        alertId:
+          $ref: './common.schema.json#/$defs/Uuid'
+        alertType:
+          $ref: '#/components/schemas/AlertType'
+        thresholdValue:
+          $ref: '#/components/schemas/ThresholdValue'
+        commodity:
+          $ref: './common.schema.json#/$defs/CommodityRef'
+        market:
+          $ref: './common.schema.json#/$defs/MarketRef'
+        triggeredAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+        triggerValue:
+          description: >-
+            The value that met the condition: the latest modal price in priceUnit for price alerts, or the
+            unrounded 7-day change in percent (possibly negative) for percentage alerts, stored rounded half-up to
+            4 decimal places (spec §34; alert_events.trigger_value numeric(14,4)).
+          type: number
+          x-agrinex-max-decimal-places: 4
+        priceUnit:
+          $ref: './price-observation.schema.json#/$defs/PriceUnit'
+        observation:
+          description: >-
+            The observation selected behind triggerValue (ADR-0010, ADR-0019), with its current values: a later
+            source revision (ADR-0009) can change its prices, while triggerValue keeps the value at trigger time.
+          $ref: './price-observation.schema.json#/$defs/PriceQuote'
+        readAt:
+          description: When the caller viewed or dismissed the event, or null when unread.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Timestamp'
+            - type: 'null'
+      required: [id, alertId, alertType, thresholdValue, commodity, market, triggeredAt, triggerValue, priceUnit, observation, readAt]
+      additionalProperties: false
+    AlertEventPage:
+      allOf:
+        - $ref: './common.schema.json#/$defs/PageMetadata'
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlertEventResponse'
+        sourceStatus:
+          $ref: './price-observation.schema.json#/$defs/SourceSyncStatus'
+      required: [items, sourceStatus]
+      unevaluatedProperties: false
+    ComponentHealth:
+      description: Health of an internal component, from the backend's health checks (spec §27; ADR-0018).
+      type: string
+      enum: [UP, DOWN, UNKNOWN]
+    SystemStatusResponse:
+      type: object
+      properties:
+        generatedAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+        components:
+          type: object
+          properties:
+            database:
+              $ref: '#/components/schemas/ComponentHealth'
+            redis:
+              description: Redis DOWN degrades rate limiting and caching to in-process fallbacks; the service stays available (ADR-0018).
+              $ref: '#/components/schemas/ComponentHealth'
+          required: [database, redis]
+          additionalProperties: false
+        governmentApiKey:
+          description: Whether DATA_GOV_API_KEY is configured. The value itself is never exposed (ADR-0020 item 2).
+          type: string
+          enum: [CONFIGURED, NOT_CONFIGURED]
+        schedule:
+          description: The configured ingestion schedule (ADR-0011 item 1). Read-only.
+          type: object
+          properties:
+            timeZone:
+              type: string
+              const: Asia/Kolkata
+            runTimes:
+              description: Local times of the scheduled runs, for example 00:00, 06:00, 12:00 and 18:00.
+              type: array
+              minItems: 1
+              items:
+                type: string
+                pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+            historicalWindowDaysBack:
+              description: Scheduled HISTORICAL_PRICE runs cover report dates from today minus this many days to today (3).
+              type: integer
+              minimum: 0
+          required: [timeZone, runTimes, historicalWindowDaysBack]
+          additionalProperties: false
+        coverage:
+          description: Coverage is deployment configuration (ADR-0006 item 1). Read-only.
+          type: object
+          properties:
+            sourceStates:
+              description: Source state values ingested, for example Maharashtra.
+              type: array
+              items:
+                type: string
+                minLength: 1
+          required: [sourceStates]
+          additionalProperties: false
+        datasets:
+          type: array
+          items:
+            $ref: '#/components/schemas/DatasetIdentity'
+      required: [generatedAt, components, governmentApiKey, schedule, coverage, datasets]
+      additionalProperties: false
+    DatasetIdentity:
+      type: object
+      properties:
+        datasetType:
+          $ref: './price-observation.schema.json#/$defs/SourceDataset'
+        resourceId:
+          $ref: './price-observation.schema.json#/$defs/DataGovResourceId'
+        title:
+          description: Official resource title (source_datasets.title).
+          type: string
+          minLength: 1
+          maxLength: 300
+      required: [datasetType, resourceId, title]
+      additionalProperties: false
+    IngestionRunStatus:
+      description: RUNNING, SUCCESS, PARTIAL_FAILURE or FAILED (spec §15, §29; status rule ADR-0011 item 8).
+      type: string
+      enum: [RUNNING, SUCCESS, PARTIAL_FAILURE, FAILED]
+    TriggeredBy:
+      description: What started the run (spec §15).
+      type: string
+      enum: [SCHEDULER, MANUAL, STARTUP]
+    IngestionErrorType:
+      description: VALIDATION, API_ERROR, CONFLICT, SCHEMA_ERROR or SYSTEM (ADR-0009, ADR-0011 item 9).
+      type: string
+      enum: [VALIDATION, API_ERROR, CONFLICT, SCHEMA_ERROR, SYSTEM]
+    IngestionErrorCode:
+      description: >-
+        UPPER_SNAKE code of an ingestion error, for example UNKNOWN_COMMODITY, UNIT_UNVERIFIED, PRICE_OUTLIER,
+        SAME_KEY_DIFFERENT_PRICES, HTTP_STATUS, NON_JSON_RESPONSE or RUN_INTERRUPTED (ADR-0008, ADR-0009,
+        ADR-0011). The list is open: the ingestion module may add codes.
+      type: string
+      pattern: '^[A-Z][A-Z0-9_]*$'
+      maxLength: 50
+    IngestionRunResponse:
+      description: Spec §30 IngestionRunResponse. Counters satisfy the accounting invariant of ADR-0012 for SUCCESS and PARTIAL_FAILURE runs.
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        datasetType:
+          $ref: './price-observation.schema.json#/$defs/SourceDataset'
+        triggeredBy:
+          $ref: '#/components/schemas/TriggeredBy'
+        status:
+          $ref: '#/components/schemas/IngestionRunStatus'
+        startedAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+        finishedAt:
+          description: null while RUNNING.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Timestamp'
+            - type: 'null'
+        durationSeconds:
+          description: finishedAt minus startedAt in whole seconds, rounded half-up; null while RUNNING.
+          anyOf:
+            - type: integer
+              minimum: 0
+            - type: 'null'
+        requestScope:
+          description: >-
+            Request parameters of the run, such as the state filter, report dates and page size. Never contains
+            credentials (ADR-0020 item 5).
+          type: object
+          additionalProperties: true
+          x-agrinex-free-form: true
+        sourceTotalRecords:
+          description: The total the source reported for the run scope, or null.
+          anyOf:
+            - type: integer
+              minimum: 0
+            - type: 'null'
+        pagesFetched:
+          type: integer
+          minimum: 0
+        pagesFailed:
+          description: Pages that failed after retries (the "Y pages failed" of spec §29).
+          type: integer
+          minimum: 0
+        recordsFetched:
+          type: integer
+          minimum: 0
+        recordsInserted:
+          type: integer
+          minimum: 0
+        recordsUpdated:
+          description: Records that revised the prices of a stored observation (ADR-0009).
+          type: integer
+          minimum: 0
+        duplicatesSkipped:
+          type: integer
+          minimum: 0
+        validationErrorsCount:
+          type: integer
+          minimum: 0
+        recordsConflicted:
+          description: Records quarantined as same-key conflicts (ADR-0009).
+          type: integer
+          minimum: 0
+        recordsOutOfScope:
+          type: integer
+          minimum: 0
+        completenessPercent:
+          description: >-
+            (recordsInserted + recordsUpdated + duplicatesSkipped) / (recordsFetched - recordsOutOfScope) x 100,
+            rounded half-up to 2 decimal places (formula ADR-0012 item 2; the rounding is a contract-design choice).
+            null while RUNNING or when the denominator is 0. The spec §48 threshold is at least 95 per run.
+          anyOf:
+            - type: number
+              minimum: 0
+              maximum: 100
+              x-agrinex-max-decimal-places: 2
+            - type: 'null'
+        errorCount:
+          description: >-
+            Number of error rows of the run currently retained (all types). Errors are purged after 180 days
+            while runs are kept (ADR-0029), so for older runs it can be lower than the counters imply.
+          type: integer
+          minimum: 0
+      required:
+        - id
+        - datasetType
+        - triggeredBy
+        - status
+        - startedAt
+        - finishedAt
+        - durationSeconds
+        - requestScope
+        - sourceTotalRecords
+        - pagesFetched
+        - pagesFailed
+        - recordsFetched
+        - recordsInserted
+        - recordsUpdated
+        - duplicatesSkipped
+        - validationErrorsCount
+        - recordsConflicted
+        - recordsOutOfScope
+        - completenessPercent
+        - errorCount
+      additionalProperties: false
+    IngestionRunPage:
+      allOf:
+        - $ref: './common.schema.json#/$defs/PageMetadata'
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngestionRunResponse'
+      required: [items]
+      unevaluatedProperties: false
+    IngestionErrorResponse:
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        runId:
+          $ref: './common.schema.json#/$defs/Uuid'
+        errorType:
+          $ref: '#/components/schemas/IngestionErrorType'
+        errorCode:
+          $ref: '#/components/schemas/IngestionErrorCode'
+        errorMessage:
+          description: >-
+            Field and reason, or the HTTP outcome. Never contains the API key: ingestion removes the configured
+            key and any api-key parameter before storing text (ADR-0020 item 5; spec §47 Q21).
+          type: string
+          minLength: 1
+        pageOffset:
+          anyOf:
+            - type: integer
+              minimum: 0
+            - type: 'null'
+        requestReportDate:
+          description: The requested report date when a HISTORICAL delivery unit failed (ADR-0011), otherwise null.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/CalendarDate'
+            - type: 'null'
+        rawPayloadExcerpt:
+          description: >-
+            The rejected source record or error response body as compact JSON text (ADR-0020 item 2 "raw-payload
+            excerpts"), cut to at most 4,000 characters (a contract-design limit), or null when none was kept. The configured API key and any api-key
+            parameter are removed before storage (ADR-0020 item 5).
+          anyOf:
+            - type: string
+              maxLength: 4000
+            - type: 'null'
+        rawPayloadTruncated:
+          description: true when rawPayloadExcerpt was cut.
+          type: boolean
+        createdAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+      required: [id, runId, errorType, errorCode, errorMessage, pageOffset, requestReportDate, rawPayloadExcerpt, rawPayloadTruncated, createdAt]
+      additionalProperties: false
+    IngestionErrorPage:
+      allOf:
+        - $ref: './common.schema.json#/$defs/PageMetadata'
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngestionErrorResponse'
+      required: [items]
+      unevaluatedProperties: false
+    DatasetScheduleState:
+      description: Pause state of a dataset's scheduled runs (ADR-0020).
+      type: object
+      properties:
+        datasetType:
+          $ref: './price-observation.schema.json#/$defs/SourceDataset'
+        paused:
+          type: boolean
+        pausedReason:
+          description: Present exactly while paused.
+          anyOf:
+            - type: string
+              minLength: 1
+              maxLength: 500
+            - type: 'null'
+        updatedAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+      required: [datasetType, paused, pausedReason, updatedAt]
+      additionalProperties: false
+      allOf:
+        - if:
+            properties:
+              paused:
+                const: true
+            required: [paused]
+          then:
+            properties:
+              pausedReason:
+                type: string
+          else:
+            properties:
+              pausedReason:
+                type: 'null'
+    MarketFreshnessSummary:
+      description: >-
+        Freshness of the VERIFIED, active markets as of today (Asia/Kolkata), each classified by its latest
+        observation date across commodities with the active thresholds; markets without observations count as
+        unavailable (spec §46 "3 markets STALE").
+      type: object
+      properties:
+        asOfDate:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        totalMarkets:
+          type: integer
+          minimum: 0
+        fresh:
+          type: integer
+          minimum: 0
+        recent:
+          type: integer
+          minimum: 0
+        stale:
+          type: integer
+          minimum: 0
+        unavailable:
+          type: integer
+          minimum: 0
+      required: [asOfDate, totalMarkets, fresh, recent, stale, unavailable]
+      additionalProperties: false
+    DatasetHealth:
+      type: object
+      properties:
+        datasetType:
+          $ref: './price-observation.schema.json#/$defs/SourceDataset'
+        resourceId:
+          $ref: './price-observation.schema.json#/$defs/DataGovResourceId'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 300
+        schedule:
+          $ref: '#/components/schemas/DatasetScheduleState'
+        runningRunId:
+          description: The RUNNING run, or null.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Uuid'
+            - type: 'null'
+        latestCompletedRun:
+          description: The most recent run that is no longer RUNNING, or null.
+          anyOf:
+            - $ref: '#/components/schemas/IngestionRunResponse'
+            - type: 'null'
+        lastSuccessfulRunAt:
+          description: End of the most recent run that ended SUCCESS or PARTIAL_FAILURE, or null.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Timestamp'
+            - type: 'null'
+        consecutiveFailures:
+          description: >-
+            Number of FAILED runs counted back from the most recent completed run until a SUCCESS or
+            PARTIAL_FAILURE run (ADR-0019 item 7). Drives the admin dashboard banner.
+          type: integer
+          minimum: 0
+        latestReportDate:
+          description: Newest report date stored from this dataset, or null.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/CalendarDate'
+            - type: 'null'
+      required: [datasetType, resourceId, title, schedule, runningRunId, latestCompletedRun, lastSuccessfulRunAt, consecutiveFailures, latestReportDate]
+      additionalProperties: false
+    IngestionHealthResponse:
+      description: Spec §30 IngestionHealthResponse.
+      type: object
+      properties:
+        generatedAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+        datasets:
+          description: One entry per dataset, CURRENT_PRICE first.
+          type: array
+          items:
+            $ref: '#/components/schemas/DatasetHealth'
+        marketFreshness:
+          $ref: '#/components/schemas/MarketFreshnessSummary'
+      required: [generatedAt, datasets, marketFreshness]
+      additionalProperties: false
+    ReportDateStatus:
+      description: >-
+        Status of a HISTORICAL_PRICE report date (ADR-0054 item 2), with a settle age equal to the trailing window's
+        depth: SETTLED (fetched successfully when at least the settle age old), PENDING (younger than the settle
+        age), UNSETTLED (old enough, but fetched successfully only earlier), FAILED (the last attempt failed) or
+        MISSING (never attempted).
+      type: string
+      enum: [SETTLED, PENDING, UNSETTLED, FAILED, MISSING]
+    RunPurpose:
+      description: >-
+        Why a HISTORICAL_PRICE run was started (ADR-0054 item 5), also recorded as `purpose` in its requestScope:
+        the 6-hourly trailing window, the daily gap check, the weekly reconciliation or an admin trigger.
+      type: string
+      enum: [TRAILING_WINDOW, GAP_BACKFILL, RECONCILIATION, MANUAL]
+    ReportDateStatusCounts:
+      description: Covered report dates per status; the five counts add up to the number of covered dates.
+      type: object
+      properties:
+        settled:
+          type: integer
+          minimum: 0
+        pending:
+          type: integer
+          minimum: 0
+        unsettled:
+          type: integer
+          minimum: 0
+        failed:
+          type: integer
+          minimum: 0
+        missing:
+          type: integer
+          minimum: 0
+      required: [settled, pending, unsettled, failed, missing]
+      additionalProperties: false
+    ReportDateCoverage:
+      description: One incomplete report date with its ledger values.
+      type: object
+      properties:
+        reportDate:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        status:
+          $ref: '#/components/schemas/ReportDateStatus'
+        lastAttemptAt:
+          description: The last attempt, or null when never attempted.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Timestamp'
+            - type: 'null'
+        lastSuccessAt:
+          description: The last successful fetch, or null.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Timestamp'
+            - type: 'null'
+        recordsFetched:
+          description: Records fetched by the last successful fetch; null when unknown or never fetched.
+          anyOf:
+            - type: integer
+              minimum: 0
+            - type: 'null'
+        consecutiveFailures:
+          description: Failed attempts since the last successful fetch.
+          type: integer
+          minimum: 0
+      required: [reportDate, status, lastAttemptAt, lastSuccessAt, recordsFetched, consecutiveFailures]
+      additionalProperties: false
+    HistoricalRunProgress:
+      description: >-
+        Progress of the RUNNING HISTORICAL_PRICE run: the report dates it has attempted so far out of those in its
+        scope.
+      type: object
+      properties:
+        runId:
+          $ref: './common.schema.json#/$defs/Uuid'
+        purpose:
+          description: The run's purpose; null for a run recorded before purposes existed.
+          anyOf:
+            - $ref: '#/components/schemas/RunPurpose'
+            - type: 'null'
+        reportDateFrom:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        reportDateTo:
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        datesInScope:
+          type: integer
+          minimum: 1
+          maximum: 366
+        datesAttempted:
+          type: integer
+          minimum: 0
+          maximum: 366
+      required: [runId, purpose, reportDateFrom, reportDateTo, datesInScope, datesAttempted]
+      additionalProperties: false
+    HistoricalCoverageResponse:
+      description: Coverage of the HISTORICAL_PRICE report dates (ADR-0054 item 6).
+      type: object
+      properties:
+        generatedAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+        coverageFrom:
+          description: The oldest covered report date.
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        coverageTo:
+          description: The newest covered report date, today in Asia/Kolkata.
+          $ref: './common.schema.json#/$defs/CalendarDate'
+        settleAfterDays:
+          description: The settle age in days, the depth of the trailing window (ADR-0011 item 1).
+          type: integer
+          minimum: 0
+        scheduledRunsPaused:
+          description: Whether scheduled HISTORICAL_PRICE runs, the gap check and reconciliation included, are paused.
+          type: boolean
+        counts:
+          $ref: '#/components/schemas/ReportDateStatusCounts'
+        incompleteDates:
+          description: Covered dates in status UNSETTLED, FAILED or MISSING, newest first.
+          type: array
+          maxItems: 366
+          items:
+            $ref: '#/components/schemas/ReportDateCoverage'
+        runningRun:
+          description: The RUNNING HISTORICAL_PRICE run with a report-date range, or null.
+          anyOf:
+            - $ref: '#/components/schemas/HistoricalRunProgress'
+            - type: 'null'
+        nextGapCheckAt:
+          description: The next daily gap check, or null when the schedule has no next time.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Timestamp'
+            - type: 'null'
+        nextReconciliationAt:
+          description: The next weekly reconciliation, or null when the schedule has no next time.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Timestamp'
+            - type: 'null'
+        maxDatesPerGapRun:
+          type: integer
+          minimum: 1
+          maximum: 366
+        reconciliationWindowDays:
+          type: integer
+          minimum: 1
+          maximum: 366
+      required: [generatedAt, coverageFrom, coverageTo, settleAfterDays, scheduledRunsPaused, counts, incompleteDates, runningRun, nextGapCheckAt, nextReconciliationAt, maxDatesPerGapRun, reconciliationWindowDays]
+      additionalProperties: false
+    TriggerIngestionRequest:
+      description: >-
+        Spec §45 trigger body, extended by ADR-0011 item 3. fromDate and toDate are allowed only for
+        HISTORICAL_PRICE, must be given together, fromDate <= toDate <= today (Asia/Kolkata), and cover at most
+        366 report dates, counted inclusively: toDate - fromDate + 1 <= 366 (VALIDATION_FAILED with INVALID_RANGE
+        or NOT_ALLOWED otherwise).
+      type: object
+      properties:
+        datasetType:
+          $ref: './price-observation.schema.json#/$defs/SourceDataset'
+        fromDate:
+          anyOf:
+            - $ref: './common.schema.json#/$defs/CalendarDate'
+            - type: 'null'
+        toDate:
+          anyOf:
+            - $ref: './common.schema.json#/$defs/CalendarDate'
+            - type: 'null'
+      required: [datasetType]
+      additionalProperties: false
+    TriggerResponse:
+      description: Spec §30 TriggerResponse.
+      type: object
+      properties:
+        runId:
+          $ref: './common.schema.json#/$defs/Uuid'
+        datasetType:
+          $ref: './price-observation.schema.json#/$defs/SourceDataset'
+        triggeredBy:
+          type: string
+          const: MANUAL
+        status:
+          type: string
+          const: RUNNING
+        startedAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+        reportDateFrom:
+          description: First report date requested (HISTORICAL_PRICE); null for CURRENT_PRICE.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/CalendarDate'
+            - type: 'null'
+        reportDateTo:
+          description: Last report date requested (HISTORICAL_PRICE); null for CURRENT_PRICE.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/CalendarDate'
+            - type: 'null'
+      required: [runId, datasetType, triggeredBy, status, startedAt, reportDateFrom, reportDateTo]
+      additionalProperties: false
+    PauseScheduleRequest:
+      type: object
+      properties:
+        reason:
+          description: Why scheduled runs are paused, for example announced source maintenance.
+          type: string
+          minLength: 1
+          maxLength: 500
+      required: [reason]
+      additionalProperties: false
+    TransportAssumptionsUpdateRequest:
+      description: The spec §32 parameters. Each must be greater than 0 (ADR-0020 item 1).
+      type: object
+      properties:
+        ratePerKm:
+          description: Rupees per km per trip (numeric(10,2)).
+          type: number
+          exclusiveMinimum: 0
+          maximum: 99999999.99
+          x-agrinex-max-decimal-places: 2
+        minimumTripCharge:
+          description: Rupees per trip (numeric(12,2)).
+          type: number
+          exclusiveMinimum: 0
+          maximum: 9999999999.99
+          x-agrinex-max-decimal-places: 2
+        vehicleCapacityKg:
+          description: Kilograms per trip (numeric(10,2)).
+          type: number
+          exclusiveMinimum: 0
+          maximum: 99999999.99
+          x-agrinex-max-decimal-places: 2
+      required: [ratePerKm, minimumTripCharge, vehicleCapacityKg]
+      additionalProperties: false
+    TransportAssumptionResponse:
+      description: Spec §30 TransportAssumptionResponse. One version.
+      type: object
+      properties:
+        versionId:
+          $ref: './common.schema.json#/$defs/Uuid'
+        ratePerKm:
+          type: number
+          minimum: 0
+          x-agrinex-max-decimal-places: 2
+        minimumTripCharge:
+          type: number
+          minimum: 0
+          x-agrinex-max-decimal-places: 2
+        vehicleCapacityKg:
+          type: number
+          exclusiveMinimum: 0
+          x-agrinex-max-decimal-places: 2
+        active:
+          description: true for the version new comparisons use.
+          type: boolean
+        createdAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+      required: [versionId, ratePerKm, minimumTripCharge, vehicleCapacityKg, active, createdAt]
+      additionalProperties: false
+    TransportAssumptionPage:
+      allOf:
+        - $ref: './common.schema.json#/$defs/PageMetadata'
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransportAssumptionResponse'
+      required: [items]
+      unevaluatedProperties: false
+    Weight:
+      description: A scoring weight between 0 and 1, at most 4 decimal places (ADR-0020; numeric(6,4)).
+      type: number
+      minimum: 0
+      maximum: 1
+      x-agrinex-max-decimal-places: 4
+    FreshnessDays:
+      description: A freshness threshold in whole days.
+      type: integer
+      minimum: 0
+      maximum: 2147483647
+    WeightsUpdateRequest:
+      description: >-
+        Spec §16 weights and freshness thresholds (ADR-0024 defaults 0.55, 0.15, 0.10, 0.10, 0.10 and 1, 4, 10
+        days). freshnessFreshDays <= freshnessRecentDays <= freshnessStaleDays (ADR-0020 item 1).
+      type: object
+      properties:
+        wNetRealization:
+          $ref: '#/components/schemas/Weight'
+        wPrice:
+          $ref: '#/components/schemas/Weight'
+        wTrend:
+          $ref: '#/components/schemas/Weight'
+        wFreshness:
+          $ref: '#/components/schemas/Weight'
+        wTransportPenalty:
+          $ref: '#/components/schemas/Weight'
+        freshnessFreshDays:
+          $ref: '#/components/schemas/FreshnessDays'
+        freshnessRecentDays:
+          $ref: '#/components/schemas/FreshnessDays'
+        freshnessStaleDays:
+          $ref: '#/components/schemas/FreshnessDays'
+      required: [wNetRealization, wPrice, wTrend, wFreshness, wTransportPenalty, freshnessFreshDays, freshnessRecentDays, freshnessStaleDays]
+      additionalProperties: false
+    WeightsResponse:
+      description: Spec §30 WeightsResponse. One version.
+      type: object
+      properties:
+        versionId:
+          $ref: './common.schema.json#/$defs/Uuid'
+        wNetRealization:
+          $ref: '#/components/schemas/Weight'
+        wPrice:
+          $ref: '#/components/schemas/Weight'
+        wTrend:
+          $ref: '#/components/schemas/Weight'
+        wFreshness:
+          $ref: '#/components/schemas/Weight'
+        wTransportPenalty:
+          $ref: '#/components/schemas/Weight'
+        freshnessFreshDays:
+          $ref: '#/components/schemas/FreshnessDays'
+        freshnessRecentDays:
+          $ref: '#/components/schemas/FreshnessDays'
+        freshnessStaleDays:
+          $ref: '#/components/schemas/FreshnessDays'
+        active:
+          type: boolean
+        createdAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+      required: [versionId, wNetRealization, wPrice, wTrend, wFreshness, wTransportPenalty, freshnessFreshDays, freshnessRecentDays, freshnessStaleDays, active, createdAt]
+      additionalProperties: false
+    WeightsPage:
+      allOf:
+        - $ref: './common.schema.json#/$defs/PageMetadata'
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeightsResponse'
+      required: [items]
+      unevaluatedProperties: false
+    MarketReviewStatus:
+      description: PROVISIONAL (registered from the feed, hidden from farmers), VERIFIED or MERGED (ADR-0014).
+      type: string
+      enum: [PROVISIONAL, VERIFIED, MERGED]
+    MarketCoordinates:
+      type: object
+      properties:
+        lat:
+          $ref: './common.schema.json#/$defs/Latitude'
+        lon:
+          $ref: './common.schema.json#/$defs/Longitude'
+        approximate:
+          description: true when the coordinates are the district centroid (ADR-0014).
+          type: boolean
+        source:
+          description: Provenance of the coordinates (markets.coordinate_source).
+          type: string
+          minLength: 1
+          maxLength: 300
+      required: [lat, lon, approximate, source]
+      additionalProperties: false
+    AdminMarketFields:
+      description: Fields shared by AdminMarketResponse and AdminMarketDetailResponse.
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        name:
+          $ref: './common.schema.json#/$defs/ReferenceName'
+        slug:
+          description: >-
+            Globally unique slug: the lower-case name with every run of non-alphanumeric characters replaced by one
+            hyphen, plus a collision suffix (ADR-0014 item 6). Edge hyphens are kept, for example `pune-moshi-`.
+          type: string
+          minLength: 1
+          maxLength: 220
+          pattern: '^\S+$'
+        district:
+          $ref: './common.schema.json#/$defs/DistrictRef'
+        state:
+          $ref: './common.schema.json#/$defs/StateRef'
+        reviewStatus:
+          $ref: '#/components/schemas/MarketReviewStatus'
+        active:
+          type: boolean
+        mergedIntoMarketId:
+          description: Target of a merge; present exactly when reviewStatus is MERGED.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/Uuid'
+            - type: 'null'
+        coordinates:
+          description: The market coordinates, or null when the market has none (then it cannot be a comparison candidate).
+          anyOf:
+            - $ref: '#/components/schemas/MarketCoordinates'
+            - type: 'null'
+        createdAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+      required: [id, name, slug, district, state, reviewStatus, active, mergedIntoMarketId, coordinates, createdAt]
+    AdminMarketResponse:
+      allOf:
+        - $ref: '#/components/schemas/AdminMarketFields'
+      unevaluatedProperties: false
+    MarketSourceAlias:
+      description: One source spelling mapped to the market (spec §47 Q4 canonical mapping table; ADR-0014).
+      type: object
+      properties:
+        sourceStateName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        sourceDistrictName:
+          type: string
+          minLength: 1
+          maxLength: 150
+        sourceMarketName:
+          description: Whitespace-normalized source spelling.
+          type: string
+          minLength: 1
+          maxLength: 200
+        sourceMarketNameRaw:
+          description: The spelling exactly as first received, including edge or doubled spaces.
+          type: string
+          minLength: 1
+          maxLength: 200
+        evidenceNote:
+          type: string
+          minLength: 1
+          maxLength: 500
+        createdAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+      required: [sourceStateName, sourceDistrictName, sourceMarketName, sourceMarketNameRaw, evidenceNote, createdAt]
+      additionalProperties: false
+    AdminMarketDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/AdminMarketFields'
+      properties:
+        aliases:
+          description: Source spellings mapped to the market, ordered by createdAt, then by source state, district and market name.
+          type: array
+          items:
+            $ref: '#/components/schemas/MarketSourceAlias'
+        latestReportDate:
+          description: Newest report date stored for the market, or null.
+          anyOf:
+            - $ref: './common.schema.json#/$defs/CalendarDate'
+            - type: 'null'
+      required: [aliases, latestReportDate]
+      unevaluatedProperties: false
+    AdminMarketPage:
+      allOf:
+        - $ref: './common.schema.json#/$defs/PageMetadata'
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminMarketResponse'
+      required: [items]
+      unevaluatedProperties: false
+    MergeMarketRequest:
+      type: object
+      properties:
+        targetMarketId:
+          description: The market this one is the same as. Unknown answers 422 REFERENCE_NOT_FOUND.
+          $ref: './common.schema.json#/$defs/Uuid'
+        evidenceNote:
+          description: Why the two spellings denote one market (ADR-0014; never fuzzy matching).
+          type: string
+          minLength: 1
+          maxLength: 500
+      required: [targetMarketId, evidenceNote]
+      additionalProperties: false
+    SetMarketCoordinatesRequest:
+      type: object
+      properties:
+        lat:
+          $ref: './common.schema.json#/$defs/Latitude'
+        lon:
+          $ref: './common.schema.json#/$defs/Longitude'
+        coordinateSource:
+          description: The identified source, for example the DMI National Agriculture Market Atlas with its date (ADR-0014).
+          type: string
+          minLength: 1
+          maxLength: 300
+      required: [lat, lon, coordinateSource]
+      additionalProperties: false
+    AdminCommodityResponse:
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        name:
+          $ref: './common.schema.json#/$defs/ReferenceName'
+        nameHi:
+          $ref: './common.schema.json#/$defs/LocalizedNameValue'
+        nameMr:
+          $ref: './common.schema.json#/$defs/LocalizedNameValue'
+        category:
+          anyOf:
+            - type: string
+              minLength: 1
+              maxLength: 100
+            - type: 'null'
+        priceUnit:
+          description: Verified unit, or null while unverified (ingestion then rejects the commodity's records as UNIT_UNVERIFIED, ADR-0008).
+          anyOf:
+            - $ref: './price-observation.schema.json#/$defs/PriceUnit'
+            - type: 'null'
+        priceUnitSource:
+          description: Official evidence of the unit, present exactly when priceUnit is present.
+          anyOf:
+            - type: string
+              minLength: 1
+              maxLength: 300
+            - type: 'null'
+        createdAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+      required: [id, name, nameHi, nameMr, category, priceUnit, priceUnitSource, createdAt]
+      additionalProperties: false
+    AdminCommodityPage:
+      allOf:
+        - $ref: './common.schema.json#/$defs/PageMetadata'
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminCommodityResponse'
+      required: [items]
+      unevaluatedProperties: false
+    AddCommodityRequest:
+      type: object
+      properties:
+        name:
+          description: >-
+            The commodity name exactly as the official source spells it. The server trims it and collapses each
+            run of whitespace to one space before storing (ADR-0006; ck_commodities_name_normalized); a value that
+            is empty after this answers 400 VALIDATION_FAILED with field code TOO_SHORT.
+          $ref: './common.schema.json#/$defs/ReferenceName'
+        category:
+          description: Official Agmarknet commodity group, or null.
+          anyOf:
+            - type: string
+              minLength: 1
+              maxLength: 100
+            - type: 'null'
+        priceUnit:
+          $ref: './price-observation.schema.json#/$defs/PriceUnit'
+        priceUnitSource:
+          description: Official evidence of the unit, for example the Agmarknet report export and its date (ADR-0008).
+          type: string
+          minLength: 1
+          maxLength: 300
+        sourceReference:
+          description: Official source reference for the commodity itself (ADR-0006 item 2). Kept in the audit details.
+          type: string
+          minLength: 1
+          maxLength: 500
+      required: [name, priceUnit, priceUnitSource, sourceReference]
+      additionalProperties: false
+    VerifyPriceUnitRequest:
+      type: object
+      properties:
+        priceUnit:
+          $ref: './price-observation.schema.json#/$defs/PriceUnit'
+        priceUnitSource:
+          type: string
+          minLength: 1
+          maxLength: 300
+      required: [priceUnit, priceUnitSource]
+      additionalProperties: false
+    UpdateCommodityNamesRequest:
+      type: object
+      properties:
+        nameHi:
+          $ref: './common.schema.json#/$defs/LocalizedNameValue'
+        nameMr:
+          $ref: './common.schema.json#/$defs/LocalizedNameValue'
+        provenanceNote:
+          description: Source of the translations (ADR-0015 item 1). Kept in the audit details.
+          type: string
+          minLength: 1
+          maxLength: 500
+      required: [nameHi, nameMr, provenanceNote]
+      additionalProperties: false
+    DistrictAliasResponse:
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        sourceStateName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        sourceDistrictName:
+          type: string
+          minLength: 1
+          maxLength: 150
+        district:
+          $ref: './common.schema.json#/$defs/DistrictRef'
+        evidenceNote:
+          type: string
+          minLength: 1
+          maxLength: 500
+        createdAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+      required: [id, sourceStateName, sourceDistrictName, district, evidenceNote, createdAt]
+      additionalProperties: false
+    DistrictAliasPage:
+      allOf:
+        - $ref: './common.schema.json#/$defs/PageMetadata'
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DistrictAliasResponse'
+      required: [items]
+      unevaluatedProperties: false
+    AddDistrictAliasRequest:
+      type: object
+      properties:
+        sourceStateName:
+          description: >-
+            The source State value. The server trims it and collapses each run of whitespace to one space before
+            storing (ck_district_source_aliases_state_normalized); a value that is empty after this answers 400
+            VALIDATION_FAILED with field code TOO_SHORT.
+          type: string
+          minLength: 1
+          maxLength: 100
+        sourceDistrictName:
+          description: The source District value, normalized like sourceStateName.
+          type: string
+          minLength: 1
+          maxLength: 150
+        districtId:
+          description: The LGD district it denotes. Unknown answers 422 REFERENCE_NOT_FOUND.
+          $ref: './common.schema.json#/$defs/Uuid'
+        evidenceNote:
+          description: Official reference for the mapping (ADR-0014 item 3).
+          type: string
+          minLength: 1
+          maxLength: 500
+      required: [sourceStateName, sourceDistrictName, districtId, evidenceNote]
+      additionalProperties: false
+    AdminAuditAction:
+      description: >-
+        Audited admin actions (admin_audit_events.action; ADR-0020 item 6). The database list is closed: a new
+        action needs a decision and a migration. Clients still tolerate values added in a later minor version.
+        No HTTP operation writes ADMIN_BOOTSTRAPPED (startup, ADR-0028), ACCOUNT_ERASED (operator procedure,
+        ADR-0037), ACCOUNT_DEACTIVATED or ACCOUNT_REACTIVATED (operator procedures, ADR-0041); they appear in
+        the audit log only.
+      type: string
+      enum:
+        - INGESTION_TRIGGERED
+        - INGESTION_PAUSED
+        - INGESTION_RESUMED
+        - TRANSPORT_ASSUMPTIONS_UPDATED
+        - RECOMMENDATION_WEIGHTS_UPDATED
+        - MARKET_VERIFIED
+        - MARKET_MERGED
+        - MARKET_DEACTIVATED
+        - MARKET_REACTIVATED
+        - MARKET_COORDINATES_SET
+        - COMMODITY_ADDED
+        - COMMODITY_UNIT_VERIFIED
+        - COMMODITY_NAMES_UPDATED
+        - DISTRICT_ALIAS_ADDED
+        - ADMIN_BOOTSTRAPPED
+        - ACCOUNT_ERASED
+        - ACCOUNT_DEACTIVATED
+        - ACCOUNT_REACTIVATED
+      x-agrinex-extensible: true
+    AdminAuditEventResponse:
+      type: object
+      properties:
+        id:
+          $ref: './common.schema.json#/$defs/Uuid'
+        action:
+          $ref: '#/components/schemas/AdminAuditAction'
+        actor:
+          description: >-
+            The ADMIN who acted; for ADMIN_BOOTSTRAPPED, the admin that was created (ADR-0028). Only the id is
+            returned, as recorded (admin_audit_events.actor_user_id); no personal data of the actor is added.
+          type: object
+          properties:
+            userId:
+              $ref: './common.schema.json#/$defs/Uuid'
+          required: [userId]
+          additionalProperties: false
+        targetType:
+          description: Kind of object acted on, for example market, commodity, transport_assumptions, source_dataset or user.
+          type: string
+          minLength: 1
+          maxLength: 50
+        targetId:
+          anyOf:
+            - type: string
+              minLength: 1
+              maxLength: 100
+            - type: 'null'
+        details:
+          description: Masked before and after values and the justification. Never credentials (ADR-0020 item 5).
+          type: object
+          additionalProperties: true
+          x-agrinex-free-form: true
+        correlationId:
+          anyOf:
+            - type: string
+              maxLength: 100
+            - type: 'null'
+        createdAt:
+          $ref: './common.schema.json#/$defs/Timestamp'
+      required: [id, action, actor, targetType, targetId, details, correlationId, createdAt]
+      additionalProperties: false
+    AdminAuditEventPage:
+      allOf:
+        - $ref: './common.schema.json#/$defs/PageMetadata'
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminAuditEventResponse'
+      required: [items]
+      unevaluatedProperties: false

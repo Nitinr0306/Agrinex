@@ -1,0 +1,33 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "triggerIngestion",
+  "scenario": "A run of the same dataset is still RUNNING (ADR-0011 item 4).",
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/admin/ingestion/trigger",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    },
+    "body": {
+      "datasetType": "CURRENT_PRICE"
+    }
+  },
+  "response": {
+    "status": 409,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0047",
+      "Content-Type": "application/problem+json"
+    },
+    "body": {
+      "type": "/problems/conflict",
+      "title": "Conflict",
+      "status": 409,
+      "detail": "A CURRENT_PRICE run is already in progress.",
+      "code": "CONFLICT",
+      "correlationId": "mock-correlation-0047",
+      "errors": [],
+      "instance": "/api/v1/admin/ingestion/trigger"
+    }
+  }
+}

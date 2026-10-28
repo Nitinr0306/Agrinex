@@ -1,0 +1,37 @@
+lgd_code,lgd_name,soi_district,soi_dist_lgd_attribute,join,centroid_lat,centroid_lon,method,polygon_parts,area_km2
+466,Ahilyanagar,AHILYANAGAR,522,census 2011 code,19.204562,74.676281,area centroid (inside polygon),1,16550.2
+467,Akola,AKOLA,501,census 2011 code,20.748571,77.055707,area centroid (inside polygon),4,5244.5
+468,Amravati,AMRAVATI,503,census 2011 code,21.187361,77.571322,area centroid (inside polygon),1,11758.1
+469,Chhatrapati Sambhajinagar,CHHATRAPATI SAMBHAJI NAGAR,515,census 2011 code,20.026715,75.280376,area centroid (inside polygon),2,9812.6
+470,Beed,BEED,523,census 2011 code,18.946759,75.838626,area centroid (inside polygon),1,10272.6
+471,Bhandara,BHANDARA,506,census 2011 code,21.114977,79.763534,area centroid (inside polygon),1,3991.7
+472,Buldhana,BULDHANA,500,census 2011 code,20.509846,76.406861,area centroid (inside polygon),1,9401.4
+473,Chandrapur,CHANDRAPUR,509,census 2011 code,20.117731,79.440227,area centroid (inside polygon),1,10976.0
+474,Dhule,DHULE,498,census 2011 code,21.110255,74.600112,area centroid (inside polygon),1,6929.0
+475,Gadchiroli,GADCHIROLI,508,census 2011 code,19.785489,80.240227,area centroid (inside polygon),1,14022.4
+476,Gondia,GONDIA,507,census 2011 code,21.165037,80.218046,area centroid (inside polygon),1,4991.5
+477,Hingoli,HINGOLI,512,census 2011 code,19.637263,77.100635,area centroid (inside polygon),1,4555.5
+478,Jalgaon,JALGAON,499,census 2011 code,20.932492,75.487409,area centroid (inside polygon),1,11367.8
+479,Jalna,JALNA,514,census 2011 code,19.805951,75.982056,area centroid (inside polygon),1,7391.7
+480,Kolhapur,KOLHAPUR,530,census 2011 code,16.470241,74.159061,area centroid (inside polygon),1,7512.3
+481,Latur,LATUR,524,census 2011 code,18.373738,76.760142,area centroid (inside polygon),2,6997.1
+482,Mumbai,MUMBAI,519,census 2011 code,18.988884,72.838260,area centroid (inside polygon),5,62.3
+483,Mumbai Suburban,MUMBAI SUBURBAN,518,census 2011 code,19.131723,72.884465,area centroid (inside polygon),6,418.3
+484,Nagpur,NAGPUR,505,census 2011 code,21.177899,79.085286,area centroid (inside polygon),1,9538.7
+485,Nanded,NANDED,511,census 2011 code,19.111361,77.616540,area centroid (inside polygon),1,10199.3
+486,Nandurbar,NANDURBAR,497,census 2011 code,21.549915,74.216592,area centroid (inside polygon),1,5736.4
+487,Nashik,NASHIK,516,census 2011 code,20.259292,74.069252,area centroid (inside polygon),1,14997.0
+488,Dharashiv,DHARASHIV,525,census 2011 code,18.188304,76.038147,area centroid (inside polygon),2,7361.9
+489,Parbhani,PARBHANI,513,census 2011 code,19.267806,76.691092,area centroid (inside polygon),1,6105.2
+490,Pune,PUNE,521,census 2011 code,18.570554,74.069108,area centroid (inside polygon),1,15182.4
+491,Raigad,RAIGAD,520,census 2011 code,18.509159,73.221622,area centroid (inside polygon),9,6774.6
+492,Ratnagiri,RATNAGIRI,528,census 2011 code,17.272774,73.455311,area centroid (inside polygon),8,8081.8
+493,Sangli,SANGLI,531,census 2011 code,17.114102,74.767901,area centroid (inside polygon),1,8391.9
+494,Satara,SATARA,527,census 2011 code,17.669750,74.172607,area centroid (inside polygon),2,10194.7
+495,Sindhudurg,SINDHUDURG,529,census 2011 code,16.133412,73.738177,area centroid (inside polygon),63,5001.4
+496,Solapur,SOLAPUR,526,census 2011 code,17.790096,75.483507,area centroid (inside polygon),1,14449.7
+497,Thane,THANE,517,census 2011 code,19.361033,73.319359,area centroid (inside polygon),4,4136.1
+498,Wardha,WARDHA,504,census 2011 code,20.796854,78.586577,area centroid (inside polygon),1,6083.2
+499,Washim,WASHIM,502,census 2011 code,20.234294,77.215914,area centroid (inside polygon),2,4961.0
+500,Yavatmal,YAVATMAL,510,census 2011 code,20.083558,78.160753,area centroid (inside polygon),2,13123.2
+665,Palghar,PALGHAR,681,name,19.792523,73.011140,area centroid (inside polygon),5,5078.0

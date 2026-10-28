@@ -1,0 +1,57 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getAdminMarket",
+  "scenario": "A PROVISIONAL market with the source spelling that registered it (note the trailing space kept in the raw value).",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/admin/markets/00000000-0000-4000-8000-0000000007ff",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0063",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "id": "00000000-0000-4000-8000-0000000007ff",
+      "name": "TEST Market G",
+      "slug": "test-market-g",
+      "district": {
+        "id": "00000000-0000-4000-8000-000000000202",
+        "name": "Test District South"
+      },
+      "state": {
+        "id": "00000000-0000-4000-8000-000000000101",
+        "code": "IN-MH",
+        "name": "Maharashtra",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "reviewStatus": "PROVISIONAL",
+      "active": true,
+      "mergedIntoMarketId": null,
+      "coordinates": {
+        "lat": 19.412781,
+        "lon": 74.506012,
+        "approximate": true,
+        "source": "Centroid of Test District South (synthetic)"
+      },
+      "createdAt": "2026-10-03T00:30:52Z",
+      "aliases": [
+        {
+          "sourceStateName": "Maharashtra",
+          "sourceDistrictName": "Test District South",
+          "sourceMarketName": "TEST Market G",
+          "sourceMarketNameRaw": "TEST Market G ",
+          "evidenceNote": "auto-registered by run 00000000-0000-4000-8000-000000000f01",
+          "createdAt": "2026-10-03T00:30:52Z"
+        }
+      ],
+      "latestReportDate": "2026-10-03"
+    }
+  }
+}

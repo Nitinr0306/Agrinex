@@ -1,0 +1,39 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listDistrictAliases",
+  "scenario": "A former district spelling mapped to its current district with evidence (ADR-0014).",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/admin/district-aliases?page=0&size=20",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0073",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-4000-8000-000000001201",
+          "sourceStateName": "Maharashtra",
+          "sourceDistrictName": "Test District Former Name",
+          "district": {
+            "id": "00000000-0000-4000-8000-000000000201",
+            "name": "Test District North"
+          },
+          "evidenceNote": "Government notification of the district rename (synthetic example)",
+          "createdAt": "2026-09-01T06:00:00Z"
+        }
+      ],
+      "page": 0,
+      "size": 20,
+      "totalItems": 1,
+      "totalPages": 1
+    }
+  }
+}

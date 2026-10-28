@@ -1,0 +1,82 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getMarketDetail",
+  "scenario": "Every CURRENT_PRICE run has failed so far, so lastSuccessfulSyncAt is null and the banner shows; the price comes from the historical bootstrap, with its true date (ADR-0005, ADR-0010).",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/markets/00000000-0000-4000-8000-000000000701?commodityId=00000000-0000-4000-8000-000000000401"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0030",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "market": {
+        "id": "00000000-0000-4000-8000-000000000701",
+        "name": "TEST Market A",
+        "district": {
+          "id": "00000000-0000-4000-8000-000000000201",
+          "name": "Test District North"
+        },
+        "state": {
+          "id": "00000000-0000-4000-8000-000000000101",
+          "code": "IN-MH",
+          "name": "Maharashtra",
+          "nameHi": null,
+          "nameMr": null
+        }
+      },
+      "active": true,
+      "approximateMarketLocation": false,
+      "latestPrices": [
+        {
+          "commodity": {
+            "id": "00000000-0000-4000-8000-000000000401",
+            "name": "Onion",
+            "nameHi": null,
+            "nameMr": null
+          },
+          "price": {
+            "observationId": "00000000-0000-4000-8000-000000000803",
+            "reportDate": "2026-09-28",
+            "variety": {
+              "id": "00000000-0000-4000-8000-000000000501",
+              "name": "Red"
+            },
+            "grade": {
+              "id": "00000000-0000-4000-8000-000000000602",
+              "name": "Local"
+            },
+            "minPrice": 2500,
+            "maxPrice": 3000,
+            "modalPrice": 2800,
+            "priceUnit": "Rs./Quintal",
+            "sourceDataset": "HISTORICAL_PRICE",
+            "sourceResourceId": "35985678-0d79-46b4-9ed6-6f13308a1d24",
+            "ingestedAt": "2026-09-29T00:33:40Z",
+            "freshnessStatus": "STALE",
+            "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+          }
+        }
+      ],
+      "noDataReason": null,
+      "sourceStatus": {
+        "sourceDataset": "CURRENT_PRICE",
+        "lastSuccessfulSyncAt": null,
+        "latestSyncFailed": true
+      }
+    }
+  }
+}

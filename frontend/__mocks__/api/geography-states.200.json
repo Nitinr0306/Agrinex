@@ -1,0 +1,28 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listStates",
+  "scenario": "Phase 1 coverage: one state.",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/geography/states"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0007",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-4000-8000-000000000101",
+          "code": "IN-MH",
+          "name": "Maharashtra",
+          "nameHi": null,
+          "nameMr": null
+        }
+      ]
+    }
+  }
+}

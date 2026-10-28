@@ -1,0 +1,50 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "mergeMarket",
+  "scenario": "An alias twin is merged into TEST Market B with an evidence note; it becomes MERGED and inactive (ADR-0014).",
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/admin/markets/00000000-0000-4000-8000-000000000708/merge",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    },
+    "body": {
+      "targetMarketId": "00000000-0000-4000-8000-000000000702",
+      "evidenceNote": "Same market under two spellings in one delivery (synthetic example)"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0065",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "id": "00000000-0000-4000-8000-000000000708",
+      "name": "TEST Market B APMC",
+      "slug": "test-market-b-apmc",
+      "district": {
+        "id": "00000000-0000-4000-8000-000000000202",
+        "name": "Test District South"
+      },
+      "state": {
+        "id": "00000000-0000-4000-8000-000000000101",
+        "code": "IN-MH",
+        "name": "Maharashtra",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "reviewStatus": "MERGED",
+      "active": false,
+      "mergedIntoMarketId": "00000000-0000-4000-8000-000000000702",
+      "coordinates": {
+        "lat": 19.412781,
+        "lon": 74.506012,
+        "approximate": true,
+        "source": "Centroid of Test District South (synthetic)"
+      },
+      "createdAt": "2026-09-14T00:31:00Z"
+    }
+  }
+}

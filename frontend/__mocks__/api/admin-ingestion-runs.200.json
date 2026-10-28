@@ -1,0 +1,84 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listIngestionRuns",
+  "scenario": "Run history, newest first, with every counter.",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/admin/ingestion/runs?page=0&size=5",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0044",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-4000-8000-000000000f02",
+          "datasetType": "HISTORICAL_PRICE",
+          "triggeredBy": "SCHEDULER",
+          "status": "FAILED",
+          "startedAt": "2026-10-03T00:32:45Z",
+          "finishedAt": "2026-10-03T00:33:30Z",
+          "durationSeconds": 45,
+          "requestScope": {
+            "filters.State": "Maharashtra",
+            "reportDates": [
+              "30-09-2026",
+              "01-10-2026",
+              "02-10-2026",
+              "03-10-2026"
+            ],
+            "limit": 500
+          },
+          "sourceTotalRecords": null,
+          "pagesFetched": 0,
+          "pagesFailed": 4,
+          "recordsFetched": 0,
+          "recordsInserted": 0,
+          "recordsUpdated": 0,
+          "duplicatesSkipped": 0,
+          "validationErrorsCount": 0,
+          "recordsConflicted": 0,
+          "recordsOutOfScope": 0,
+          "completenessPercent": null,
+          "errorCount": 4
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000f01",
+          "datasetType": "CURRENT_PRICE",
+          "triggeredBy": "SCHEDULER",
+          "status": "SUCCESS",
+          "startedAt": "2026-10-03T00:30:00Z",
+          "finishedAt": "2026-10-03T00:32:40Z",
+          "durationSeconds": 160,
+          "requestScope": {
+            "filters.state": "Maharashtra",
+            "limit": 500
+          },
+          "sourceTotalRecords": 1210,
+          "pagesFetched": 3,
+          "pagesFailed": 0,
+          "recordsFetched": 1210,
+          "recordsInserted": 1095,
+          "recordsUpdated": 4,
+          "duplicatesSkipped": 88,
+          "validationErrorsCount": 21,
+          "recordsConflicted": 2,
+          "recordsOutOfScope": 0,
+          "completenessPercent": 98.1,
+          "errorCount": 23
+        }
+      ],
+      "page": 0,
+      "size": 5,
+      "totalItems": 2,
+      "totalPages": 1
+    }
+  }
+}

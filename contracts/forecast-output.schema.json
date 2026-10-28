@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ForecastOutput",
+  "description": "OPTIONAL ML track. Output contract of the ML forecasting job (spec §35 'Output (written to forecasts table)'; spec §41: produced by ML, consumed by Backend; ADR-0030). One ForecastOutput is one generation: the forecast for one market, commodity and horizon produced at one generatedAt. The ML job stores it as one `forecasts` row per point, through its restricted database role, in one transaction (column mapping in docs/api/ML_CONTRACT_BOUNDARY.md). There is no request/response API between the backend and ML: the backend never calls the ML service (ADR-0030 item 3). Forecasts are model predictions, never government-reported prices; they are never read by comparison, recommendation, transport or alerts (docs/database/TABLE_OWNERSHIP.md). Field names follow spec §35. AgriNex never fabricates a forecast, a bound, a metric or a model identity: every value here is produced by the ML job, and a missing forecast means 'unavailable' (spec §29, §35).",
+  "x-agrinex-contract-version": "1.0.0",
+  "x-agrinex-phase": "OPTIONAL_ML",
+  "$ref": "#/$defs/ForecastOutput",
+  "$defs": {
+    "ForecastHorizonDays": {
+      "description": "Forecast horizon in days: 3 or 7 (spec §35 'predict modal price ... 3 or 7 days ahead'; forecasts.forecast_horizon_days CHECK).",
+      "type": "integer",
+      "enum": [3, 7]
+    },
+    "ForecastPoint": {
+      "description": "One predicted modal price (spec §35 forecast[] item). Prices are in the unit of the input series, which is the commodity's verified unit ('Rs./Quintal', ADR-0008). Within one generation each date appears once, and every date is after trainingDataThrough (forecasts CHECK ck_forecasts_after_training). When present, lowerBound <= predictedPrice <= upperBound (CHECK ck_forecasts_bounds).",
+      "type": "object",
+      "properties": {
+        "date": {
+          "description": "Calendar date the prediction is for (forecasts.forecast_date).",
+          "$ref": "common.schema.json#/$defs/CalendarDate"
+        },
+        "predictedPrice": {
+          "description": "Predicted modal price, rounded half-up to 2 decimal places (forecasts.predicted_price numeric(14,2)).",
+          "type": "number",
+          "x-agrinex-max-decimal-places": 2
+        },
+        "lowerBound": {
+          "description": "Lower prediction bound exactly as the model produced it, or null when the model produces none. The coverage level of the interval is not recorded, so no confidence percentage may be attached to it.",
+          "anyOf": [
+            { "type": "number", "x-agrinex-max-decimal-places": 2 },
+            { "type": "null" }
+          ]
+        },
+        "upperBound": {
+          "description": "Upper prediction bound exactly as the model produced it, or null when the model produces none (same caveat as lowerBound).",
+          "anyOf": [
+            { "type": "number", "x-agrinex-max-decimal-places": 2 },
+            { "type": "null" }
+          ]
+        }
+      },
+      "required": ["date", "predictedPrice", "lowerBound", "upperBound"],
+      "additionalProperties": false
+    },
+    "ForecastOutput": {
+      "type": "object",
+      "properties": {
+        "marketId": {
+          "description": "Market of the forecast (forecasts.market_id).",
+          "$ref": "common.schema.json#/$defs/Uuid"
+        },
+        "commodityId": {
+          "description": "Commodity of the forecast (forecasts.commodity_id). The forecast is built on the representative daily series of this market and commodity; it carries no variety (ADR-0030 item 5).",
+          "$ref": "common.schema.json#/$defs/Uuid"
+        },
+        "forecastHorizonDays": { "$ref": "#/$defs/ForecastHorizonDays" },
+        "forecast": {
+          "description": "Predicted points of this generation, in ascending date order.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ForecastPoint" }
+        },
+        "modelName": {
+          "description": "Name of the model that produced the forecast, for example one of the spec §35 baselines (forecasts.model_name varchar(100)).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "modelVersion": {
+          "description": "Version of that model, chosen by the ML track (forecasts.model_version varchar(50)).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "mae": {
+          "description": "Validation mean absolute error reported by the ML job for this model version, in the price unit, or null when not computed (spec §35, §36; forecasts.mae numeric(14,4)).",
+          "anyOf": [
+            { "type": "number", "minimum": 0, "x-agrinex-max-decimal-places": 4 },
+            { "type": "null" }
+          ]
+        },
+        "rmse": {
+          "description": "Validation root mean squared error, in the price unit, or null when not computed (forecasts.rmse numeric(14,4)).",
+          "anyOf": [
+            { "type": "number", "minimum": 0, "x-agrinex-max-decimal-places": 4 },
+            { "type": "null" }
+          ]
+        },
+        "trainingDataThrough": {
+          "description": "Date of the last observation used for training (forecasts.training_data_through). Chronological validation only; no data after this date was used (spec §35, §47 Q14).",
+          "$ref": "common.schema.json#/$defs/CalendarDate"
+        },
+        "generatedAt": {
+          "description": "When the ML job produced this generation (forecasts.generated_at). All rows of one generation share it.",
+          "$ref": "common.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": ["marketId", "commodityId", "forecastHorizonDays", "forecast", "modelName", "modelVersion", "mae", "rmse", "trainingDataThrough", "generatedAt"],
+      "additionalProperties": false
+    }
+  }
+}

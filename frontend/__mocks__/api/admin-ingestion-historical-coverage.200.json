@@ -1,0 +1,76 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getHistoricalCoverage",
+  "scenario": "One report date failed and two were fetched only before they settled; a gap-backfill run is in progress.",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata"
+  },
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/admin/ingestion/historical-coverage",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0101",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "generatedAt": "2026-10-03T04:25:00Z",
+      "coverageFrom": "2025-10-03",
+      "coverageTo": "2026-10-03",
+      "settleAfterDays": 3,
+      "scheduledRunsPaused": false,
+      "counts": {
+        "settled": 360,
+        "pending": 3,
+        "unsettled": 2,
+        "failed": 1,
+        "missing": 0
+      },
+      "incompleteDates": [
+        {
+          "reportDate": "2026-09-29",
+          "status": "UNSETTLED",
+          "lastAttemptAt": "2026-09-30T06:30:12Z",
+          "lastSuccessAt": "2026-09-30T06:30:12Z",
+          "recordsFetched": 1204,
+          "consecutiveFailures": 0
+        },
+        {
+          "reportDate": "2026-09-28",
+          "status": "UNSETTLED",
+          "lastAttemptAt": "2026-09-30T06:30:10Z",
+          "lastSuccessAt": "2026-09-30T06:30:10Z",
+          "recordsFetched": 1391,
+          "consecutiveFailures": 0
+        },
+        {
+          "reportDate": "2026-09-14",
+          "status": "FAILED",
+          "lastAttemptAt": "2026-10-02T21:30:05Z",
+          "lastSuccessAt": "2026-09-15T00:30:44Z",
+          "recordsFetched": 1188,
+          "consecutiveFailures": 2
+        }
+      ],
+      "runningRun": {
+        "runId": "7a1d2c3e-4b5f-4a6b-8c7d-9e0f1a2b3c4d",
+        "purpose": "GAP_BACKFILL",
+        "reportDateFrom": "2026-09-14",
+        "reportDateTo": "2026-09-29",
+        "datesInScope": 16,
+        "datesAttempted": 9
+      },
+      "nextGapCheckAt": "2026-10-03T21:30:00Z",
+      "nextReconciliationAt": "2026-10-03T22:30:00Z",
+      "maxDatesPerGapRun": 31,
+      "reconciliationWindowDays": 14
+    }
+  }
+}

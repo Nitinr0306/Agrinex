@@ -1,0 +1,43 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "updateRecommendationWeights",
+  "scenario": "A new weights version becomes active (values synthetic).",
+  "request": {
+    "method": "PUT",
+    "path": "/api/v1/admin/config/recommendation-weights",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    },
+    "body": {
+      "wNetRealization": 0.55,
+      "wPrice": 0.15,
+      "wTrend": 0.05,
+      "wFreshness": 0.15,
+      "wTransportPenalty": 0.1,
+      "freshnessFreshDays": 1,
+      "freshnessRecentDays": 4,
+      "freshnessStaleDays": 10
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0061",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "versionId": "00000000-0000-4000-8000-000000000b02",
+      "wNetRealization": 0.55,
+      "wPrice": 0.15,
+      "wTrend": 0.05,
+      "wFreshness": 0.15,
+      "wTransportPenalty": 0.1,
+      "freshnessFreshDays": 1,
+      "freshnessRecentDays": 4,
+      "freshnessStaleDays": 10,
+      "active": true,
+      "createdAt": "2026-10-03T05:20:00Z"
+    }
+  }
+}

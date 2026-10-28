@@ -1,0 +1,212 @@
+@import "tailwindcss";
+
+/*
+ * AgriNex design tokens: the approved Hisaab values (role file 02 §14.2 column A; ADR-0043).
+ * Values marked "derived" are not listed in §14.2; each reuses an approved value or a tint of one
+ * (ADR-0043 item 5 refinement) and passes WCAG 2.1 AA against the surfaces it is used on.
+ */
+@theme {
+  --color-*: initial;
+
+  --color-paper: #faf6ee; /* surface.page */
+  --color-raised: #ffffff; /* surface.raised (derived) */
+  --color-sunken: #f1ede6; /* surface.sunken (derived: status.unavailable bg) */
+  --color-ink: #1d1a16; /* text.primary */
+  --color-ink-2: #5a5248; /* text.secondary */
+  --color-inverse: #ffffff; /* text.inverse (derived) */
+  --color-rule: #d9cfbf; /* border.subtle: decorative only */
+  --color-rule-strong: #8c8070; /* border.strong: controls and chart marks */
+  --color-action: #1e5b3a; /* action.primary.bg */
+  --color-action-hover: #174a2f; /* derived: darker action for hover */
+  --color-net: #1e5b3a; /* value.net */
+  --color-hyp: #3d3a9e; /* value.hypothetical */
+  --color-hyp-surface: #eeedf8; /* value.hypothetical-surface (derived tint) */
+  --color-fresh: #1e5b3a;
+  --color-fresh-bg: #eaf3ec;
+  --color-recent: #0e5e63;
+  --color-recent-bg: #e3f1f1;
+  --color-stale: #8a5300;
+  --color-stale-bg: #fff3d6;
+  --color-unavailable: #5a5248;
+  --color-unavailable-bg: #f1ede6;
+  --color-rising: #1e7b45;
+  --color-falling: #b42318;
+  --color-steady: #5a5248; /* trend.stable and trend.insufficient (derived: text.secondary) */
+  --color-outage: #1d1a16;
+  --color-outage-bg: #fff3d6;
+  --color-outage-border: #8a5300;
+  --color-error: #b42318; /* signal.error (derived: trend.falling) */
+  --color-error-bg: #fdecea; /* derived tint */
+  --color-transport-fill: #5a5248; /* chart.transport.fill */
+  --color-transport-track: #d9cfbf; /* chart.transport.track */
+  --color-focus: #1d1a16; /* focus.ring (derived: text.primary) */
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+
+  --font-sans: var(--font-plex-sans), var(--font-plex-deva), ui-sans-serif, system-ui, sans-serif;
+  --font-deva: var(--font-plex-deva), var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), var(--font-plex-deva), ui-monospace, monospace;
+
+  /* Type ramp (px size / line): display 28/36, title 22/28, heading 18/24, body 16/24, label 14/20,
+     caption 13/18, numeric 24/32. Devanagari line heights are raised below (§11). */
+  --text-display: 1.75rem;
+  --text-display--line-height: var(--lh-display);
+  --text-title: 1.375rem;
+  --text-title--line-height: var(--lh-title);
+  --text-heading: 1.125rem;
+  --text-heading--line-height: var(--lh-heading);
+  --text-body: 1rem;
+  --text-body--line-height: var(--lh-body);
+  --text-label: 0.875rem;
+  --text-label--line-height: var(--lh-label);
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: var(--lh-caption);
+  --text-numeric: 1.5rem;
+  --text-numeric--line-height: var(--lh-numeric);
+
+  --radius-control: 4px;
+  --radius-card: 4px;
+
+  --breakpoint-tablet: 37.5rem; /* 600 px */
+  --breakpoint-desktop: 64rem; /* 1024 px */
+
+  --animate-fade: fade 200ms ease-out;
+}
+
+:root {
+  --lh-display: 2.25rem;
+  --lh-title: 1.75rem;
+  --lh-heading: 1.5rem;
+  --lh-body: 1.5rem;
+  --lh-label: 1.25rem;
+  --lh-caption: 1.125rem;
+  --lh-numeric: 2rem;
+  color-scheme: light;
+}
+
+/* Devanagari: line height at least 1.5, 1.6 preferred (role file 02 §11). */
+:root:lang(mr),
+:root:lang(hi) {
+  --lh-display: 2.75rem;
+  --lh-title: 2.25rem;
+  --lh-heading: 1.8rem;
+  --lh-body: 1.6rem;
+  --lh-label: 1.4rem;
+  --lh-caption: 1.3rem;
+  --lh-numeric: 2.4rem;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--lh-body);
+    min-height: 100dvh;
+  }
+
+  :lang(mr),
+  :lang(hi) {
+    font-family: var(--font-deva);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  button,
+  [role="button"],
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Small upper-case section label. Letter-spacing is never applied to Devanagari (§11). */
+  .eyebrow {
+    font-size: var(--text-caption);
+    line-height: var(--lh-caption);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-ink-2);
+  }
+
+  :lang(mr) .eyebrow,
+  :lang(hi) .eyebrow {
+    letter-spacing: normal;
+  }
+
+  /* Figures: IBM Plex Mono, tabular (§1.1). */
+  .figure {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Ledger leaders between a label and its amount. */
+  .leader {
+    flex: 1 1 auto;
+    min-width: 1rem;
+    border-bottom: 1px dotted var(--color-rule-strong);
+    margin: 0 0.5rem 0.35rem;
+  }
+
+  /* The double rule above the bottom line of every ledger. */
+  .double-rule {
+    border-top: 3px double var(--color-ink);
+  }
+
+  /* The reserved hypothetical treatment: colour + dashed pattern + the word "What-if" (§6). */
+  .hyp-frame {
+    border: 2px dashed var(--color-hyp);
+    background: var(--color-hyp-surface);
+  }
+
+  .hyp-value {
+    color: var(--color-hyp);
+    text-decoration: underline dashed var(--color-hyp);
+    text-underline-offset: 3px;
+  }
+
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}

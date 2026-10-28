@@ -1,0 +1,50 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "compareSellingOptions",
+  "scenario": "A schema-valid but extreme quantity whose estimates would exceed the stored precision: 422, nothing recorded, and no quantity limit (ADR-0023 item 1; ADR-0040).",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/selling-options/compare",
+    "body": {
+      "commodityId": "00000000-0000-4000-8000-000000000401",
+      "quantity": 999999999.999,
+      "quantityUnit": "QUINTAL",
+      "originLat": 20.104532,
+      "originLon": 73.918274,
+      "maxDistanceKm": 150
+    }
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0021",
+      "Content-Type": "application/problem+json"
+    },
+    "body": {
+      "type": "/problems/estimate-out-of-range",
+      "title": "Estimate out of range",
+      "status": 422,
+      "detail": "The estimates for this quantity exceed the amounts AgriNex can record.",
+      "code": "ESTIMATE_OUT_OF_RANGE",
+      "correlationId": "mock-correlation-0021",
+      "errors": [
+        {
+          "field": "quantity",
+          "code": "OUT_OF_RANGE",
+          "message": "the estimates for this quantity exceed the stored precision"
+        }
+      ],
+      "instance": "/api/v1/selling-options/compare"
+    }
+  }
+}

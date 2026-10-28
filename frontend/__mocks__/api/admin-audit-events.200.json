@@ -1,0 +1,78 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listAdminAuditEvents",
+  "scenario": "Audited admin actions with masked before and after details (ADR-0020), including a deactivation by the operator procedure (ADR-0041), which no HTTP operation performs.",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/admin/audit-events?page=0&size=20",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0075",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-4000-8000-000000001103",
+          "action": "ACCOUNT_DEACTIVATED",
+          "actor": {
+            "userId": "00000000-0000-4000-8000-000000000e02"
+          },
+          "targetType": "user",
+          "targetId": "00000000-0000-4000-8000-000000000e09",
+          "details": {
+            "role": "FARMER",
+            "reason": "Abusive use reported (synthetic example)"
+          },
+          "correlationId": "mock-correlation-9003",
+          "createdAt": "2026-10-03T06:10:00Z"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000001102",
+          "action": "MARKET_VERIFIED",
+          "actor": {
+            "userId": "00000000-0000-4000-8000-000000000e02"
+          },
+          "targetType": "market",
+          "targetId": "00000000-0000-4000-8000-0000000007ff",
+          "details": {
+            "before": {
+              "reviewStatus": "PROVISIONAL"
+            },
+            "after": {
+              "reviewStatus": "VERIFIED"
+            }
+          },
+          "correlationId": "mock-correlation-9002",
+          "createdAt": "2026-10-03T05:50:00Z"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000001101",
+          "action": "INGESTION_TRIGGERED",
+          "actor": {
+            "userId": "00000000-0000-4000-8000-000000000e02"
+          },
+          "targetType": "source_dataset",
+          "targetId": "HISTORICAL_PRICE",
+          "details": {
+            "fromDate": "2026-09-27",
+            "toDate": "2026-09-30",
+            "runId": "00000000-0000-4000-8000-000000000f03"
+          },
+          "correlationId": "mock-correlation-9001",
+          "createdAt": "2026-10-03T04:25:00Z"
+        }
+      ],
+      "page": 0,
+      "size": 20,
+      "totalItems": 3,
+      "totalPages": 1
+    }
+  }
+}

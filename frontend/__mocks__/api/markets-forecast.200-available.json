@@ -1,0 +1,97 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getMarketForecast",
+  "scenario": "OPTIONAL ML track: an invented forecast from a placeholder model. It is a model prediction, never a reported price, and never affects comparison or alerts (ADR-0030). Metrics and bounds are as an ML job would write them.",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/markets/00000000-0000-4000-8000-000000000702/forecast?commodityId=00000000-0000-4000-8000-000000000401"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0034",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "available": true,
+      "kind": "ML_FORECAST",
+      "inputBasis": "REPRESENTATIVE_DAILY_SERIES",
+      "market": {
+        "id": "00000000-0000-4000-8000-000000000702",
+        "name": "TEST Market B"
+      },
+      "commodity": {
+        "id": "00000000-0000-4000-8000-000000000401",
+        "name": "Onion",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "priceUnit": "Rs./Quintal",
+      "forecasts": [
+        {
+          "forecastHorizonDays": 7,
+          "modelName": "TEST-MODEL",
+          "modelVersion": "0.0.0-test",
+          "generatedAt": "2026-10-02T21:00:00Z",
+          "trainingDataThrough": "2026-10-01",
+          "mae": 210.4,
+          "rmse": 300.2,
+          "forecast": [
+            {
+              "date": "2026-10-03",
+              "predictedPrice": 3090,
+              "lowerBound": 2910,
+              "upperBound": 3280
+            },
+            {
+              "date": "2026-10-04",
+              "predictedPrice": 3075,
+              "lowerBound": 2880,
+              "upperBound": 3280
+            },
+            {
+              "date": "2026-10-05",
+              "predictedPrice": 3060,
+              "lowerBound": 2850,
+              "upperBound": 3280
+            },
+            {
+              "date": "2026-10-06",
+              "predictedPrice": 3070,
+              "lowerBound": 2845,
+              "upperBound": 3305
+            },
+            {
+              "date": "2026-10-07",
+              "predictedPrice": 3085,
+              "lowerBound": 2845,
+              "upperBound": 3335
+            },
+            {
+              "date": "2026-10-08",
+              "predictedPrice": 3080,
+              "lowerBound": 2825,
+              "upperBound": 3345
+            },
+            {
+              "date": "2026-10-09",
+              "predictedPrice": 3065,
+              "lowerBound": 2795,
+              "upperBound": 3345
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

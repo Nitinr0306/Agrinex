@@ -1,0 +1,55 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getSystemStatus",
+  "scenario": "Read-only status: Redis is down, so rate limiting and caching run in-process (ADR-0018); the API key value is never shown.",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/admin/system/status",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0048",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "generatedAt": "2026-10-03T04:20:00Z",
+      "components": {
+        "database": "UP",
+        "redis": "DOWN"
+      },
+      "governmentApiKey": "CONFIGURED",
+      "schedule": {
+        "timeZone": "Asia/Kolkata",
+        "runTimes": [
+          "00:00",
+          "06:00",
+          "12:00",
+          "18:00"
+        ],
+        "historicalWindowDaysBack": 3
+      },
+      "coverage": {
+        "sourceStates": [
+          "Maharashtra"
+        ]
+      },
+      "datasets": [
+        {
+          "datasetType": "CURRENT_PRICE",
+          "resourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+          "title": "Current Daily Price of Various Commodities from Various Markets (Mandi)"
+        },
+        {
+          "datasetType": "HISTORICAL_PRICE",
+          "resourceId": "35985678-0d79-46b4-9ed6-6f13308a1d24",
+          "title": "Variety-wise Daily Market Prices Data of Commodity"
+        }
+      ]
+    }
+  }
+}

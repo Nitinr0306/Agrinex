@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "addCommodity",
+  "scenario": "Adding a commodity with an official source reference and its verified unit (ADR-0006, ADR-0008).",
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/admin/commodities",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    },
+    "body": {
+      "name": "TEST Commodity New",
+      "category": "Vegetables",
+      "priceUnit": "Rs./Quintal",
+      "priceUnitSource": "Agmarknet 2.0 Daily Price and Arrival Report export (synthetic example)",
+      "sourceReference": "Agmarknet 2.0 commodity master (synthetic example)"
+    }
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0070",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "id": "00000000-0000-4000-8000-000000000406",
+      "name": "TEST Commodity New",
+      "nameHi": null,
+      "nameMr": null,
+      "category": "Vegetables",
+      "priceUnit": "Rs./Quintal",
+      "priceUnitSource": "Agmarknet 2.0 Daily Price and Arrival Report export (synthetic example)",
+      "createdAt": "2026-10-03T05:30:00Z"
+    }
+  }
+}

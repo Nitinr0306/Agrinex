@@ -1,0 +1,31 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listGrades",
+  "scenario": "Grades exactly as the source reports them.",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/commodities/00000000-0000-4000-8000-000000000401/grades"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0012",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-4000-8000-000000000601",
+          "name": "FAQ",
+          "commodityId": "00000000-0000-4000-8000-000000000401"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000602",
+          "name": "Local",
+          "commodityId": "00000000-0000-4000-8000-000000000401"
+        }
+      ]
+    }
+  }
+}

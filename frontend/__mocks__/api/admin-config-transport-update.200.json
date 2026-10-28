@@ -1,0 +1,33 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "updateTransportAssumptions",
+  "scenario": "A new transport-assumptions version becomes active; earlier versions stay unchanged.",
+  "request": {
+    "method": "PUT",
+    "path": "/api/v1/admin/config/transport-assumptions",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    },
+    "body": {
+      "ratePerKm": 9,
+      "minimumTripCharge": 300,
+      "vehicleCapacityKg": 1000
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0059",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "versionId": "00000000-0000-4000-8000-000000000a02",
+      "ratePerKm": 9,
+      "minimumTripCharge": 300,
+      "vehicleCapacityKg": 1000,
+      "active": true,
+      "createdAt": "2026-10-03T05:10:00Z"
+    }
+  }
+}

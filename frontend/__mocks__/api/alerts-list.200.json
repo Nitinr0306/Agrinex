@@ -1,0 +1,61 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listAlerts",
+  "scenario": "The caller's alerts, most recently triggered first.",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/alerts?page=0&size=20",
+    "headers": {
+      "Authorization": "Bearer mock.farmer.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0036",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-4000-8000-000000000c01",
+          "alertType": "PRICE_ABOVE",
+          "status": "ACTIVE",
+          "commodity": {
+            "id": "00000000-0000-4000-8000-000000000401",
+            "name": "Onion",
+            "nameHi": null,
+            "nameMr": null
+          },
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000702",
+            "name": "TEST Market B"
+          },
+          "thresholdValue": 3000,
+          "priceUnit": "Rs./Quintal",
+          "lastTriggeredAt": "2026-10-03T00:33:01Z"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000c02",
+          "alertType": "PERCENTAGE_FALL",
+          "status": "PAUSED",
+          "commodity": {
+            "id": "00000000-0000-4000-8000-000000000401",
+            "name": "Onion",
+            "nameHi": null,
+            "nameMr": null
+          },
+          "market": null,
+          "thresholdValue": 5,
+          "priceUnit": "Rs./Quintal",
+          "lastTriggeredAt": null
+        }
+      ],
+      "page": 0,
+      "size": 20,
+      "totalItems": 2,
+      "totalPages": 1
+    }
+  }
+}

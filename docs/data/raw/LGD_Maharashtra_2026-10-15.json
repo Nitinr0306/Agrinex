@@ -1,0 +1,3238 @@
+{
+ "source": "Local Government Directory (LGD), https://lgdirectory.gov.in/webservices/lgdws/ - POST stateList, districtList (stateCode=27), subdistrictList (districtCode=<code>)",
+ "retrieved": "2026-10-15",
+ "state": {
+  "stateNameEnglish": "Maharashtra",
+  "stateCode": 27,
+  "census2001Code": "27",
+  "census2011Code": "27",
+  "stateNameLocal": "महाराष्ट्र"
+ },
+ "districts": [
+  {
+   "sscode": "",
+   "districtCode": 466,
+   "districtNameEnglish": "Ahilyanagar",
+   "census2001Code": "26",
+   "census2011Code": "522",
+   "districtNameLocal": "अहिल्यानगर"
+  },
+  {
+   "sscode": "",
+   "districtCode": 467,
+   "districtNameEnglish": "Akola",
+   "census2001Code": "05",
+   "census2011Code": "501",
+   "districtNameLocal": "अकोला"
+  },
+  {
+   "sscode": "",
+   "districtCode": 468,
+   "districtNameEnglish": "Amravati",
+   "census2001Code": "07",
+   "census2011Code": "503",
+   "districtNameLocal": "अमरावती"
+  },
+  {
+   "sscode": "",
+   "districtCode": 469,
+   "districtNameEnglish": "Chhatrapati Sambhajinagar",
+   "census2001Code": "19",
+   "census2011Code": "515",
+   "districtNameLocal": "छत्रपती संभाजीनगर"
+  },
+  {
+   "sscode": "",
+   "districtCode": 470,
+   "districtNameEnglish": "Beed",
+   "census2001Code": "27",
+   "census2011Code": "523",
+   "districtNameLocal": "बीड"
+  },
+  {
+   "sscode": "",
+   "districtCode": 471,
+   "districtNameEnglish": "Bhandara",
+   "census2001Code": "10",
+   "census2011Code": "506",
+   "districtNameLocal": "भंडारा"
+  },
+  {
+   "sscode": "27",
+   "districtCode": 472,
+   "districtNameEnglish": "Buldhana",
+   "census2001Code": "04",
+   "census2011Code": "500",
+   "districtNameLocal": "बुलढाणा"
+  },
+  {
+   "sscode": "",
+   "districtCode": 473,
+   "districtNameEnglish": "Chandrapur",
+   "census2001Code": "13",
+   "census2011Code": "509",
+   "districtNameLocal": "चंद्रपूर"
+  },
+  {
+   "sscode": "",
+   "districtCode": 474,
+   "districtNameEnglish": "Dhule",
+   "census2001Code": "02",
+   "census2011Code": "498",
+   "districtNameLocal": "धुळे"
+  },
+  {
+   "sscode": "",
+   "districtCode": 475,
+   "districtNameEnglish": "Gadchiroli",
+   "census2001Code": "12",
+   "census2011Code": "508",
+   "districtNameLocal": "गडचिरोली"
+  },
+  {
+   "sscode": "",
+   "districtCode": 476,
+   "districtNameEnglish": "Gondia",
+   "census2001Code": "11",
+   "census2011Code": "507",
+   "districtNameLocal": "गोंदीया"
+  },
+  {
+   "sscode": "",
+   "districtCode": 477,
+   "districtNameEnglish": "Hingoli",
+   "census2001Code": "16",
+   "census2011Code": "512",
+   "districtNameLocal": "हिंगोली"
+  },
+  {
+   "sscode": "",
+   "districtCode": 478,
+   "districtNameEnglish": "Jalgaon",
+   "census2001Code": "03",
+   "census2011Code": "499",
+   "districtNameLocal": "जळगाव"
+  },
+  {
+   "sscode": "",
+   "districtCode": 479,
+   "districtNameEnglish": "Jalna",
+   "census2001Code": "18",
+   "census2011Code": "514",
+   "districtNameLocal": "जालना"
+  },
+  {
+   "sscode": "",
+   "districtCode": 480,
+   "districtNameEnglish": "Kolhapur",
+   "census2001Code": "34",
+   "census2011Code": "530",
+   "districtNameLocal": "कोल्हापूर"
+  },
+  {
+   "sscode": "",
+   "districtCode": 481,
+   "districtNameEnglish": "Latur",
+   "census2001Code": "28",
+   "census2011Code": "524",
+   "districtNameLocal": "लातूर"
+  },
+  {
+   "sscode": "",
+   "districtCode": 482,
+   "districtNameEnglish": "Mumbai",
+   "census2001Code": "23",
+   "census2011Code": "519",
+   "districtNameLocal": "मुंबई"
+  },
+  {
+   "sscode": "",
+   "districtCode": 483,
+   "districtNameEnglish": "Mumbai Suburban",
+   "census2001Code": "22",
+   "census2011Code": "518",
+   "districtNameLocal": "मुंबई उपनगर"
+  },
+  {
+   "sscode": "",
+   "districtCode": 484,
+   "districtNameEnglish": "Nagpur",
+   "census2001Code": "09",
+   "census2011Code": "505",
+   "districtNameLocal": "नागपूर"
+  },
+  {
+   "sscode": "",
+   "districtCode": 485,
+   "districtNameEnglish": "Nanded",
+   "census2001Code": "15",
+   "census2011Code": "511",
+   "districtNameLocal": "नांदेड"
+  },
+  {
+   "sscode": "",
+   "districtCode": 486,
+   "districtNameEnglish": "Nandurbar",
+   "census2001Code": "01",
+   "census2011Code": "497",
+   "districtNameLocal": "नंदूरबार"
+  },
+  {
+   "sscode": "",
+   "districtCode": 487,
+   "districtNameEnglish": "Nashik",
+   "census2001Code": "20",
+   "census2011Code": "516",
+   "districtNameLocal": "नाशिक"
+  },
+  {
+   "sscode": "",
+   "districtCode": 488,
+   "districtNameEnglish": "Dharashiv",
+   "census2001Code": "29",
+   "census2011Code": "525",
+   "districtNameLocal": "धाराशिव"
+  },
+  {
+   "sscode": "",
+   "districtCode": 489,
+   "districtNameEnglish": "Parbhani",
+   "census2001Code": "17",
+   "census2011Code": "513",
+   "districtNameLocal": "परभणी"
+  },
+  {
+   "sscode": "",
+   "districtCode": 490,
+   "districtNameEnglish": "Pune",
+   "census2001Code": "25",
+   "census2011Code": "521",
+   "districtNameLocal": "पुणे"
+  },
+  {
+   "sscode": "",
+   "districtCode": 491,
+   "districtNameEnglish": "Raigad",
+   "census2001Code": "24",
+   "census2011Code": "520",
+   "districtNameLocal": "रायगड"
+  },
+  {
+   "sscode": "",
+   "districtCode": 492,
+   "districtNameEnglish": "Ratnagiri",
+   "census2001Code": "32",
+   "census2011Code": "528",
+   "districtNameLocal": "रत्नागिरी"
+  },
+  {
+   "sscode": "",
+   "districtCode": 493,
+   "districtNameEnglish": "Sangli",
+   "census2001Code": "35",
+   "census2011Code": "531",
+   "districtNameLocal": "सांगली"
+  },
+  {
+   "sscode": "",
+   "districtCode": 494,
+   "districtNameEnglish": "Satara",
+   "census2001Code": "31",
+   "census2011Code": "527",
+   "districtNameLocal": "सातारा"
+  },
+  {
+   "sscode": "",
+   "districtCode": 495,
+   "districtNameEnglish": "Sindhudurg",
+   "census2001Code": "33",
+   "census2011Code": "529",
+   "districtNameLocal": "सिंधुदुर्ग"
+  },
+  {
+   "sscode": "",
+   "districtCode": 496,
+   "districtNameEnglish": "Solapur",
+   "census2001Code": "30",
+   "census2011Code": "526",
+   "districtNameLocal": "सोलापूर"
+  },
+  {
+   "sscode": "",
+   "districtCode": 497,
+   "districtNameEnglish": "Thane",
+   "census2001Code": "21",
+   "census2011Code": "517",
+   "districtNameLocal": "ठाणे"
+  },
+  {
+   "sscode": "",
+   "districtCode": 498,
+   "districtNameEnglish": "Wardha",
+   "census2001Code": "08",
+   "census2011Code": "504",
+   "districtNameLocal": "वर्धा"
+  },
+  {
+   "sscode": "",
+   "districtCode": 499,
+   "districtNameEnglish": "Washim",
+   "census2001Code": "06",
+   "census2011Code": "502",
+   "districtNameLocal": "वाशिम"
+  },
+  {
+   "sscode": "",
+   "districtCode": 500,
+   "districtNameEnglish": "Yavatmal",
+   "census2001Code": "14",
+   "census2011Code": "510",
+   "districtNameLocal": "यवतमाळ"
+  },
+  {
+   "sscode": null,
+   "districtCode": 665,
+   "districtNameEnglish": "Palghar",
+   "census2001Code": null,
+   "census2011Code": "000",
+   "districtNameLocal": "पालघर "
+  }
+ ],
+ "subdistrictsByDistrictCode": {
+  "466": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4201,
+    "subdistrictNameEnglish": "Akole",
+    "subdistrictNameLocal": "अकोले",
+    "census2001Code": "0001",
+    "census2011Code": "04201"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4202,
+    "subdistrictNameEnglish": "Sangamner",
+    "subdistrictNameLocal": "संगमनेर",
+    "census2001Code": "2   ",
+    "census2011Code": "04202"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4203,
+    "subdistrictNameEnglish": "Kopargaon",
+    "subdistrictNameLocal": "कोपरगाव",
+    "census2001Code": "3   ",
+    "census2011Code": "04203"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4204,
+    "subdistrictNameEnglish": "Rahta",
+    "subdistrictNameLocal": "रहाता",
+    "census2001Code": "4   ",
+    "census2011Code": "04204"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4205,
+    "subdistrictNameEnglish": "Shrirampur",
+    "subdistrictNameLocal": "श्रीरामपूर",
+    "census2001Code": "5   ",
+    "census2011Code": "04205"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4206,
+    "subdistrictNameEnglish": "Nevasa",
+    "subdistrictNameLocal": "नेवासा",
+    "census2001Code": "6   ",
+    "census2011Code": "04206"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4207,
+    "subdistrictNameEnglish": "Shevgaon",
+    "subdistrictNameLocal": "शेगाव",
+    "census2001Code": "7   ",
+    "census2011Code": "04207"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4208,
+    "subdistrictNameEnglish": "Pathardi",
+    "subdistrictNameLocal": "पाथर्डी",
+    "census2001Code": "8   ",
+    "census2011Code": "04208"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4209,
+    "subdistrictNameEnglish": "Nagar",
+    "subdistrictNameLocal": "नगर",
+    "census2001Code": "9   ",
+    "census2011Code": "04209"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4210,
+    "subdistrictNameEnglish": "Rahuri",
+    "subdistrictNameLocal": "राहुरी",
+    "census2001Code": "10  ",
+    "census2011Code": "04210"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4211,
+    "subdistrictNameEnglish": "Parner",
+    "subdistrictNameLocal": "पारनेर",
+    "census2001Code": "11  ",
+    "census2011Code": "04211"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4212,
+    "subdistrictNameEnglish": "Shrigonda",
+    "subdistrictNameLocal": "श्रीगोंदा",
+    "census2001Code": "12  ",
+    "census2011Code": "04212"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4213,
+    "subdistrictNameEnglish": "Karjat",
+    "subdistrictNameLocal": "कर्जत",
+    "census2001Code": "0013",
+    "census2011Code": "04213"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4214,
+    "subdistrictNameEnglish": "Jamkhed",
+    "subdistrictNameLocal": "जामखेड",
+    "census2001Code": "14  ",
+    "census2011Code": "04214"
+   }
+  ],
+  "467": [
+   {
+    "sscode": "",
+    "subdistrictCode": 3988,
+    "subdistrictNameEnglish": "Telhara",
+    "subdistrictNameLocal": "तेल्हारा",
+    "census2001Code": "1   ",
+    "census2011Code": "03988"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3989,
+    "subdistrictNameEnglish": "Akot",
+    "subdistrictNameLocal": "अकोट",
+    "census2001Code": "2   ",
+    "census2011Code": "03989"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3990,
+    "subdistrictNameEnglish": "Balapur",
+    "subdistrictNameLocal": "बाळापूर",
+    "census2001Code": "3   ",
+    "census2011Code": "03990"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3991,
+    "subdistrictNameEnglish": "Akola",
+    "subdistrictNameLocal": "अकोला",
+    "census2001Code": "4   ",
+    "census2011Code": "03991"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3992,
+    "subdistrictNameEnglish": "Murtijapur",
+    "subdistrictNameLocal": "मुर्तिजापूर",
+    "census2001Code": "5   ",
+    "census2011Code": "03992"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3993,
+    "subdistrictNameEnglish": "Patur",
+    "subdistrictNameLocal": "पातूर",
+    "census2001Code": "6   ",
+    "census2011Code": "03993"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3994,
+    "subdistrictNameEnglish": "Barshitakli",
+    "subdistrictNameLocal": "बार्शीटाकळी",
+    "census2001Code": "7   ",
+    "census2011Code": "03994"
+   }
+  ],
+  "468": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4001,
+    "subdistrictNameEnglish": "Dharni",
+    "subdistrictNameLocal": "धारणी",
+    "census2001Code": "1   ",
+    "census2011Code": "04001"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4002,
+    "subdistrictNameEnglish": "Chikhaldara",
+    "subdistrictNameLocal": "चिखलदरा",
+    "census2001Code": "2   ",
+    "census2011Code": "04002"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4003,
+    "subdistrictNameEnglish": "Anjangaon Surji",
+    "subdistrictNameLocal": "अंजनगाव सुर्जी",
+    "census2001Code": "3   ",
+    "census2011Code": "04003"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4004,
+    "subdistrictNameEnglish": "Achalpur",
+    "subdistrictNameLocal": "अचलपूर",
+    "census2001Code": "4   ",
+    "census2011Code": "04004"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4005,
+    "subdistrictNameEnglish": "Chandurbazar",
+    "subdistrictNameLocal": "चांदूर बाजार",
+    "census2001Code": "5   ",
+    "census2011Code": "04005"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4006,
+    "subdistrictNameEnglish": "Morshi",
+    "subdistrictNameLocal": "मोर्शी",
+    "census2001Code": "6   ",
+    "census2011Code": "04006"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4007,
+    "subdistrictNameEnglish": "Warud",
+    "subdistrictNameLocal": "वरूड",
+    "census2001Code": "7   ",
+    "census2011Code": "04007"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4008,
+    "subdistrictNameEnglish": "Tiosa",
+    "subdistrictNameLocal": "तिवसा",
+    "census2001Code": "8   ",
+    "census2011Code": "04008"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4009,
+    "subdistrictNameEnglish": "Amravati",
+    "subdistrictNameLocal": "अमरावती",
+    "census2001Code": "9   ",
+    "census2011Code": "04009"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4010,
+    "subdistrictNameEnglish": "Bhatkuli",
+    "subdistrictNameLocal": "भातकुली",
+    "census2001Code": "10  ",
+    "census2011Code": "04010"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4011,
+    "subdistrictNameEnglish": "Daryapur",
+    "subdistrictNameLocal": "दर्यापूर",
+    "census2001Code": "11  ",
+    "census2011Code": "04011"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4012,
+    "subdistrictNameEnglish": "Nandgaon-Khandeshwar",
+    "subdistrictNameLocal": "नांदगाव खंडेश्वर",
+    "census2001Code": "12  ",
+    "census2011Code": "04012"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4013,
+    "subdistrictNameEnglish": "Chandur Railway",
+    "subdistrictNameLocal": "चांदूर रेल्वे",
+    "census2001Code": "13  ",
+    "census2011Code": "04013"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4014,
+    "subdistrictNameEnglish": "Dhamangaon Railway",
+    "subdistrictNameLocal": "धामनगाव रेल्वे",
+    "census2001Code": "14  ",
+    "census2011Code": "04014"
+   }
+  ],
+  "469": [
+   {
+    "sscode": "27",
+    "subdistrictCode": 4133,
+    "subdistrictNameEnglish": "Kannad",
+    "subdistrictNameLocal": "कन्नड",
+    "census2001Code": "1   ",
+    "census2011Code": "04133"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4134,
+    "subdistrictNameEnglish": "Soegaon",
+    "subdistrictNameLocal": "सोयगाव",
+    "census2001Code": "2   ",
+    "census2011Code": "04134"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4135,
+    "subdistrictNameEnglish": "Sillod",
+    "subdistrictNameLocal": "सिल्लोड",
+    "census2001Code": "3   ",
+    "census2011Code": "04135"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4136,
+    "subdistrictNameEnglish": "Phulambri",
+    "subdistrictNameLocal": "फुलंब्री",
+    "census2001Code": "4   ",
+    "census2011Code": "04136"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4137,
+    "subdistrictNameEnglish": "Chhatrapati Sambhajinagar",
+    "subdistrictNameLocal": "छत्रपती संभाजीनगर",
+    "census2001Code": "5   ",
+    "census2011Code": "04137"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4138,
+    "subdistrictNameEnglish": "Khuldabad",
+    "subdistrictNameLocal": "खुलताबाद",
+    "census2001Code": "6   ",
+    "census2011Code": "04138"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4139,
+    "subdistrictNameEnglish": "Vaijapur",
+    "subdistrictNameLocal": "वैजापूर",
+    "census2001Code": "7   ",
+    "census2011Code": "04139"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4140,
+    "subdistrictNameEnglish": "Gangapur",
+    "subdistrictNameLocal": "गंगापूर",
+    "census2001Code": "8   ",
+    "census2011Code": "04140"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4141,
+    "subdistrictNameEnglish": "Paithan",
+    "subdistrictNameLocal": "पैठण",
+    "census2001Code": "9   ",
+    "census2011Code": "04141"
+   }
+  ],
+  "470": [
+   {
+    "sscode": "27",
+    "subdistrictCode": 4215,
+    "subdistrictNameEnglish": "Ashti",
+    "subdistrictNameLocal": "आष्टी",
+    "census2001Code": "1   ",
+    "census2011Code": "04215"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4216,
+    "subdistrictNameEnglish": "Patoda",
+    "subdistrictNameLocal": "पाटोदा",
+    "census2001Code": "2   ",
+    "census2011Code": "04216"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4217,
+    "subdistrictNameEnglish": "Shirur (Kasar)",
+    "subdistrictNameLocal": "शिरूर (कासार)",
+    "census2001Code": "3   ",
+    "census2011Code": "04217"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4218,
+    "subdistrictNameEnglish": "Georai",
+    "subdistrictNameLocal": "गेवराई",
+    "census2001Code": "4   ",
+    "census2011Code": "04218"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4219,
+    "subdistrictNameEnglish": "Majalgaon",
+    "subdistrictNameLocal": "माजलगाव",
+    "census2001Code": "5   ",
+    "census2011Code": "04219"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4220,
+    "subdistrictNameEnglish": "Wadwani",
+    "subdistrictNameLocal": "वडवणी",
+    "census2001Code": "6   ",
+    "census2011Code": "04220"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4221,
+    "subdistrictNameEnglish": "Beed",
+    "subdistrictNameLocal": "बीड",
+    "census2001Code": "7   ",
+    "census2011Code": "04221"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4222,
+    "subdistrictNameEnglish": "Kaij",
+    "subdistrictNameLocal": "केज",
+    "census2001Code": "8   ",
+    "census2011Code": "04222"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4223,
+    "subdistrictNameEnglish": "Dharur",
+    "subdistrictNameLocal": "धारूर",
+    "census2001Code": "9   ",
+    "census2011Code": "04223"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4224,
+    "subdistrictNameEnglish": "Parli",
+    "subdistrictNameLocal": "परळी",
+    "census2001Code": "10  ",
+    "census2011Code": "04224"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4225,
+    "subdistrictNameEnglish": "Ambejogai",
+    "subdistrictNameLocal": "आंबेजोगाई",
+    "census2001Code": "11  ",
+    "census2011Code": "04225"
+   }
+  ],
+  "471": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4037,
+    "subdistrictNameEnglish": "Tumsar",
+    "subdistrictNameLocal": "तुमसर",
+    "census2001Code": "1   ",
+    "census2011Code": "04037"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4038,
+    "subdistrictNameEnglish": "Mohadi",
+    "subdistrictNameLocal": "मोहाडी",
+    "census2001Code": "2   ",
+    "census2011Code": "04038"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4039,
+    "subdistrictNameEnglish": "Bhandara",
+    "subdistrictNameLocal": "भंडारा",
+    "census2001Code": "3   ",
+    "census2011Code": "04039"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4040,
+    "subdistrictNameEnglish": "Sakoli",
+    "subdistrictNameLocal": "साकोली",
+    "census2001Code": "4   ",
+    "census2011Code": "04040"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4041,
+    "subdistrictNameEnglish": "Lakhani",
+    "subdistrictNameLocal": "लाखनी",
+    "census2001Code": "5   ",
+    "census2011Code": "04041"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4042,
+    "subdistrictNameEnglish": "Pauni",
+    "subdistrictNameLocal": "पवनी",
+    "census2001Code": "6   ",
+    "census2011Code": "04042"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4043,
+    "subdistrictNameEnglish": "Lakhandur",
+    "subdistrictNameLocal": "लाखंदूर",
+    "census2001Code": "7   ",
+    "census2011Code": "04043"
+   }
+  ],
+  "472": [
+   {
+    "sscode": "27",
+    "subdistrictCode": 3975,
+    "subdistrictNameEnglish": "Jalgaon (Jamod)",
+    "subdistrictNameLocal": "जळगाव (जामोद)",
+    "census2001Code": "1   ",
+    "census2011Code": "03975"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3976,
+    "subdistrictNameEnglish": "Sangrampur",
+    "subdistrictNameLocal": "संग्रामपूर",
+    "census2001Code": "2   ",
+    "census2011Code": "03976"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3977,
+    "subdistrictNameEnglish": "Shegaon",
+    "subdistrictNameLocal": "शेगाव",
+    "census2001Code": "3   ",
+    "census2011Code": "03977"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3978,
+    "subdistrictNameEnglish": "Nandura",
+    "subdistrictNameLocal": "नांदुरा",
+    "census2001Code": "4   ",
+    "census2011Code": "03978"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3979,
+    "subdistrictNameEnglish": "Malkapur",
+    "subdistrictNameLocal": "मलकापूर",
+    "census2001Code": "5   ",
+    "census2011Code": "03979"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3980,
+    "subdistrictNameEnglish": "Motala",
+    "subdistrictNameLocal": "मोताळा",
+    "census2001Code": "6   ",
+    "census2011Code": "03980"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3981,
+    "subdistrictNameEnglish": "Khamgaon",
+    "subdistrictNameLocal": "खामगाव",
+    "census2001Code": "7   ",
+    "census2011Code": "03981"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3982,
+    "subdistrictNameEnglish": "Mehkar",
+    "subdistrictNameLocal": "मेहकर",
+    "census2001Code": "8   ",
+    "census2011Code": "03982"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3983,
+    "subdistrictNameEnglish": "Chikhli",
+    "subdistrictNameLocal": "चिखली",
+    "census2001Code": "9   ",
+    "census2011Code": "03983"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3984,
+    "subdistrictNameEnglish": "Buldana",
+    "subdistrictNameLocal": "बुलडाणा",
+    "census2001Code": "10  ",
+    "census2011Code": "03984"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3985,
+    "subdistrictNameEnglish": "Deolgaon Raja",
+    "subdistrictNameLocal": "देउळगाव राजा",
+    "census2001Code": "11  ",
+    "census2011Code": "03985"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3986,
+    "subdistrictNameEnglish": "Sindkhed Raja",
+    "subdistrictNameLocal": "सिंदखेड राजा",
+    "census2001Code": "12  ",
+    "census2011Code": "03986"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 3987,
+    "subdistrictNameEnglish": "Lonar",
+    "subdistrictNameLocal": "लोणार",
+    "census2001Code": "13  ",
+    "census2011Code": "03987"
+   }
+  ],
+  "473": [
+   {
+    "sscode": "",
+    "subdistrictCode": 4064,
+    "subdistrictNameEnglish": "Warora",
+    "subdistrictNameLocal": "वरोरा ",
+    "census2001Code": "1   ",
+    "census2011Code": "04064"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4065,
+    "subdistrictNameEnglish": "Chimur",
+    "subdistrictNameLocal": "चिमूर",
+    "census2001Code": "2   ",
+    "census2011Code": "04065"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4066,
+    "subdistrictNameEnglish": "Nagbhid",
+    "subdistrictNameLocal": "नागभिड",
+    "census2001Code": "3   ",
+    "census2011Code": "04066"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4067,
+    "subdistrictNameEnglish": "Brahmapuri",
+    "subdistrictNameLocal": "ब्रम्हपुरी",
+    "census2001Code": "4   ",
+    "census2011Code": "04067"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4068,
+    "subdistrictNameEnglish": "Sawali",
+    "subdistrictNameLocal": "सावली ",
+    "census2001Code": "5   ",
+    "census2011Code": "04068"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4069,
+    "subdistrictNameEnglish": "Sindewahi",
+    "subdistrictNameLocal": "सिंदेवाही ",
+    "census2001Code": "6   ",
+    "census2011Code": "04069"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4070,
+    "subdistrictNameEnglish": "Bhadravati",
+    "subdistrictNameLocal": "भद्रावती ",
+    "census2001Code": "7   ",
+    "census2011Code": "04070"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4071,
+    "subdistrictNameEnglish": "Chandrapur",
+    "subdistrictNameLocal": "चंद्रपूर ",
+    "census2001Code": "8   ",
+    "census2011Code": "04071"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4072,
+    "subdistrictNameEnglish": "Mul",
+    "subdistrictNameLocal": "मुल",
+    "census2001Code": "9   ",
+    "census2011Code": "04072"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4073,
+    "subdistrictNameEnglish": "Pombhurna",
+    "subdistrictNameLocal": "पोम्भूर्णा",
+    "census2001Code": "10  ",
+    "census2011Code": "04073"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4074,
+    "subdistrictNameEnglish": "Ballarpur",
+    "subdistrictNameLocal": "बल्लारपूर",
+    "census2001Code": "11  ",
+    "census2011Code": "04074"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4075,
+    "subdistrictNameEnglish": "Korpana",
+    "subdistrictNameLocal": "कोरपना",
+    "census2001Code": "12  ",
+    "census2011Code": "04075"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4076,
+    "subdistrictNameEnglish": "Jiwati",
+    "subdistrictNameLocal": "जिवती",
+    "census2001Code": "0   ",
+    "census2011Code": "04076"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4077,
+    "subdistrictNameEnglish": "Rajura",
+    "subdistrictNameLocal": "राजुरा ",
+    "census2001Code": "13  ",
+    "census2011Code": "04077"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4078,
+    "subdistrictNameEnglish": "Gondpipri",
+    "subdistrictNameLocal": "गोंडपिपरी",
+    "census2001Code": "14  ",
+    "census2011Code": "04078"
+   }
+  ],
+  "474": [
+   {
+    "sscode": "",
+    "subdistrictCode": 3956,
+    "subdistrictNameEnglish": "Shirpur",
+    "subdistrictNameLocal": "शिरपूर",
+    "census2001Code": "1   ",
+    "census2011Code": "03956"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3957,
+    "subdistrictNameEnglish": "Sindkhede",
+    "subdistrictNameLocal": "सिंदखेडे",
+    "census2001Code": "2   ",
+    "census2011Code": "03957"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3958,
+    "subdistrictNameEnglish": "Sakri",
+    "subdistrictNameLocal": "साक्री",
+    "census2001Code": "3   ",
+    "census2011Code": "03958"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3959,
+    "subdistrictNameEnglish": "Dhule",
+    "subdistrictNameLocal": "धुळे",
+    "census2001Code": "4   ",
+    "census2011Code": "03959"
+   }
+  ],
+  "475": [
+   {
+    "sscode": "",
+    "subdistrictCode": 4052,
+    "subdistrictNameEnglish": "Desaiganj (Vadasa)",
+    "subdistrictNameLocal": "देसाईगंज (वडसा)",
+    "census2001Code": "1   ",
+    "census2011Code": "04052"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4053,
+    "subdistrictNameEnglish": "Armori",
+    "subdistrictNameLocal": "आरमोरी",
+    "census2001Code": "2   ",
+    "census2011Code": "04053"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4054,
+    "subdistrictNameEnglish": "Kurkheda",
+    "subdistrictNameLocal": "कुरखेडा ",
+    "census2001Code": "3   ",
+    "census2011Code": "04054"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4055,
+    "subdistrictNameEnglish": "Korchi",
+    "subdistrictNameLocal": "कोरची",
+    "census2001Code": "4   ",
+    "census2011Code": "04055"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4056,
+    "subdistrictNameEnglish": "Dhanora",
+    "subdistrictNameLocal": "धानोरा ",
+    "census2001Code": "5   ",
+    "census2011Code": "04056"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4057,
+    "subdistrictNameEnglish": "Gadchiroli",
+    "subdistrictNameLocal": "गडचिरोली ",
+    "census2001Code": "6   ",
+    "census2011Code": "04057"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4058,
+    "subdistrictNameEnglish": "Chamorshi",
+    "subdistrictNameLocal": "चामोर्शी ",
+    "census2001Code": "7   ",
+    "census2011Code": "04058"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4059,
+    "subdistrictNameEnglish": "Mulchera",
+    "subdistrictNameLocal": "मुलचेरा ",
+    "census2001Code": "8   ",
+    "census2011Code": "04059"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4060,
+    "subdistrictNameEnglish": "Etapalli",
+    "subdistrictNameLocal": "एटापल्ली ",
+    "census2001Code": "9   ",
+    "census2011Code": "04060"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4061,
+    "subdistrictNameEnglish": "Bhamragad",
+    "subdistrictNameLocal": "भामरागड ",
+    "census2001Code": "10  ",
+    "census2011Code": "04061"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4062,
+    "subdistrictNameEnglish": "Aheri",
+    "subdistrictNameLocal": "अहेरी ",
+    "census2001Code": "11  ",
+    "census2011Code": "04062"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4063,
+    "subdistrictNameEnglish": "Sironcha",
+    "subdistrictNameLocal": "सिरोंचा ",
+    "census2001Code": "12  ",
+    "census2011Code": "04063"
+   }
+  ],
+  "476": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4044,
+    "subdistrictNameEnglish": "Tirora",
+    "subdistrictNameLocal": "तिरोडा",
+    "census2001Code": "1   ",
+    "census2011Code": "04044"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4045,
+    "subdistrictNameEnglish": "Goregaon",
+    "subdistrictNameLocal": "गोरेगाव",
+    "census2001Code": "2   ",
+    "census2011Code": "04045"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4046,
+    "subdistrictNameEnglish": "Gondiya",
+    "subdistrictNameLocal": "गोंदिया",
+    "census2001Code": "3   ",
+    "census2011Code": "04046"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4047,
+    "subdistrictNameEnglish": "Amgaon",
+    "subdistrictNameLocal": "आमगाव",
+    "census2001Code": "4   ",
+    "census2011Code": "04047"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4048,
+    "subdistrictNameEnglish": "Salekasa",
+    "subdistrictNameLocal": "सालेकसा",
+    "census2001Code": "5   ",
+    "census2011Code": "04048"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4049,
+    "subdistrictNameEnglish": "Sadak-Arjuni",
+    "subdistrictNameLocal": "सडक अर्जुनी",
+    "census2001Code": "6   ",
+    "census2011Code": "04049"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4050,
+    "subdistrictNameEnglish": "Arjuni Morgaon",
+    "subdistrictNameLocal": "अर्जुनी मोरगाव",
+    "census2001Code": "7   ",
+    "census2011Code": "04050"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4051,
+    "subdistrictNameEnglish": "Deori",
+    "subdistrictNameLocal": "देवरी",
+    "census2001Code": "8   ",
+    "census2011Code": "04051"
+   }
+  ],
+  "477": [
+   {
+    "sscode": "27",
+    "subdistrictCode": 4111,
+    "subdistrictNameEnglish": "Sengaon",
+    "subdistrictNameLocal": "सेनगाव",
+    "census2001Code": "1   ",
+    "census2011Code": "04111"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4112,
+    "subdistrictNameEnglish": "Hingoli",
+    "subdistrictNameLocal": "हिंगोली ",
+    "census2001Code": "2   ",
+    "census2011Code": "04112"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4113,
+    "subdistrictNameEnglish": "Aundha (Nagnath)",
+    "subdistrictNameLocal": "औंढा (नागनाथ)",
+    "census2001Code": "3   ",
+    "census2011Code": "04113"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4114,
+    "subdistrictNameEnglish": "Kalamnuri",
+    "subdistrictNameLocal": "कळमनुरी",
+    "census2001Code": "4   ",
+    "census2011Code": "04114"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4115,
+    "subdistrictNameEnglish": "Vasmath",
+    "subdistrictNameLocal": "वसमत",
+    "census2001Code": "5   ",
+    "census2011Code": "04115"
+   }
+  ],
+  "478": [
+   {
+    "sscode": "",
+    "subdistrictCode": 3960,
+    "subdistrictNameEnglish": "Chopda",
+    "subdistrictNameLocal": "चोपडा",
+    "census2001Code": "1   ",
+    "census2011Code": "03960"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3961,
+    "subdistrictNameEnglish": "Yawal",
+    "subdistrictNameLocal": "यावल",
+    "census2001Code": "2   ",
+    "census2011Code": "03961"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3962,
+    "subdistrictNameEnglish": "Raver",
+    "subdistrictNameLocal": "रावेर",
+    "census2001Code": "3   ",
+    "census2011Code": "03962"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3963,
+    "subdistrictNameEnglish": "Muktainagar (Edlabad)",
+    "subdistrictNameLocal": "मुक्ताईनगर(एदलाबाद)",
+    "census2001Code": "4   ",
+    "census2011Code": "03963"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3964,
+    "subdistrictNameEnglish": "Bodvad",
+    "subdistrictNameLocal": "बोधवड",
+    "census2001Code": "5   ",
+    "census2011Code": "03964"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3965,
+    "subdistrictNameEnglish": "Bhusawal",
+    "subdistrictNameLocal": "भुसावळ",
+    "census2001Code": "6   ",
+    "census2011Code": "03965"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3966,
+    "subdistrictNameEnglish": "Jalgaon",
+    "subdistrictNameLocal": "जळगाव",
+    "census2001Code": "7   ",
+    "census2011Code": "03966"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3967,
+    "subdistrictNameEnglish": "Erandol",
+    "subdistrictNameLocal": "एरंडोल",
+    "census2001Code": "8   ",
+    "census2011Code": "03967"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3968,
+    "subdistrictNameEnglish": "Dharangaon",
+    "subdistrictNameLocal": "धरणगाव",
+    "census2001Code": "9   ",
+    "census2011Code": "03968"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3969,
+    "subdistrictNameEnglish": "Amalner",
+    "subdistrictNameLocal": "अमळनेर",
+    "census2001Code": "10  ",
+    "census2011Code": "03969"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3970,
+    "subdistrictNameEnglish": "Parola",
+    "subdistrictNameLocal": "पारोळा",
+    "census2001Code": "11  ",
+    "census2011Code": "03970"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3971,
+    "subdistrictNameEnglish": "Bhadgaon",
+    "subdistrictNameLocal": "भडगाव",
+    "census2001Code": "12  ",
+    "census2011Code": "03971"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3972,
+    "subdistrictNameEnglish": "Chalisgaon",
+    "subdistrictNameLocal": "चाळीसगाव",
+    "census2001Code": "13  ",
+    "census2011Code": "03972"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3973,
+    "subdistrictNameEnglish": "Pachora",
+    "subdistrictNameLocal": "पाचोरा",
+    "census2001Code": "14  ",
+    "census2011Code": "03973"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3974,
+    "subdistrictNameEnglish": "Jamner",
+    "subdistrictNameLocal": "जामनेर",
+    "census2001Code": "15  ",
+    "census2011Code": "03974"
+   }
+  ],
+  "479": [
+   {
+    "sscode": "27",
+    "subdistrictCode": 4125,
+    "subdistrictNameEnglish": "Bhokardan",
+    "subdistrictNameLocal": "भोकरदन",
+    "census2001Code": "1   ",
+    "census2011Code": "04125"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4126,
+    "subdistrictNameEnglish": "Jafrabad",
+    "subdistrictNameLocal": "जाफ्राबाद",
+    "census2001Code": "2   ",
+    "census2011Code": "04126"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4127,
+    "subdistrictNameEnglish": "Jalna",
+    "subdistrictNameLocal": "जालना",
+    "census2001Code": "3   ",
+    "census2011Code": "04127"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4128,
+    "subdistrictNameEnglish": "Badnapur",
+    "subdistrictNameLocal": "बदनापूर",
+    "census2001Code": "4   ",
+    "census2011Code": "04128"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4129,
+    "subdistrictNameEnglish": "Ambad",
+    "subdistrictNameLocal": "अंबड",
+    "census2001Code": "5   ",
+    "census2011Code": "04129"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4130,
+    "subdistrictNameEnglish": "Ghansawangi",
+    "subdistrictNameLocal": "घनसावंगी",
+    "census2001Code": "6   ",
+    "census2011Code": "04130"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4131,
+    "subdistrictNameEnglish": "Partur",
+    "subdistrictNameLocal": "परतूर",
+    "census2001Code": "7   ",
+    "census2011Code": "04131"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4132,
+    "subdistrictNameEnglish": "Mantha",
+    "subdistrictNameLocal": "मंठा",
+    "census2001Code": "8   ",
+    "census2011Code": "04132"
+   }
+  ],
+  "480": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4283,
+    "subdistrictNameEnglish": "Shahuwadi",
+    "subdistrictNameLocal": "शाहूवाडी",
+    "census2001Code": "1   ",
+    "census2011Code": "04283"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4284,
+    "subdistrictNameEnglish": "Panhala",
+    "subdistrictNameLocal": "पन्हाळा",
+    "census2001Code": "2   ",
+    "census2011Code": "04284"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4285,
+    "subdistrictNameEnglish": "Hatkanangle",
+    "subdistrictNameLocal": "हातकणंगले",
+    "census2001Code": "3   ",
+    "census2011Code": "04285"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4286,
+    "subdistrictNameEnglish": "Shirol",
+    "subdistrictNameLocal": "शिरोळ",
+    "census2001Code": "4   ",
+    "census2011Code": "04286"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4287,
+    "subdistrictNameEnglish": "Karvir",
+    "subdistrictNameLocal": "करवीर",
+    "census2001Code": "5   ",
+    "census2011Code": "04287"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4288,
+    "subdistrictNameEnglish": "Gaganbawada",
+    "subdistrictNameLocal": "गगनबावडा",
+    "census2001Code": "6   ",
+    "census2011Code": "04288"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4289,
+    "subdistrictNameEnglish": "Radhanagari",
+    "subdistrictNameLocal": "राधानगरी",
+    "census2001Code": "7   ",
+    "census2011Code": "04289"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4290,
+    "subdistrictNameEnglish": "Kagal",
+    "subdistrictNameLocal": "कागल",
+    "census2001Code": "8   ",
+    "census2011Code": "04290"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4291,
+    "subdistrictNameEnglish": "Bhudargad",
+    "subdistrictNameLocal": "भूदरगड",
+    "census2001Code": "9   ",
+    "census2011Code": "04291"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4292,
+    "subdistrictNameEnglish": "Ajra",
+    "subdistrictNameLocal": "आजरा",
+    "census2001Code": "10  ",
+    "census2011Code": "04292"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4293,
+    "subdistrictNameEnglish": "Gadhinglaj",
+    "subdistrictNameLocal": "गडहिंग्लज",
+    "census2001Code": "11  ",
+    "census2011Code": "04293"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4294,
+    "subdistrictNameEnglish": "Chandgad",
+    "subdistrictNameLocal": "चंदगड",
+    "census2001Code": "12  ",
+    "census2011Code": "04294"
+   }
+  ],
+  "481": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4226,
+    "subdistrictNameEnglish": "Latur",
+    "subdistrictNameLocal": "लातूर",
+    "census2001Code": "1   ",
+    "census2011Code": "04226"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4227,
+    "subdistrictNameEnglish": "Renapur",
+    "subdistrictNameLocal": "रेनापूर",
+    "census2001Code": "2   ",
+    "census2011Code": "04227"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4228,
+    "subdistrictNameEnglish": "Ahmadpur",
+    "subdistrictNameLocal": "अहमदपूर",
+    "census2001Code": "3   ",
+    "census2011Code": "04228"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4229,
+    "subdistrictNameEnglish": "Jalkot",
+    "subdistrictNameLocal": "जलकोट",
+    "census2001Code": "4   ",
+    "census2011Code": "04229"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4230,
+    "subdistrictNameEnglish": "Chakur",
+    "subdistrictNameLocal": "चाकूर",
+    "census2001Code": "5   ",
+    "census2011Code": "04230"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4231,
+    "subdistrictNameEnglish": "Shirur Anantpal",
+    "subdistrictNameLocal": "शिरूर अनंतपाळ",
+    "census2001Code": "6   ",
+    "census2011Code": "04231"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4232,
+    "subdistrictNameEnglish": "Ausa",
+    "subdistrictNameLocal": "औसा",
+    "census2001Code": "7   ",
+    "census2011Code": "04232"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4233,
+    "subdistrictNameEnglish": "Nilanga",
+    "subdistrictNameLocal": "निलंगा",
+    "census2001Code": "8   ",
+    "census2011Code": "04233"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4234,
+    "subdistrictNameEnglish": "Deoni",
+    "subdistrictNameLocal": "देवनी",
+    "census2001Code": "9   ",
+    "census2011Code": "04234"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4235,
+    "subdistrictNameEnglish": "Udgir",
+    "subdistrictNameLocal": "उदगीर",
+    "census2001Code": "10  ",
+    "census2011Code": "04235"
+   }
+  ],
+  "482": [],
+  "483": [
+   {
+    "sscode": "27",
+    "subdistrictCode": 7179,
+    "subdistrictNameEnglish": "Andheri",
+    "subdistrictNameLocal": "अंधेरी",
+    "census2001Code": null,
+    "census2011Code": "00000"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 7180,
+    "subdistrictNameEnglish": "Kurla",
+    "subdistrictNameLocal": "कुर्ला",
+    "census2001Code": null,
+    "census2011Code": "00000"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 7181,
+    "subdistrictNameEnglish": "Borivali",
+    "subdistrictNameLocal": "बोरीवली",
+    "census2001Code": null,
+    "census2011Code": "00000"
+   }
+  ],
+  "484": [
+   {
+    "sscode": "",
+    "subdistrictCode": 4023,
+    "subdistrictNameEnglish": "Narkhed",
+    "subdistrictNameLocal": "नरखेड",
+    "census2001Code": "1   ",
+    "census2011Code": "04023"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4024,
+    "subdistrictNameEnglish": "Katol",
+    "subdistrictNameLocal": "काटोल",
+    "census2001Code": "2   ",
+    "census2011Code": "04024"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4025,
+    "subdistrictNameEnglish": "Kalameshwar",
+    "subdistrictNameLocal": "कळमेश्वर ",
+    "census2001Code": "3   ",
+    "census2011Code": "04025"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4026,
+    "subdistrictNameEnglish": "Savner",
+    "subdistrictNameLocal": "सावनेर",
+    "census2001Code": "4   ",
+    "census2011Code": "04026"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4027,
+    "subdistrictNameEnglish": "Parseoni",
+    "subdistrictNameLocal": "पारशिवनी",
+    "census2001Code": "5   ",
+    "census2011Code": "04027"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4028,
+    "subdistrictNameEnglish": "Ramtek",
+    "subdistrictNameLocal": "रामटेक",
+    "census2001Code": "6   ",
+    "census2011Code": "04028"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4029,
+    "subdistrictNameEnglish": "Mauda",
+    "subdistrictNameLocal": "मौदा",
+    "census2001Code": "7   ",
+    "census2011Code": "04029"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4030,
+    "subdistrictNameEnglish": "Kamptee",
+    "subdistrictNameLocal": "कामठी",
+    "census2001Code": "8   ",
+    "census2011Code": "04030"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4031,
+    "subdistrictNameEnglish": "Nagpur (Rural)",
+    "subdistrictNameLocal": "नागपूर (ग्रामीण)",
+    "census2001Code": "9   ",
+    "census2011Code": "04031"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4032,
+    "subdistrictNameEnglish": "Nagpur (Urban)",
+    "subdistrictNameLocal": "नागपूर (शहर)",
+    "census2001Code": "10  ",
+    "census2011Code": "04032"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4033,
+    "subdistrictNameEnglish": "Hingna",
+    "subdistrictNameLocal": "हिंगणा",
+    "census2001Code": "11  ",
+    "census2011Code": "04033"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4034,
+    "subdistrictNameEnglish": "Umred",
+    "subdistrictNameLocal": "उमरेड",
+    "census2001Code": "12  ",
+    "census2011Code": "04034"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4035,
+    "subdistrictNameEnglish": "Kuhi",
+    "subdistrictNameLocal": "कुही",
+    "census2001Code": "13  ",
+    "census2011Code": "04035"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4036,
+    "subdistrictNameEnglish": "Bhiwapur",
+    "subdistrictNameLocal": "भिवापूर",
+    "census2001Code": "14  ",
+    "census2011Code": "04036"
+   }
+  ],
+  "485": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4095,
+    "subdistrictNameEnglish": "Mahur",
+    "subdistrictNameLocal": "माहूर",
+    "census2001Code": "1   ",
+    "census2011Code": "04095"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4096,
+    "subdistrictNameEnglish": "Kinwat",
+    "subdistrictNameLocal": "किनवत",
+    "census2001Code": "2   ",
+    "census2011Code": "04096"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4097,
+    "subdistrictNameEnglish": "Himayatnagar",
+    "subdistrictNameLocal": "हिमायतनगर",
+    "census2001Code": "3   ",
+    "census2011Code": "04097"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4098,
+    "subdistrictNameEnglish": "Hadgaon",
+    "subdistrictNameLocal": "हदगाव",
+    "census2001Code": "4   ",
+    "census2011Code": "04098"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4099,
+    "subdistrictNameEnglish": "Ardhapur",
+    "subdistrictNameLocal": "अर्धापूर",
+    "census2001Code": "5   ",
+    "census2011Code": "04099"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4100,
+    "subdistrictNameEnglish": "Nanded",
+    "subdistrictNameLocal": "नांदेड",
+    "census2001Code": "6   ",
+    "census2011Code": "04100"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4101,
+    "subdistrictNameEnglish": "Mudkhed",
+    "subdistrictNameLocal": "मुदखेड",
+    "census2001Code": "7   ",
+    "census2011Code": "04101"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4102,
+    "subdistrictNameEnglish": "Bhokar",
+    "subdistrictNameLocal": "भोकर",
+    "census2001Code": "8   ",
+    "census2011Code": "04102"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4103,
+    "subdistrictNameEnglish": "Umri",
+    "subdistrictNameLocal": "उमरी",
+    "census2001Code": "9   ",
+    "census2011Code": "04103"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4104,
+    "subdistrictNameEnglish": "Dharmabad",
+    "subdistrictNameLocal": "धर्माबाद",
+    "census2001Code": "10  ",
+    "census2011Code": "04104"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4105,
+    "subdistrictNameEnglish": "Biloli",
+    "subdistrictNameLocal": "बिलोली",
+    "census2001Code": "11  ",
+    "census2011Code": "04105"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4106,
+    "subdistrictNameEnglish": "Naigaon (Khairgaon)",
+    "subdistrictNameLocal": "नायगाव (खैरगाव)",
+    "census2001Code": "12  ",
+    "census2011Code": "04106"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4107,
+    "subdistrictNameEnglish": "Loha",
+    "subdistrictNameLocal": "लोहा",
+    "census2001Code": "13  ",
+    "census2011Code": "04107"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4108,
+    "subdistrictNameEnglish": "Kandhar",
+    "subdistrictNameLocal": "कंधार",
+    "census2001Code": "14  ",
+    "census2011Code": "04108"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4109,
+    "subdistrictNameEnglish": "Mukhed",
+    "subdistrictNameLocal": "मुखेड",
+    "census2001Code": "15  ",
+    "census2011Code": "04109"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4110,
+    "subdistrictNameEnglish": "Deglur",
+    "subdistrictNameLocal": "देगलुर",
+    "census2001Code": "16  ",
+    "census2011Code": "04110"
+   }
+  ],
+  "486": [
+   {
+    "sscode": null,
+    "subdistrictCode": 3950,
+    "subdistrictNameEnglish": "Akkalkuwa",
+    "subdistrictNameLocal": "अक्कलकुवा",
+    "census2001Code": "1   ",
+    "census2011Code": "03950"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3951,
+    "subdistrictNameEnglish": "Akrani",
+    "subdistrictNameLocal": "अकर्नी",
+    "census2001Code": "2   ",
+    "census2011Code": "03951"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3952,
+    "subdistrictNameEnglish": "Talode",
+    "subdistrictNameLocal": "तलोदा",
+    "census2001Code": "3   ",
+    "census2011Code": "03952"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3953,
+    "subdistrictNameEnglish": "Shahade",
+    "subdistrictNameLocal": "शहादा",
+    "census2001Code": "4   ",
+    "census2011Code": "03953"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3954,
+    "subdistrictNameEnglish": "Nandurbar",
+    "subdistrictNameLocal": "नंदूरबार",
+    "census2001Code": "5   ",
+    "census2011Code": "03954"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3955,
+    "subdistrictNameEnglish": "Nawapur",
+    "subdistrictNameLocal": "नवापूर",
+    "census2001Code": "6   ",
+    "census2011Code": "03955"
+   }
+  ],
+  "487": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4142,
+    "subdistrictNameEnglish": "Surgana",
+    "subdistrictNameLocal": "सुरगना",
+    "census2001Code": "1   ",
+    "census2011Code": "04142"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4143,
+    "subdistrictNameEnglish": "Kalwan",
+    "subdistrictNameLocal": "कालवण",
+    "census2001Code": "2   ",
+    "census2011Code": "04143"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4144,
+    "subdistrictNameEnglish": "Deola",
+    "subdistrictNameLocal": "देवळा",
+    "census2001Code": "3   ",
+    "census2011Code": "04144"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4145,
+    "subdistrictNameEnglish": "Baglan",
+    "subdistrictNameLocal": "बागलण",
+    "census2001Code": "4   ",
+    "census2011Code": "04145"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4146,
+    "subdistrictNameEnglish": "Malegaon",
+    "subdistrictNameLocal": "मालेगाव",
+    "census2001Code": "0005",
+    "census2011Code": "04146"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4147,
+    "subdistrictNameEnglish": "Nandgaon",
+    "subdistrictNameLocal": "नांदगाव",
+    "census2001Code": "6   ",
+    "census2011Code": "04147"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4148,
+    "subdistrictNameEnglish": "Chandvad",
+    "subdistrictNameLocal": "चांदवड",
+    "census2001Code": "7   ",
+    "census2011Code": "04148"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4149,
+    "subdistrictNameEnglish": "Dindori",
+    "subdistrictNameLocal": "दिंडोरी",
+    "census2001Code": "8   ",
+    "census2011Code": "04149"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4150,
+    "subdistrictNameEnglish": "Peth",
+    "subdistrictNameLocal": "पेठ",
+    "census2001Code": "9   ",
+    "census2011Code": "04150"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4151,
+    "subdistrictNameEnglish": "Trimbakeshwar",
+    "subdistrictNameLocal": "त्र्यंबक",
+    "census2001Code": "10  ",
+    "census2011Code": "04151"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4152,
+    "subdistrictNameEnglish": "Nashik",
+    "subdistrictNameLocal": "नाशिक",
+    "census2001Code": "11  ",
+    "census2011Code": "04152"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4153,
+    "subdistrictNameEnglish": "Igatpuri",
+    "subdistrictNameLocal": "इगतपूरी",
+    "census2001Code": "12  ",
+    "census2011Code": "04153"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4154,
+    "subdistrictNameEnglish": "Sinnar",
+    "subdistrictNameLocal": "सिन्नर",
+    "census2001Code": "13  ",
+    "census2011Code": "04154"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4155,
+    "subdistrictNameEnglish": "Niphad",
+    "subdistrictNameLocal": "निफाड",
+    "census2001Code": "14  ",
+    "census2011Code": "04155"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4156,
+    "subdistrictNameEnglish": "Yevla",
+    "subdistrictNameLocal": "येवला",
+    "census2001Code": "15  ",
+    "census2011Code": "04156"
+   }
+  ],
+  "488": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4236,
+    "subdistrictNameEnglish": "Paranda",
+    "subdistrictNameLocal": "परंडा",
+    "census2001Code": "1   ",
+    "census2011Code": "04236"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4237,
+    "subdistrictNameEnglish": "Bhum",
+    "subdistrictNameLocal": "भूम",
+    "census2001Code": "2   ",
+    "census2011Code": "04237"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4238,
+    "subdistrictNameEnglish": "Washi",
+    "subdistrictNameLocal": "वाशी",
+    "census2001Code": "3   ",
+    "census2011Code": "04238"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4239,
+    "subdistrictNameEnglish": "Kalamb",
+    "subdistrictNameLocal": "कळंब",
+    "census2001Code": "0004",
+    "census2011Code": "04239"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4240,
+    "subdistrictNameEnglish": "Dharashiv",
+    "subdistrictNameLocal": "धाराशिव",
+    "census2001Code": "5   ",
+    "census2011Code": "04240"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4241,
+    "subdistrictNameEnglish": "Tuljapur",
+    "subdistrictNameLocal": "तुळजापूर",
+    "census2001Code": "6   ",
+    "census2011Code": "04241"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4242,
+    "subdistrictNameEnglish": "Lohara",
+    "subdistrictNameLocal": "लोहारा",
+    "census2001Code": "7   ",
+    "census2011Code": "04242"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4243,
+    "subdistrictNameEnglish": "Omarga",
+    "subdistrictNameLocal": "उमरगा",
+    "census2001Code": "8   ",
+    "census2011Code": "04243"
+   }
+  ],
+  "489": [
+   {
+    "sscode": "27",
+    "subdistrictCode": 4116,
+    "subdistrictNameEnglish": "Selu",
+    "subdistrictNameLocal": "सेलू",
+    "census2001Code": "1   ",
+    "census2011Code": "04116"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4117,
+    "subdistrictNameEnglish": "Jintur",
+    "subdistrictNameLocal": "जिंतुर",
+    "census2001Code": "2   ",
+    "census2011Code": "04117"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4118,
+    "subdistrictNameEnglish": "Parbhani",
+    "subdistrictNameLocal": "परभणी",
+    "census2001Code": "3   ",
+    "census2011Code": "04118"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4119,
+    "subdistrictNameEnglish": "Manwath",
+    "subdistrictNameLocal": "मानवत",
+    "census2001Code": "4   ",
+    "census2011Code": "04119"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4120,
+    "subdistrictNameEnglish": "Pathri",
+    "subdistrictNameLocal": "पाथ्री",
+    "census2001Code": "5   ",
+    "census2011Code": "04120"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4121,
+    "subdistrictNameEnglish": "Sonpeth",
+    "subdistrictNameLocal": "सोनपेठ",
+    "census2001Code": "6   ",
+    "census2011Code": "04121"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4122,
+    "subdistrictNameEnglish": "Gangakhed",
+    "subdistrictNameLocal": "गंगाखेड",
+    "census2001Code": "7   ",
+    "census2011Code": "04122"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4123,
+    "subdistrictNameEnglish": "Palam",
+    "subdistrictNameLocal": "पालम",
+    "census2001Code": "8   ",
+    "census2011Code": "04123"
+   },
+   {
+    "sscode": "27",
+    "subdistrictCode": 4124,
+    "subdistrictNameEnglish": "Purna",
+    "subdistrictNameLocal": "पुर्णा",
+    "census2001Code": "9   ",
+    "census2011Code": "04124"
+   }
+  ],
+  "490": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4187,
+    "subdistrictNameEnglish": "Junnar",
+    "subdistrictNameLocal": "जुन्नर",
+    "census2001Code": "1   ",
+    "census2011Code": "04187"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4188,
+    "subdistrictNameEnglish": "Ambegaon",
+    "subdistrictNameLocal": "आंबेगाव",
+    "census2001Code": "2   ",
+    "census2011Code": "04188"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4189,
+    "subdistrictNameEnglish": "Shirur",
+    "subdistrictNameLocal": "शिरूर",
+    "census2001Code": "3   ",
+    "census2011Code": "04189"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4190,
+    "subdistrictNameEnglish": "Khed",
+    "subdistrictNameLocal": "खेड",
+    "census2001Code": "4   ",
+    "census2011Code": "04190"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4191,
+    "subdistrictNameEnglish": "Mawal",
+    "subdistrictNameLocal": "मावळ",
+    "census2001Code": "5   ",
+    "census2011Code": "04191"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4192,
+    "subdistrictNameEnglish": "Mulshi",
+    "subdistrictNameLocal": "मुळशी",
+    "census2001Code": "6   ",
+    "census2011Code": "04192"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4193,
+    "subdistrictNameEnglish": "Haveli",
+    "subdistrictNameLocal": "हवेली",
+    "census2001Code": "7   ",
+    "census2011Code": "04193"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4194,
+    "subdistrictNameEnglish": "Pune City",
+    "subdistrictNameLocal": "पुणे शहर",
+    "census2001Code": "8   ",
+    "census2011Code": "04194"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4195,
+    "subdistrictNameEnglish": "Daund",
+    "subdistrictNameLocal": "दौंड",
+    "census2001Code": "9   ",
+    "census2011Code": "04195"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4196,
+    "subdistrictNameEnglish": "Purandhar",
+    "subdistrictNameLocal": "पुरंदर",
+    "census2001Code": "10  ",
+    "census2011Code": "04196"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4197,
+    "subdistrictNameEnglish": "Rajgad",
+    "subdistrictNameLocal": "राजगड",
+    "census2001Code": "11  ",
+    "census2011Code": "04197"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4198,
+    "subdistrictNameEnglish": "Bhor",
+    "subdistrictNameLocal": "भोर",
+    "census2001Code": "12  ",
+    "census2011Code": "04198"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4199,
+    "subdistrictNameEnglish": "Baramati",
+    "subdistrictNameLocal": "बारामती",
+    "census2001Code": "13  ",
+    "census2011Code": "04199"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4200,
+    "subdistrictNameEnglish": "Indapur",
+    "subdistrictNameLocal": "इंदापूर",
+    "census2001Code": "14  ",
+    "census2011Code": "04200"
+   }
+  ],
+  "491": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4172,
+    "subdistrictNameEnglish": "Uran",
+    "subdistrictNameLocal": "उरण",
+    "census2001Code": "1   ",
+    "census2011Code": "04172"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4173,
+    "subdistrictNameEnglish": "Panvel",
+    "subdistrictNameLocal": "पनवेल",
+    "census2001Code": "2   ",
+    "census2011Code": "04173"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4174,
+    "subdistrictNameEnglish": "Karjat",
+    "subdistrictNameLocal": "कर्जत",
+    "census2001Code": "3   ",
+    "census2011Code": "04174"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4175,
+    "subdistrictNameEnglish": "Khalapur",
+    "subdistrictNameLocal": "खालापूर",
+    "census2001Code": "4   ",
+    "census2011Code": "04175"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4176,
+    "subdistrictNameEnglish": "Pen",
+    "subdistrictNameLocal": "पेण",
+    "census2001Code": "5   ",
+    "census2011Code": "04176"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4177,
+    "subdistrictNameEnglish": "Alibag",
+    "subdistrictNameLocal": "अलिबाग",
+    "census2001Code": "6   ",
+    "census2011Code": "04177"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4178,
+    "subdistrictNameEnglish": "Murud",
+    "subdistrictNameLocal": "मुरूड",
+    "census2001Code": "7   ",
+    "census2011Code": "04178"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4179,
+    "subdistrictNameEnglish": "Roha",
+    "subdistrictNameLocal": "रोहा",
+    "census2001Code": "8   ",
+    "census2011Code": "04179"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4180,
+    "subdistrictNameEnglish": "Sudhagad",
+    "subdistrictNameLocal": "सुधागड",
+    "census2001Code": "9   ",
+    "census2011Code": "04180"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4181,
+    "subdistrictNameEnglish": "Mangaon",
+    "subdistrictNameLocal": "मानगाव",
+    "census2001Code": "10  ",
+    "census2011Code": "04181"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4182,
+    "subdistrictNameEnglish": "Tala",
+    "subdistrictNameLocal": "तळा",
+    "census2001Code": "11  ",
+    "census2011Code": "04182"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4183,
+    "subdistrictNameEnglish": "Shrivardhan",
+    "subdistrictNameLocal": "श्रीवर्धन",
+    "census2001Code": "12  ",
+    "census2011Code": "04183"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4184,
+    "subdistrictNameEnglish": "Mhasla",
+    "subdistrictNameLocal": "म्हासळा",
+    "census2001Code": "13  ",
+    "census2011Code": "04184"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4185,
+    "subdistrictNameEnglish": "Mahad",
+    "subdistrictNameLocal": "महाड",
+    "census2001Code": "14  ",
+    "census2011Code": "04185"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4186,
+    "subdistrictNameEnglish": "Poladpur",
+    "subdistrictNameLocal": "पोलादपूर",
+    "census2001Code": "15  ",
+    "census2011Code": "04186"
+   }
+  ],
+  "492": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4266,
+    "subdistrictNameEnglish": "Mandangad",
+    "subdistrictNameLocal": "मंडणगड",
+    "census2001Code": "1   ",
+    "census2011Code": "04266"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4267,
+    "subdistrictNameEnglish": "Dapoli",
+    "subdistrictNameLocal": "दापोली",
+    "census2001Code": "2   ",
+    "census2011Code": "04267"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4268,
+    "subdistrictNameEnglish": "Khed",
+    "subdistrictNameLocal": "खेड",
+    "census2001Code": "0003",
+    "census2011Code": "04268"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4269,
+    "subdistrictNameEnglish": "Chiplun",
+    "subdistrictNameLocal": "चिपळूण",
+    "census2001Code": "4   ",
+    "census2011Code": "04269"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4270,
+    "subdistrictNameEnglish": "Guhagar",
+    "subdistrictNameLocal": "गुहाघर",
+    "census2001Code": "5   ",
+    "census2011Code": "04270"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4271,
+    "subdistrictNameEnglish": "Ratnagiri",
+    "subdistrictNameLocal": "रत्नागिरी",
+    "census2001Code": "6   ",
+    "census2011Code": "04271"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4272,
+    "subdistrictNameEnglish": "Sangameshwar",
+    "subdistrictNameLocal": "संगमेश्वर",
+    "census2001Code": "7   ",
+    "census2011Code": "04272"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4273,
+    "subdistrictNameEnglish": "Lanja",
+    "subdistrictNameLocal": "लांजा",
+    "census2001Code": "8   ",
+    "census2011Code": "04273"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4274,
+    "subdistrictNameEnglish": "Rajapur",
+    "subdistrictNameLocal": "राजापूर",
+    "census2001Code": "9   ",
+    "census2011Code": "04274"
+   }
+  ],
+  "493": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4295,
+    "subdistrictNameEnglish": "Shirala",
+    "subdistrictNameLocal": "शिराळा",
+    "census2001Code": "1   ",
+    "census2011Code": "04295"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4296,
+    "subdistrictNameEnglish": "Walwa",
+    "subdistrictNameLocal": "वाळवा",
+    "census2001Code": "2   ",
+    "census2011Code": "04296"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4297,
+    "subdistrictNameEnglish": "Palus",
+    "subdistrictNameLocal": "पलुस",
+    "census2001Code": "3   ",
+    "census2011Code": "04297"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4298,
+    "subdistrictNameEnglish": "Kadegaon",
+    "subdistrictNameLocal": "कडेगाव",
+    "census2001Code": "0   ",
+    "census2011Code": "04298"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4299,
+    "subdistrictNameEnglish": "Khanapur",
+    "subdistrictNameLocal": "खानापूर",
+    "census2001Code": "4   ",
+    "census2011Code": "04299"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4300,
+    "subdistrictNameEnglish": "Atpadi",
+    "subdistrictNameLocal": "आटपाडी",
+    "census2001Code": "5   ",
+    "census2011Code": "04300"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4301,
+    "subdistrictNameEnglish": "Tasgaon",
+    "subdistrictNameLocal": "तासगाव",
+    "census2001Code": "6   ",
+    "census2011Code": "04301"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4302,
+    "subdistrictNameEnglish": "Miraj",
+    "subdistrictNameLocal": "मिरज",
+    "census2001Code": "7   ",
+    "census2011Code": "04302"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4303,
+    "subdistrictNameEnglish": "Kavathemahankal",
+    "subdistrictNameLocal": "कवठेमहांकाळ",
+    "census2001Code": "8   ",
+    "census2011Code": "04303"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4304,
+    "subdistrictNameEnglish": "Jat",
+    "subdistrictNameLocal": "जत",
+    "census2001Code": "9   ",
+    "census2011Code": "04304"
+   }
+  ],
+  "494": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4255,
+    "subdistrictNameEnglish": "Mahabaleshwar",
+    "subdistrictNameLocal": "महाबळेश्वर",
+    "census2001Code": "1   ",
+    "census2011Code": "04255"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4256,
+    "subdistrictNameEnglish": "Wai",
+    "subdistrictNameLocal": "वाई",
+    "census2001Code": "2   ",
+    "census2011Code": "04256"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4257,
+    "subdistrictNameEnglish": "Khandala",
+    "subdistrictNameLocal": "खंडाळा",
+    "census2001Code": "3   ",
+    "census2011Code": "04257"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4258,
+    "subdistrictNameEnglish": "Phaltan",
+    "subdistrictNameLocal": "फलटण",
+    "census2001Code": "4   ",
+    "census2011Code": "04258"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4259,
+    "subdistrictNameEnglish": "Man",
+    "subdistrictNameLocal": "माण",
+    "census2001Code": "5   ",
+    "census2011Code": "04259"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4260,
+    "subdistrictNameEnglish": "Khatav",
+    "subdistrictNameLocal": "खटाव",
+    "census2001Code": "6   ",
+    "census2011Code": "04260"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4261,
+    "subdistrictNameEnglish": "Koregaon",
+    "subdistrictNameLocal": "कोरेगाव",
+    "census2001Code": "7   ",
+    "census2011Code": "04261"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4262,
+    "subdistrictNameEnglish": "Satara",
+    "subdistrictNameLocal": "सातारा",
+    "census2001Code": "8   ",
+    "census2011Code": "04262"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4263,
+    "subdistrictNameEnglish": "Jaoli",
+    "subdistrictNameLocal": "जावळी",
+    "census2001Code": "9   ",
+    "census2011Code": "04263"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4264,
+    "subdistrictNameEnglish": "Patan",
+    "subdistrictNameLocal": "पाटण",
+    "census2001Code": "10  ",
+    "census2011Code": "04264"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4265,
+    "subdistrictNameEnglish": "Karad",
+    "subdistrictNameLocal": "कराड",
+    "census2001Code": "11  ",
+    "census2011Code": "04265"
+   }
+  ],
+  "495": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4275,
+    "subdistrictNameEnglish": "Devgad",
+    "subdistrictNameLocal": "देवगड",
+    "census2001Code": "1   ",
+    "census2011Code": "04275"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4276,
+    "subdistrictNameEnglish": "Vaibhavvadi",
+    "subdistrictNameLocal": "वैभववाडी",
+    "census2001Code": "2   ",
+    "census2011Code": "04276"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4277,
+    "subdistrictNameEnglish": "Kankavli",
+    "subdistrictNameLocal": "कणकवली",
+    "census2001Code": "3   ",
+    "census2011Code": "04277"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4278,
+    "subdistrictNameEnglish": "Malwan",
+    "subdistrictNameLocal": "मालवण",
+    "census2001Code": "4   ",
+    "census2011Code": "04278"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4279,
+    "subdistrictNameEnglish": "Vengurla",
+    "subdistrictNameLocal": "वेंगुर्ला",
+    "census2001Code": "5   ",
+    "census2011Code": "04279"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4280,
+    "subdistrictNameEnglish": "Kudal",
+    "subdistrictNameLocal": "कुडाळ",
+    "census2001Code": "6   ",
+    "census2011Code": "04280"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4281,
+    "subdistrictNameEnglish": "Sawantwadi",
+    "subdistrictNameLocal": "सावंतवाडी",
+    "census2001Code": "7   ",
+    "census2011Code": "04281"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4282,
+    "subdistrictNameEnglish": "Dodamarg",
+    "subdistrictNameLocal": "दोडामार्ग",
+    "census2001Code": "8   ",
+    "census2011Code": "04282"
+   }
+  ],
+  "496": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4244,
+    "subdistrictNameEnglish": "Karmala",
+    "subdistrictNameLocal": "करमाळा",
+    "census2001Code": "1   ",
+    "census2011Code": "04244"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4245,
+    "subdistrictNameEnglish": "Madha",
+    "subdistrictNameLocal": "माढा",
+    "census2001Code": "2   ",
+    "census2011Code": "04245"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4246,
+    "subdistrictNameEnglish": "Barshi",
+    "subdistrictNameLocal": "बार्शी",
+    "census2001Code": "3   ",
+    "census2011Code": "04246"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4247,
+    "subdistrictNameEnglish": "Solapur North",
+    "subdistrictNameLocal": "उत्तर सोलापूर",
+    "census2001Code": "4   ",
+    "census2011Code": "04247"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4248,
+    "subdistrictNameEnglish": "Mohol",
+    "subdistrictNameLocal": "मोहोळ",
+    "census2001Code": "5   ",
+    "census2011Code": "04248"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4249,
+    "subdistrictNameEnglish": "Pandharpur",
+    "subdistrictNameLocal": "पंढरपूर",
+    "census2001Code": "6   ",
+    "census2011Code": "04249"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4250,
+    "subdistrictNameEnglish": "Malshiras",
+    "subdistrictNameLocal": "माळशिरस",
+    "census2001Code": "7   ",
+    "census2011Code": "04250"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4251,
+    "subdistrictNameEnglish": "Sangole",
+    "subdistrictNameLocal": "सांगोले",
+    "census2001Code": "8   ",
+    "census2011Code": "04251"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4252,
+    "subdistrictNameEnglish": "Mangalvedhe",
+    "subdistrictNameLocal": "मंगळवेढे",
+    "census2001Code": "9   ",
+    "census2011Code": "04252"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4253,
+    "subdistrictNameEnglish": "Solapur South",
+    "subdistrictNameLocal": "दक्षिण सोलापूर",
+    "census2001Code": "10  ",
+    "census2011Code": "04253"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4254,
+    "subdistrictNameEnglish": "Akkalkot",
+    "subdistrictNameLocal": "अक्कलकोट",
+    "census2001Code": "11  ",
+    "census2011Code": "04254"
+   }
+  ],
+  "497": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4165,
+    "subdistrictNameEnglish": "Thane",
+    "subdistrictNameLocal": "ठाणे",
+    "census2001Code": "9   ",
+    "census2011Code": "04165"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4166,
+    "subdistrictNameEnglish": "Bhiwandi",
+    "subdistrictNameLocal": "भिवंडी",
+    "census2001Code": "10  ",
+    "census2011Code": "04166"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4167,
+    "subdistrictNameEnglish": "Shahapur",
+    "subdistrictNameLocal": "शहापूर",
+    "census2001Code": "11  ",
+    "census2011Code": "04167"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4168,
+    "subdistrictNameEnglish": "Kalyan",
+    "subdistrictNameLocal": "कल्याण",
+    "census2001Code": "12  ",
+    "census2011Code": "04168"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4169,
+    "subdistrictNameEnglish": "Ulhasnagar",
+    "subdistrictNameLocal": "उल्हासनगर",
+    "census2001Code": "13  ",
+    "census2011Code": "04169"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4170,
+    "subdistrictNameEnglish": "Ambarnath",
+    "subdistrictNameLocal": "अंबरनाथ",
+    "census2001Code": "14  ",
+    "census2011Code": "04170"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4171,
+    "subdistrictNameEnglish": "Murbad",
+    "subdistrictNameLocal": "मुरबाड",
+    "census2001Code": "15  ",
+    "census2011Code": "04171"
+   }
+  ],
+  "498": [
+   {
+    "sscode": "",
+    "subdistrictCode": 4015,
+    "subdistrictNameEnglish": "Ashti",
+    "subdistrictNameLocal": "आष्टी",
+    "census2001Code": "1   ",
+    "census2011Code": "04015"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4016,
+    "subdistrictNameEnglish": "Karanja",
+    "subdistrictNameLocal": "कारंजा",
+    "census2001Code": "3   ",
+    "census2011Code": "04016"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4017,
+    "subdistrictNameEnglish": "Arvi",
+    "subdistrictNameLocal": "आर्वी",
+    "census2001Code": "3   ",
+    "census2011Code": "04017"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4018,
+    "subdistrictNameEnglish": "Seloo",
+    "subdistrictNameLocal": "सेलू",
+    "census2001Code": "4   ",
+    "census2011Code": "04018"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4019,
+    "subdistrictNameEnglish": "Wardha",
+    "subdistrictNameLocal": "वर्धा",
+    "census2001Code": "5   ",
+    "census2011Code": "04019"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4020,
+    "subdistrictNameEnglish": "Deoli",
+    "subdistrictNameLocal": "देवळी",
+    "census2001Code": "6   ",
+    "census2011Code": "04020"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4021,
+    "subdistrictNameEnglish": "Hinganghat",
+    "subdistrictNameLocal": "हिंगणघाट",
+    "census2001Code": "7   ",
+    "census2011Code": "04021"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4022,
+    "subdistrictNameEnglish": "Samudrapur",
+    "subdistrictNameLocal": "समुद्रपूर",
+    "census2001Code": "8   ",
+    "census2011Code": "04022"
+   }
+  ],
+  "499": [
+   {
+    "sscode": null,
+    "subdistrictCode": 3995,
+    "subdistrictNameEnglish": "Malegaon",
+    "subdistrictNameLocal": "मालेगाव",
+    "census2001Code": "1   ",
+    "census2011Code": "03995"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3996,
+    "subdistrictNameEnglish": "Mangrulpir",
+    "subdistrictNameLocal": "मंगरूळपीर",
+    "census2001Code": "2   ",
+    "census2011Code": "03996"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3997,
+    "subdistrictNameEnglish": "Karanja",
+    "subdistrictNameLocal": "कारंजा",
+    "census2001Code": "3   ",
+    "census2011Code": "03997"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 3998,
+    "subdistrictNameEnglish": "Manora",
+    "subdistrictNameLocal": "मानोरा",
+    "census2001Code": "4   ",
+    "census2011Code": "03998"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 3999,
+    "subdistrictNameEnglish": "Washim",
+    "subdistrictNameLocal": "वाशिम",
+    "census2001Code": "5   ",
+    "census2011Code": "03999"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4000,
+    "subdistrictNameEnglish": "Risod",
+    "subdistrictNameLocal": "रिसोड",
+    "census2001Code": "6   ",
+    "census2011Code": "04000"
+   }
+  ],
+  "500": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4079,
+    "subdistrictNameEnglish": "Ner",
+    "subdistrictNameLocal": "नेर",
+    "census2001Code": "1   ",
+    "census2011Code": "04079"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4080,
+    "subdistrictNameEnglish": "Babulgaon",
+    "subdistrictNameLocal": "बाबूलगाव",
+    "census2001Code": "2   ",
+    "census2011Code": "04080"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4081,
+    "subdistrictNameEnglish": "Kalamb",
+    "subdistrictNameLocal": "कळंब",
+    "census2001Code": "3   ",
+    "census2011Code": "04081"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4082,
+    "subdistrictNameEnglish": "Yavatmal",
+    "subdistrictNameLocal": "यवतमाळ",
+    "census2001Code": "4   ",
+    "census2011Code": "04082"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4083,
+    "subdistrictNameEnglish": "Darwha",
+    "subdistrictNameLocal": "धारवा",
+    "census2001Code": "5   ",
+    "census2011Code": "04083"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4084,
+    "subdistrictNameEnglish": "Digras",
+    "subdistrictNameLocal": "दिग्रस",
+    "census2001Code": "6   ",
+    "census2011Code": "04084"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4085,
+    "subdistrictNameEnglish": "Pusad",
+    "subdistrictNameLocal": "पूसद",
+    "census2001Code": "7   ",
+    "census2011Code": "04085"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4086,
+    "subdistrictNameEnglish": "Umarkhed",
+    "subdistrictNameLocal": "उमरखेड",
+    "census2001Code": "8   ",
+    "census2011Code": "04086"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4087,
+    "subdistrictNameEnglish": "Mahagaon",
+    "subdistrictNameLocal": "महागाव",
+    "census2001Code": "9   ",
+    "census2011Code": "04087"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4088,
+    "subdistrictNameEnglish": "Arni",
+    "subdistrictNameLocal": "अर्नी",
+    "census2001Code": "10  ",
+    "census2011Code": "04088"
+   },
+   {
+    "sscode": "",
+    "subdistrictCode": 4089,
+    "subdistrictNameEnglish": "Ghatanji",
+    "subdistrictNameLocal": "घाटंजी",
+    "census2001Code": "11  ",
+    "census2011Code": "04089"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4090,
+    "subdistrictNameEnglish": "Kelapur",
+    "subdistrictNameLocal": "केलापूर",
+    "census2001Code": "12  ",
+    "census2011Code": "04090"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4091,
+    "subdistrictNameEnglish": "Ralegaon",
+    "subdistrictNameLocal": "राळेगाव",
+    "census2001Code": "13  ",
+    "census2011Code": "04091"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4092,
+    "subdistrictNameEnglish": "Maregaon",
+    "subdistrictNameLocal": "मारेगाव",
+    "census2001Code": "14  ",
+    "census2011Code": "04092"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4093,
+    "subdistrictNameEnglish": "Zari-Jamani",
+    "subdistrictNameLocal": "जरी जामनी",
+    "census2001Code": "15  ",
+    "census2011Code": "04093"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4094,
+    "subdistrictNameEnglish": "Wani",
+    "subdistrictNameLocal": "वनी",
+    "census2001Code": "16  ",
+    "census2011Code": "04094"
+   }
+  ],
+  "665": [
+   {
+    "sscode": null,
+    "subdistrictCode": 4157,
+    "subdistrictNameEnglish": "Talasari",
+    "subdistrictNameLocal": "तलासरी",
+    "census2001Code": "1   ",
+    "census2011Code": "04157"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4158,
+    "subdistrictNameEnglish": "Dahanu",
+    "subdistrictNameLocal": "डहाणू",
+    "census2001Code": "2   ",
+    "census2011Code": "04158"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4159,
+    "subdistrictNameEnglish": "Vikramgad",
+    "subdistrictNameLocal": "विक्रमगड",
+    "census2001Code": "3   ",
+    "census2011Code": "04159"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4160,
+    "subdistrictNameEnglish": "Jawhar",
+    "subdistrictNameLocal": "जव्हार",
+    "census2001Code": "4   ",
+    "census2011Code": "04160"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4161,
+    "subdistrictNameEnglish": "Mokhada",
+    "subdistrictNameLocal": "मोखाडा",
+    "census2001Code": "5   ",
+    "census2011Code": "04161"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4162,
+    "subdistrictNameEnglish": "Wada",
+    "subdistrictNameLocal": "वाडा",
+    "census2001Code": "6   ",
+    "census2011Code": "04162"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4163,
+    "subdistrictNameEnglish": "Palghar",
+    "subdistrictNameLocal": "पालघर",
+    "census2001Code": "7   ",
+    "census2011Code": "04163"
+   },
+   {
+    "sscode": null,
+    "subdistrictCode": 4164,
+    "subdistrictNameEnglish": "Vasai",
+    "subdistrictNameLocal": "वसई",
+    "census2001Code": "8   ",
+    "census2011Code": "04164"
+   }
+  ]
+ }
+}

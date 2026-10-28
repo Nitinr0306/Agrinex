@@ -1,0 +1,52 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listIngestionRunErrors",
+  "scenario": "The first page (size 2) of the run's 23 error rows: a validation rejection and a same-key conflict, with raw-payload excerpts.",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/admin/ingestion/runs/00000000-0000-4000-8000-000000000f01/errors?page=0&size=2",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0045",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-4000-8000-000000001001",
+          "runId": "00000000-0000-4000-8000-000000000f01",
+          "errorType": "VALIDATION",
+          "errorCode": "UNKNOWN_COMMODITY",
+          "errorMessage": "commodity: not in the known list",
+          "pageOffset": null,
+          "requestReportDate": null,
+          "rawPayloadExcerpt": "{\"state\":\"Maharashtra\",\"district\":\"Test District North\",\"market\":\"TEST Market A\",\"commodity\":\"Test Unknown Crop\",\"variety\":\"Other\",\"grade\":\"FAQ\",\"arrival_date\":\"03/10/2026\",\"min_price\":1000,\"max_price\":1200,\"modal_price\":1100}",
+          "rawPayloadTruncated": false,
+          "createdAt": "2026-10-03T00:30:41Z"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000001002",
+          "runId": "00000000-0000-4000-8000-000000000f01",
+          "errorType": "CONFLICT",
+          "errorCode": "SAME_KEY_DIFFERENT_PRICES",
+          "errorMessage": "same identity delivered with different prices; quarantined",
+          "pageOffset": null,
+          "requestReportDate": null,
+          "rawPayloadExcerpt": "{\"state\":\"Maharashtra\",\"district\":\"Test District South\",\"market\":\"TEST Market E\",\"commodity\":\"Onion\",\"variety\":\"Red\",\"grade\":\"FAQ\",\"arrival_date\":\"03/10/2026\",\"min_price\":2900,\"max_price\":3300,\"modal_price\":3150}",
+          "rawPayloadTruncated": false,
+          "createdAt": "2026-10-03T00:31:02Z"
+        }
+      ],
+      "page": 0,
+      "size": 2,
+      "totalItems": 23,
+      "totalPages": 12
+    }
+  }
+}

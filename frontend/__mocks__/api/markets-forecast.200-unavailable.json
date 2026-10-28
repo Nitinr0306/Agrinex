@@ -1,0 +1,43 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getMarketForecast",
+  "scenario": "No forecast dated today or later (ML not built, stopped or failed): available false and no prediction. Never a 5xx (spec §29, §35).",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/markets/00000000-0000-4000-8000-000000000703/forecast?commodityId=00000000-0000-4000-8000-000000000401"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0035",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "available": false,
+      "kind": "ML_FORECAST",
+      "inputBasis": "REPRESENTATIVE_DAILY_SERIES",
+      "market": {
+        "id": "00000000-0000-4000-8000-000000000703",
+        "name": "TEST Market C"
+      },
+      "commodity": {
+        "id": "00000000-0000-4000-8000-000000000401",
+        "name": "Onion",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "priceUnit": "Rs./Quintal",
+      "forecasts": []
+    }
+  }
+}

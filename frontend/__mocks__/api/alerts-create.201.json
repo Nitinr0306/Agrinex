@@ -1,0 +1,44 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "createAlert",
+  "scenario": "A price alert for one market.",
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/alerts",
+    "headers": {
+      "Authorization": "Bearer mock.farmer.token"
+    },
+    "body": {
+      "alertType": "PRICE_ABOVE",
+      "commodityId": "00000000-0000-4000-8000-000000000401",
+      "marketId": "00000000-0000-4000-8000-000000000702",
+      "thresholdValue": 3000
+    }
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0038",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "id": "00000000-0000-4000-8000-000000000c01",
+      "alertType": "PRICE_ABOVE",
+      "status": "ACTIVE",
+      "commodity": {
+        "id": "00000000-0000-4000-8000-000000000401",
+        "name": "Onion",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "market": {
+        "id": "00000000-0000-4000-8000-000000000702",
+        "name": "TEST Market B"
+      },
+      "thresholdValue": 3000,
+      "priceUnit": "Rs./Quintal",
+      "lastTriggeredAt": null
+    }
+  }
+}

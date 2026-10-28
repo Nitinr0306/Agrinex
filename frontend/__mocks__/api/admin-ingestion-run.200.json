@@ -1,0 +1,51 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getIngestionRun",
+  "scenario": "A triggered historical backfill still RUNNING: counters so far, no end time, completeness not yet applicable (ADR-0012).",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/admin/ingestion/runs/00000000-0000-4000-8000-000000000f03",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0056",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "id": "00000000-0000-4000-8000-000000000f03",
+      "datasetType": "HISTORICAL_PRICE",
+      "triggeredBy": "MANUAL",
+      "status": "RUNNING",
+      "startedAt": "2026-10-03T04:25:00Z",
+      "finishedAt": null,
+      "durationSeconds": null,
+      "requestScope": {
+        "filters.State": "Maharashtra",
+        "reportDates": [
+          "27-09-2026",
+          "28-09-2026",
+          "29-09-2026",
+          "30-09-2026"
+        ],
+        "limit": 500
+      },
+      "sourceTotalRecords": null,
+      "pagesFetched": 2,
+      "pagesFailed": 0,
+      "recordsFetched": 164,
+      "recordsInserted": 150,
+      "recordsUpdated": 0,
+      "duplicatesSkipped": 9,
+      "validationErrorsCount": 5,
+      "recordsConflicted": 0,
+      "recordsOutOfScope": 0,
+      "completenessPercent": null,
+      "errorCount": 5
+    }
+  }
+}

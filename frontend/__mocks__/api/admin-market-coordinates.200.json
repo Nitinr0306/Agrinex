@@ -1,0 +1,51 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "setMarketCoordinates",
+  "scenario": "Exact coordinates from an identified source replace the district centroid and clear the approximate flag (ADR-0014).",
+  "request": {
+    "method": "PUT",
+    "path": "/api/v1/admin/markets/00000000-0000-4000-8000-000000000704/coordinates",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    },
+    "body": {
+      "lat": 19.25423,
+      "lon": 74.07707,
+      "coordinateSource": "DMI National Agriculture Market Atlas (synthetic example)"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0068",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "id": "00000000-0000-4000-8000-000000000704",
+      "name": "TEST Market D",
+      "slug": "test-market-d",
+      "district": {
+        "id": "00000000-0000-4000-8000-000000000202",
+        "name": "Test District South"
+      },
+      "state": {
+        "id": "00000000-0000-4000-8000-000000000101",
+        "code": "IN-MH",
+        "name": "Maharashtra",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "reviewStatus": "VERIFIED",
+      "active": true,
+      "mergedIntoMarketId": null,
+      "coordinates": {
+        "lat": 19.25423,
+        "lon": 74.07707,
+        "approximate": false,
+        "source": "DMI National Agriculture Market Atlas (synthetic example)"
+      },
+      "createdAt": "2026-09-01T06:00:00Z"
+    }
+  }
+}

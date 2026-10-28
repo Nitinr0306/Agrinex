@@ -1,0 +1,38 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "registerFarmer",
+  "scenario": "Quick registration with a mobile number and an email address signs the new farmer in. The email is not verified yet, so a verification link is sent to it after the response (ADR-0047, ADR-0048).",
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/auth/register",
+    "body": {
+      "phoneNumber": "+919000000001",
+      "email": "test.farmer@example.invalid",
+      "password": "mock-pass-1",
+      "displayName": "Test Farmer",
+      "defaultDistrictId": "00000000-0000-4000-8000-000000000201"
+    }
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0001",
+      "Content-Type": "application/json",
+      "Set-Cookie": "__Secure-agrinex_refresh=mock-refresh-token; Max-Age=604800; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict",
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "accessToken": "mock.farmer.token",
+      "tokenType": "Bearer",
+      "expiresIn": 900,
+      "user": {
+        "id": "00000000-0000-4000-8000-000000000e01",
+        "role": "FARMER",
+        "displayName": "Test Farmer",
+        "defaultDistrictId": "00000000-0000-4000-8000-000000000201",
+        "emailVerified": false
+      }
+    }
+  }
+}

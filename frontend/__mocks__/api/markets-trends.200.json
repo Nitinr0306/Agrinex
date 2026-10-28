@@ -1,0 +1,290 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getMarketTrend",
+  "scenario": "30-day chart; the 7-day mean (3101.85) is 8.5 % below the previous 7-day mean (3390.00), so FALLING (spec §33; ADR-0025). Dates without data are absent, not interpolated.",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/markets/00000000-0000-4000-8000-000000000702/trends?commodityId=00000000-0000-4000-8000-000000000401&days=30"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0032",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "market": {
+        "id": "00000000-0000-4000-8000-000000000702",
+        "name": "TEST Market B"
+      },
+      "commodity": {
+        "id": "00000000-0000-4000-8000-000000000401",
+        "name": "Onion",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "variety": null,
+      "grade": null,
+      "priceUnit": "Rs./Quintal",
+      "days": 30,
+      "window": {
+        "chartFrom": "2026-09-04",
+        "chartTo": "2026-10-03",
+        "recentFrom": "2026-09-27",
+        "recentTo": "2026-10-03",
+        "baselineFrom": "2026-09-20",
+        "baselineTo": "2026-09-26"
+      },
+      "trendDirection": "FALLING",
+      "changePercent7Day": -8.5,
+      "observations": [
+        {
+          "observationId": "00000000-0000-4000-8000-000000000808",
+          "reportDate": "2026-09-05",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000501",
+            "name": "Red"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 3069,
+          "maxPrice": 3498,
+          "modalPrice": 3300,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "HISTORICAL_PRICE",
+          "sourceResourceId": "35985678-0d79-46b4-9ed6-6f13308a1d24",
+          "ingestedAt": "2026-09-05T00:32:05Z",
+          "freshnessStatus": "UNAVAILABLE",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        },
+        {
+          "observationId": "00000000-0000-4000-8000-000000000809",
+          "reportDate": "2026-09-10",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000502",
+            "name": "Other"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 3115.5,
+          "maxPrice": 3551,
+          "modalPrice": 3350,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "HISTORICAL_PRICE",
+          "sourceResourceId": "35985678-0d79-46b4-9ed6-6f13308a1d24",
+          "ingestedAt": "2026-09-10T00:32:05Z",
+          "freshnessStatus": "UNAVAILABLE",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        },
+        {
+          "observationId": "00000000-0000-4000-8000-00000000080a",
+          "reportDate": "2026-09-15",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000501",
+            "name": "Red"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 3143.4,
+          "maxPrice": 3582.8,
+          "modalPrice": 3380,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "HISTORICAL_PRICE",
+          "sourceResourceId": "35985678-0d79-46b4-9ed6-6f13308a1d24",
+          "ingestedAt": "2026-09-15T00:32:05Z",
+          "freshnessStatus": "UNAVAILABLE",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        },
+        {
+          "observationId": "00000000-0000-4000-8000-00000000080b",
+          "reportDate": "2026-09-20",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000501",
+            "name": "Red"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 3162,
+          "maxPrice": 3604,
+          "modalPrice": 3400,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "HISTORICAL_PRICE",
+          "sourceResourceId": "35985678-0d79-46b4-9ed6-6f13308a1d24",
+          "ingestedAt": "2026-09-20T00:32:05Z",
+          "freshnessStatus": "UNAVAILABLE",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        },
+        {
+          "observationId": "00000000-0000-4000-8000-00000000080c",
+          "reportDate": "2026-09-22",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000502",
+            "name": "Other"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 3143.4,
+          "maxPrice": 3582.8,
+          "modalPrice": 3380,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "HISTORICAL_PRICE",
+          "sourceResourceId": "35985678-0d79-46b4-9ed6-6f13308a1d24",
+          "ingestedAt": "2026-09-22T00:32:05Z",
+          "freshnessStatus": "UNAVAILABLE",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        },
+        {
+          "observationId": "00000000-0000-4000-8000-00000000080d",
+          "reportDate": "2026-09-24",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000501",
+            "name": "Red"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 3124.8,
+          "maxPrice": 3561.6,
+          "modalPrice": 3360,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "HISTORICAL_PRICE",
+          "sourceResourceId": "35985678-0d79-46b4-9ed6-6f13308a1d24",
+          "ingestedAt": "2026-09-24T00:32:05Z",
+          "freshnessStatus": "STALE",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        },
+        {
+          "observationId": "00000000-0000-4000-8000-00000000080e",
+          "reportDate": "2026-09-26",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000501",
+            "name": "Red"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 3180.6,
+          "maxPrice": 3625.2,
+          "modalPrice": 3420,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "CURRENT_PRICE",
+          "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+          "ingestedAt": "2026-09-26T00:32:05Z",
+          "freshnessStatus": "STALE",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        },
+        {
+          "observationId": "00000000-0000-4000-8000-00000000080f",
+          "reportDate": "2026-09-27",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000502",
+            "name": "Other"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 2929.5,
+          "maxPrice": 3339,
+          "modalPrice": 3150,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "CURRENT_PRICE",
+          "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+          "ingestedAt": "2026-09-27T00:32:05Z",
+          "freshnessStatus": "STALE",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        },
+        {
+          "observationId": "00000000-0000-4000-8000-000000000810",
+          "reportDate": "2026-09-29",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000501",
+            "name": "Red"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 2901.6,
+          "maxPrice": 3307.2,
+          "modalPrice": 3120,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "CURRENT_PRICE",
+          "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+          "ingestedAt": "2026-09-29T00:32:05Z",
+          "freshnessStatus": "RECENT",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        },
+        {
+          "observationId": "00000000-0000-4000-8000-000000000811",
+          "reportDate": "2026-10-01",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000502",
+            "name": "Other"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 2824.78,
+          "maxPrice": 3219.64,
+          "modalPrice": 3037.4,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "CURRENT_PRICE",
+          "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+          "ingestedAt": "2026-10-01T00:32:05Z",
+          "freshnessStatus": "RECENT",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        },
+        {
+          "observationId": "00000000-0000-4000-8000-000000000801",
+          "reportDate": "2026-10-03",
+          "variety": {
+            "id": "00000000-0000-4000-8000-000000000501",
+            "name": "Red"
+          },
+          "grade": {
+            "id": "00000000-0000-4000-8000-000000000601",
+            "name": "FAQ"
+          },
+          "minPrice": 2900,
+          "maxPrice": 3300,
+          "modalPrice": 3100,
+          "priceUnit": "Rs./Quintal",
+          "sourceDataset": "CURRENT_PRICE",
+          "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+          "ingestedAt": "2026-10-03T00:32:05Z",
+          "freshnessStatus": "FRESH",
+          "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+        }
+      ],
+      "sourceStatus": {
+        "sourceDataset": "CURRENT_PRICE",
+        "lastSuccessfulSyncAt": "2026-10-03T00:32:40Z",
+        "latestSyncFailed": false
+      }
+    }
+  }
+}

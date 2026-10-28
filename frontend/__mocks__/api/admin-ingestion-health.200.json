@@ -1,0 +1,128 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getIngestionHealth",
+  "scenario": "The current dataset synced; the historical run failed once (admin banner from consecutiveFailures).",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/admin/ingestion/health",
+    "headers": {
+      "Authorization": "Bearer mock.admin.token"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0043",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "generatedAt": "2026-10-03T04:20:00Z",
+      "datasets": [
+        {
+          "datasetType": "CURRENT_PRICE",
+          "resourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+          "title": "Current Daily Price of Various Commodities from Various Markets (Mandi)",
+          "schedule": {
+            "datasetType": "CURRENT_PRICE",
+            "paused": false,
+            "pausedReason": null,
+            "updatedAt": "2026-09-01T06:00:00Z"
+          },
+          "runningRunId": null,
+          "latestCompletedRun": {
+            "id": "00000000-0000-4000-8000-000000000f01",
+            "datasetType": "CURRENT_PRICE",
+            "triggeredBy": "SCHEDULER",
+            "status": "SUCCESS",
+            "startedAt": "2026-10-03T00:30:00Z",
+            "finishedAt": "2026-10-03T00:32:40Z",
+            "durationSeconds": 160,
+            "requestScope": {
+              "filters.state": "Maharashtra",
+              "limit": 500
+            },
+            "sourceTotalRecords": 1210,
+            "pagesFetched": 3,
+            "pagesFailed": 0,
+            "recordsFetched": 1210,
+            "recordsInserted": 1095,
+            "recordsUpdated": 4,
+            "duplicatesSkipped": 88,
+            "validationErrorsCount": 21,
+            "recordsConflicted": 2,
+            "recordsOutOfScope": 0,
+            "completenessPercent": 98.1,
+            "errorCount": 23
+          },
+          "lastSuccessfulRunAt": "2026-10-03T00:32:40Z",
+          "consecutiveFailures": 0,
+          "latestReportDate": "2026-10-03"
+        },
+        {
+          "datasetType": "HISTORICAL_PRICE",
+          "resourceId": "35985678-0d79-46b4-9ed6-6f13308a1d24",
+          "title": "Variety-wise Daily Market Prices Data of Commodity",
+          "schedule": {
+            "datasetType": "HISTORICAL_PRICE",
+            "paused": false,
+            "pausedReason": null,
+            "updatedAt": "2026-09-01T06:00:00Z"
+          },
+          "runningRunId": null,
+          "latestCompletedRun": {
+            "id": "00000000-0000-4000-8000-000000000f02",
+            "datasetType": "HISTORICAL_PRICE",
+            "triggeredBy": "SCHEDULER",
+            "status": "FAILED",
+            "startedAt": "2026-10-03T00:32:45Z",
+            "finishedAt": "2026-10-03T00:33:30Z",
+            "durationSeconds": 45,
+            "requestScope": {
+              "filters.State": "Maharashtra",
+              "reportDates": [
+                "30-09-2026",
+                "01-10-2026",
+                "02-10-2026",
+                "03-10-2026"
+              ],
+              "limit": 500
+            },
+            "sourceTotalRecords": null,
+            "pagesFetched": 0,
+            "pagesFailed": 4,
+            "recordsFetched": 0,
+            "recordsInserted": 0,
+            "recordsUpdated": 0,
+            "duplicatesSkipped": 0,
+            "validationErrorsCount": 0,
+            "recordsConflicted": 0,
+            "recordsOutOfScope": 0,
+            "completenessPercent": null,
+            "errorCount": 4
+          },
+          "lastSuccessfulRunAt": "2026-10-02T18:33:40Z",
+          "consecutiveFailures": 1,
+          "latestReportDate": "2026-10-02"
+        }
+      ],
+      "marketFreshness": {
+        "asOfDate": "2026-10-03",
+        "totalMarkets": 6,
+        "fresh": 3,
+        "recent": 0,
+        "stale": 1,
+        "unavailable": 2
+      }
+    }
+  }
+}

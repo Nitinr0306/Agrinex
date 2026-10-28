@@ -1,0 +1,3 @@
+# Checks the selected profile and the production settings before the application context exists (Spring Boot
+# "Application Events and Listeners": listeners for events before the context are registered here).
+org.springframework.context.ApplicationListener=com.agrinex.common.config.StartupProfileValidator

@@ -1,0 +1,184 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "compareSellingOptions",
+  "scenario": "Markets are in range but none has a recent observation: 200 with empty options and noDataReason (spec §29; ADR-0023). maxDistanceKm was omitted, so the default 150 applies. Cabbage is still listed because its only recent observation is at TEST Market F, 180 km away; every market inside the radius is listed as excluded.",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/selling-options/compare",
+    "body": {
+      "commodityId": "00000000-0000-4000-8000-000000000407",
+      "quantity": 3,
+      "quantityUnit": "QUINTAL",
+      "originLat": 20.104532,
+      "originLon": 73.918274
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0015",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "recommendationId": "00000000-0000-4000-8000-000000000902",
+      "generatedAt": "2026-10-03T04:12:09Z",
+      "scenario": {
+        "kind": "COMPARISON",
+        "persisted": true,
+        "userOverrides": null
+      },
+      "commodity": {
+        "id": "00000000-0000-4000-8000-000000000407",
+        "name": "Cabbage",
+        "nameHi": null,
+        "nameMr": null
+      },
+      "variety": null,
+      "grade": null,
+      "priceUnit": "Rs./Quintal",
+      "quantity": 3,
+      "quantityUnit": "QUINTAL",
+      "quantityInQuintal": 3,
+      "origin": {
+        "lat": 20.104532,
+        "lon": 73.918274
+      },
+      "maxDistanceKm": 150,
+      "transportAssumptions": {
+        "versionId": "00000000-0000-4000-8000-000000000a01",
+        "ratePerKm": 8,
+        "minimumTripCharge": 300,
+        "vehicleCapacityKg": 1000,
+        "appliedRatePerKm": 8,
+        "ratePerKmSource": "CONFIGURED"
+      },
+      "decisionBasis": {
+        "rankingMethod": "DETERMINISTIC_COMPOSITE_SCORE",
+        "weightsVersionId": "00000000-0000-4000-8000-000000000b01",
+        "mlContributed": false
+      },
+      "priceOnlyWinnerId": null,
+      "netRealizationWinnerId": null,
+      "rankingsDisagree": false,
+      "options": [],
+      "excludedMarkets": [
+        {
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000701",
+            "name": "TEST Market A",
+            "district": {
+              "id": "00000000-0000-4000-8000-000000000201",
+              "name": "Test District North"
+            },
+            "state": {
+              "id": "00000000-0000-4000-8000-000000000101",
+              "code": "IN-MH",
+              "name": "Maharashtra",
+              "nameHi": null,
+              "nameMr": null
+            }
+          },
+          "distanceKm": 15,
+          "approximateMarketLocation": false,
+          "reason": "NO_RECENT_PRICE_DATA"
+        },
+        {
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000703",
+            "name": "TEST Market C",
+            "district": {
+              "id": "00000000-0000-4000-8000-000000000201",
+              "name": "Test District North"
+            },
+            "state": {
+              "id": "00000000-0000-4000-8000-000000000101",
+              "code": "IN-MH",
+              "name": "Maharashtra",
+              "nameHi": null,
+              "nameMr": null
+            }
+          },
+          "distanceKm": 42,
+          "approximateMarketLocation": false,
+          "reason": "NO_RECENT_PRICE_DATA"
+        },
+        {
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000704",
+            "name": "TEST Market D",
+            "district": {
+              "id": "00000000-0000-4000-8000-000000000202",
+              "name": "Test District South"
+            },
+            "state": {
+              "id": "00000000-0000-4000-8000-000000000101",
+              "code": "IN-MH",
+              "name": "Maharashtra",
+              "nameHi": null,
+              "nameMr": null
+            }
+          },
+          "distanceKm": 98.49,
+          "approximateMarketLocation": true,
+          "reason": "NO_RECENT_PRICE_DATA"
+        },
+        {
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000702",
+            "name": "TEST Market B",
+            "district": {
+              "id": "00000000-0000-4000-8000-000000000202",
+              "name": "Test District South"
+            },
+            "state": {
+              "id": "00000000-0000-4000-8000-000000000101",
+              "code": "IN-MH",
+              "name": "Maharashtra",
+              "nameHi": null,
+              "nameMr": null
+            }
+          },
+          "distanceKm": 128,
+          "approximateMarketLocation": false,
+          "reason": "NO_RECENT_PRICE_DATA"
+        },
+        {
+          "market": {
+            "id": "00000000-0000-4000-8000-000000000705",
+            "name": "TEST Market E",
+            "district": {
+              "id": "00000000-0000-4000-8000-000000000202",
+              "name": "Test District South"
+            },
+            "state": {
+              "id": "00000000-0000-4000-8000-000000000101",
+              "code": "IN-MH",
+              "name": "Maharashtra",
+              "nameHi": null,
+              "nameMr": null
+            }
+          },
+          "distanceKm": 131.52,
+          "approximateMarketLocation": false,
+          "reason": "NO_RECENT_PRICE_DATA"
+        }
+      ],
+      "noDataReason": "NO_RECENT_PRICE_DATA",
+      "sourceStatus": {
+        "sourceDataset": "CURRENT_PRICE",
+        "lastSuccessfulSyncAt": "2026-10-03T00:32:40Z",
+        "latestSyncFailed": false
+      }
+    }
+  }
+}

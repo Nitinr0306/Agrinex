@@ -1,0 +1,35 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "login",
+  "scenario": "A farmer signs in with the mobile number; the account's email was verified earlier.",
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/auth/login",
+    "body": {
+      "identifier": "+919000000001",
+      "password": "mock-pass-1"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0002",
+      "Content-Type": "application/json",
+      "Set-Cookie": "__Secure-agrinex_refresh=mock-refresh-token; Max-Age=604800; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict",
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "accessToken": "mock.farmer.token",
+      "tokenType": "Bearer",
+      "expiresIn": 900,
+      "user": {
+        "id": "00000000-0000-4000-8000-000000000e01",
+        "role": "FARMER",
+        "displayName": "Test Farmer",
+        "defaultDistrictId": "00000000-0000-4000-8000-000000000201",
+        "emailVerified": true
+      }
+    }
+  }
+}

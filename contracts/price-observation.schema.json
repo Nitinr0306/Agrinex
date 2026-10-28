@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PriceObservation",
+  "description": "A government-reported mandi price observation as AgriNex stores and publishes it, with full provenance and freshness. Spec §41: produced by Data Engineering; consumed by Backend, ML and QA. The root schema is the self-contained form; `$defs/PriceQuote` is the same object without location and commodity context, used inside responses that already carry that context. Also defines the source synchronization status and the daily series that is the optional ML input (ADR-0010 rule 7, ADR-0030). Every value is a real stored observation: AgriNex never fabricates, interpolates, averages or converts a published price (spec P10, §31 RULE 5; ADR-0008, ADR-0010). Hand-authored and authoritative for the API contract area; conventions in docs/api/API_CONVENTIONS.md and docs/api/PROVENANCE_AND_FRESHNESS.md.",
+  "x-agrinex-contract-version": "1.0.0",
+  "$ref": "#/$defs/PriceObservation",
+  "$defs": {
+    "PriceUnit": {
+      "description": "Unit of the source prices, in the source's own notation, for example 'Rs./Quintal'. The data.gov.in JSON payload has no unit field: the unit is verified per commodity from official DMI/Agmarknet evidence and recorded on every stored observation (spec §31 RULE 3; ADR-0008). Prices are never converted between units. Comparison and alerts accept only 'Rs./Quintal' (ADR-0008, ADR-0023).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50,
+      "examples": ["Rs./Quintal"]
+    },
+    "PriceAmount": {
+      "description": "A source price in `priceUnit`. Parsed from the source as an exact decimal and rounded half-up to 2 decimal places at ingestion (ADR-0008). Always greater than 0.",
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "x-agrinex-max-decimal-places": 2
+    },
+    "SourceDataset": {
+      "description": "Government dataset that supplied the observation (ADR-0006): CURRENT_PRICE is data.gov.in resource 9ef84268-d588-465a-a308-a864a43d0070 (Current Daily Price of Various Commodities from Various Markets (Mandi)); HISTORICAL_PRICE is resource 35985678-0d79-46b4-9ed6-6f13308a1d24 (Variety-wise Daily Market Prices Data of Commodity). Both are published by DMI on data.gov.in (spec §1).",
+      "type": "string",
+      "enum": ["CURRENT_PRICE", "HISTORICAL_PRICE"],
+      "x-agrinex-extensible": true
+    },
+    "DataGovResourceId": {
+      "description": "data.gov.in resource identifier of the source dataset (spec §1). Public, never a credential.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "FreshnessStatus": {
+      "description": "Freshness of an observation at response time, derived from its reportDate and today's date in Asia/Kolkata (ADR-0007) under the thresholds of the recommendation-weights version in use (defaults 1, 4 and 10 days; spec §16, F1.16, FR-13): the comparison's version for comparisons and simulations (recommendation_runs.weights_id; ADR-0026 item 3), the active version elsewhere: FRESH when reportDate >= today - freshDays; RECENT when >= today - recentDays; STALE when >= today - staleDays; otherwise UNAVAILABLE. Derived on every response and never stored on observations (docs/database/DATABASE_ARCHITECTURE.md §10.6).",
+      "type": "string",
+      "enum": ["FRESH", "RECENT", "STALE", "UNAVAILABLE"]
+    },
+    "Attribution": {
+      "description": "Source attribution that every price-related screen must show with the report date (spec §31 RULE 7; ADR-0022 item 9).",
+      "type": "string",
+      "const": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+    },
+    "TrendDirection": {
+      "description": "Direction of the 7-day change of the representative daily series (spec §33; ADR-0025): RISING above +3.0 %, FALLING below -3.0 %, otherwise STABLE, classified on the unrounded change. INSUFFICIENT_DATA when fewer than 4 daily values exist in the last 14 days or either 7-day window is empty.",
+      "type": "string",
+      "enum": ["RISING", "STABLE", "FALLING", "INSUFFICIENT_DATA"]
+    },
+    "ChangePercent7Day": {
+      "description": "Trend statistic (spec §33; ADR-0025): (mean of daily values today-6..today minus mean of daily values today-13..today-7) / the second mean x 100, rounded half-up to 1 decimal place for display. The direction and percentage alerts use the unrounded value (ADR-0019 item 2, ADR-0025 item 1). A labelled statistic, never a price. null when trendDirection is INSUFFICIENT_DATA.",
+      "anyOf": [
+        { "type": "number", "x-agrinex-max-decimal-places": 1 },
+        { "type": "null" }
+      ]
+    },
+    "NoDataReason": {
+      "description": "Why a price-serving response holds no observation although the request was valid (spec §29; ADR-0023): NO_RECENT_PRICE_DATA means no stored observation dated within the active stale window (today - staleDays .. today, Asia/Kolkata) matched the request. Nothing is fabricated to fill the gap (spec §31 RULE 5).",
+      "type": "string",
+      "enum": ["NO_RECENT_PRICE_DATA"]
+    },
+    "PriceQuoteFields": {
+      "description": "Fields shared by PriceQuote and PriceObservation. Open on its own; each concrete schema closes it with unevaluatedProperties.",
+      "type": "object",
+      "properties": {
+        "observationId": {
+          "description": "Identifier of the stored observation (ADR-0010 item 5). Stable for the life of the observation.",
+          "$ref": "common.schema.json#/$defs/Uuid"
+        },
+        "reportDate": {
+          "description": "Date the source observation describes: the source arrival_date / Arrival_Date, parsed strictly from dd/MM/yyyy (ADR-0007). It is never the ingestion date and is never moved forward (ADR-0005).",
+          "$ref": "common.schema.json#/$defs/CalendarDate"
+        },
+        "variety": {
+          "description": "Source variety, or null when the source omitted it (ADR-0006).",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/VarietyRef" },
+            { "type": "null" }
+          ]
+        },
+        "grade": {
+          "description": "Source grade, or null when the source omitted it (ADR-0006).",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/GradeRef" },
+            { "type": "null" }
+          ]
+        },
+        "minPrice": {
+          "description": "Minimum price as reported, in priceUnit; null when the source omitted it. A reported zero is rejected at ingestion, never read as missing (ADR-0008). When present, minPrice <= modalPrice.",
+          "anyOf": [
+            { "$ref": "#/$defs/PriceAmount" },
+            { "type": "null" }
+          ]
+        },
+        "maxPrice": {
+          "description": "Maximum price as reported, in priceUnit; null when the source omitted it. When present, modalPrice <= maxPrice.",
+          "anyOf": [
+            { "$ref": "#/$defs/PriceAmount" },
+            { "type": "null" }
+          ]
+        },
+        "modalPrice": {
+          "description": "Modal price as reported, in priceUnit. The 'latest reported price' shown to farmers (spec §31 RULE 4).",
+          "$ref": "#/$defs/PriceAmount"
+        },
+        "priceUnit": { "$ref": "#/$defs/PriceUnit" },
+        "sourceDataset": { "$ref": "#/$defs/SourceDataset" },
+        "sourceResourceId": { "$ref": "#/$defs/DataGovResourceId" },
+        "ingestedAt": {
+          "description": "When AgriNex wrote the current price values: at insert, or at the latest source revision (ADR-0009). Not when the market reported them; see reportDate.",
+          "$ref": "common.schema.json#/$defs/Timestamp"
+        },
+        "freshnessStatus": { "$ref": "#/$defs/FreshnessStatus" },
+        "attribution": { "$ref": "#/$defs/Attribution" }
+      },
+      "required": [
+        "observationId",
+        "reportDate",
+        "variety",
+        "grade",
+        "minPrice",
+        "maxPrice",
+        "modalPrice",
+        "priceUnit",
+        "sourceDataset",
+        "sourceResourceId",
+        "ingestedAt",
+        "freshnessStatus",
+        "attribution"
+      ]
+    },
+    "PriceQuote": {
+      "description": "One real, stored government-reported observation, published with the provenance and freshness that ADR-0022 item 9 requires of every object that carries a price. Used where the enclosing object already identifies the market and commodity.",
+      "allOf": [{ "$ref": "#/$defs/PriceQuoteFields" }],
+      "unevaluatedProperties": false
+    },
+    "PriceObservation": {
+      "description": "Self-contained form of a PriceQuote, with the state, district, market and commodity it belongs to.",
+      "allOf": [{ "$ref": "#/$defs/PriceQuoteFields" }],
+      "properties": {
+        "state": { "$ref": "common.schema.json#/$defs/StateRef" },
+        "district": { "$ref": "common.schema.json#/$defs/DistrictRef" },
+        "market": { "$ref": "common.schema.json#/$defs/MarketRef" },
+        "commodity": { "$ref": "common.schema.json#/$defs/CommodityRef" }
+      },
+      "required": ["state", "district", "market", "commodity"],
+      "unevaluatedProperties": false
+    },
+    "SourceSyncStatus": {
+      "description": "Latest synchronization status of the current-price dataset, carried by every response that serves price data (ADR-0022 item 9). It drives the spec §29 banner 'Latest source synchronization is unavailable. Showing most recently stored government-reported data.', which is shown while latestSyncFailed is true (ADR-0005). It never changes the stored data shown with it: during an outage, stored observations keep their true report dates and freshness.",
+      "type": "object",
+      "properties": {
+        "sourceDataset": {
+          "description": "The dataset this status describes. Always CURRENT_PRICE (ADR-0005 item 5).",
+          "type": "string",
+          "const": "CURRENT_PRICE"
+        },
+        "lastSuccessfulSyncAt": {
+          "description": "End time of the most recent CURRENT_PRICE ingestion run that ended SUCCESS or PARTIAL_FAILURE, that is, the last run that loaded source data (ADR-0011). null when no such run exists.",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/Timestamp" },
+            { "type": "null" }
+          ]
+        },
+        "latestSyncFailed": {
+          "description": "true when the most recent completed (not RUNNING) CURRENT_PRICE run ended FAILED (ADR-0005, ADR-0011 item 8): nothing was fetched (the source was unavailable, rejected the request or returned an unexpected structure), a load transaction failed, or the run was interrupted. false otherwise, including when no run has completed yet.",
+          "type": "boolean"
+        }
+      },
+      "required": ["sourceDataset", "lastSuccessfulSyncAt", "latestSyncFailed"],
+      "additionalProperties": false
+    },
+    "DailyPriceSeries": {
+      "description": "Optional ML input (spec §35 'Input (from backend/DB)'; ADR-0030): the representative daily series of one market and commodity, one selected real observation per date (ADR-0010 rule 7), read by the ML job from a read-only database view owned by the price module. Field names follow §35; observationId, varietyId, gradeId, sourceDataset and priceUnit are provenance additions. No request/response API exists between the backend and ML (ADR-0030).",
+      "type": "object",
+      "properties": {
+        "marketId": { "$ref": "common.schema.json#/$defs/Uuid" },
+        "commodityId": { "$ref": "common.schema.json#/$defs/Uuid" },
+        "varietyId": {
+          "description": "Variety filter of the series. Always null in the current architecture: forecasts are built on the representative series (ADR-0030 item 5).",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/Uuid" },
+            { "type": "null" }
+          ]
+        },
+        "gradeId": {
+          "description": "Grade filter of the series. Always null in the current architecture (ADR-0030 item 5).",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/Uuid" },
+            { "type": "null" }
+          ]
+        },
+        "priceUnit": {
+          "description": "Unit of every price in the series. A series never mixes units (ADR-0008).",
+          "$ref": "#/$defs/PriceUnit"
+        },
+        "observations": {
+          "description": "Daily points in ascending date order, at most one per date.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/DailySeriesPoint" }
+        }
+      },
+      "required": ["marketId", "commodityId", "varietyId", "gradeId", "priceUnit", "observations"],
+      "additionalProperties": false
+    },
+    "DailySeriesPoint": {
+      "description": "One point of the daily series: the observation selected for that date by ADR-0010 rules 1, 3 and 4 (current-dataset precedence; exact variety and grade filter; otherwise the lower-median representative). Never an average or an interpolated value.",
+      "type": "object",
+      "properties": {
+        "date": { "$ref": "common.schema.json#/$defs/CalendarDate" },
+        "observationId": { "$ref": "common.schema.json#/$defs/Uuid" },
+        "modalPrice": { "$ref": "#/$defs/PriceAmount" },
+        "minPrice": {
+          "anyOf": [
+            { "$ref": "#/$defs/PriceAmount" },
+            { "type": "null" }
+          ]
+        },
+        "maxPrice": {
+          "anyOf": [
+            { "$ref": "#/$defs/PriceAmount" },
+            { "type": "null" }
+          ]
+        },
+        "varietyId": {
+          "description": "Variety of the selected observation; null when the source omitted it.",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/Uuid" },
+            { "type": "null" }
+          ]
+        },
+        "gradeId": {
+          "description": "Grade of the selected observation; null when the source omitted it.",
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/Uuid" },
+            { "type": "null" }
+          ]
+        },
+        "sourceDataset": { "$ref": "#/$defs/SourceDataset" }
+      },
+      "required": ["date", "observationId", "modalPrice", "minPrice", "maxPrice", "varietyId", "gradeId", "sourceDataset"],
+      "additionalProperties": false
+    }
+  }
+}

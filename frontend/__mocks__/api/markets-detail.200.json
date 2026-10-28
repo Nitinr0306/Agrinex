@@ -1,0 +1,111 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "getMarketDetail",
+  "scenario": "Latest reported prices per commodity at one VERIFIED market, each chosen by ADR-0010 with full provenance.",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/markets/00000000-0000-4000-8000-000000000702"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0028",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "market": {
+        "id": "00000000-0000-4000-8000-000000000702",
+        "name": "TEST Market B",
+        "district": {
+          "id": "00000000-0000-4000-8000-000000000202",
+          "name": "Test District South"
+        },
+        "state": {
+          "id": "00000000-0000-4000-8000-000000000101",
+          "code": "IN-MH",
+          "name": "Maharashtra",
+          "nameHi": null,
+          "nameMr": null
+        }
+      },
+      "active": true,
+      "approximateMarketLocation": false,
+      "latestPrices": [
+        {
+          "commodity": {
+            "id": "00000000-0000-4000-8000-000000000401",
+            "name": "Onion",
+            "nameHi": null,
+            "nameMr": null
+          },
+          "price": {
+            "observationId": "00000000-0000-4000-8000-000000000801",
+            "reportDate": "2026-10-03",
+            "variety": {
+              "id": "00000000-0000-4000-8000-000000000501",
+              "name": "Red"
+            },
+            "grade": {
+              "id": "00000000-0000-4000-8000-000000000601",
+              "name": "FAQ"
+            },
+            "minPrice": 2900,
+            "maxPrice": 3300,
+            "modalPrice": 3100,
+            "priceUnit": "Rs./Quintal",
+            "sourceDataset": "CURRENT_PRICE",
+            "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+            "ingestedAt": "2026-10-03T00:32:05Z",
+            "freshnessStatus": "FRESH",
+            "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+          }
+        },
+        {
+          "commodity": {
+            "id": "00000000-0000-4000-8000-000000000402",
+            "name": "Tomato",
+            "nameHi": null,
+            "nameMr": null
+          },
+          "price": {
+            "observationId": "00000000-0000-4000-8000-000000000807",
+            "reportDate": "2026-09-30",
+            "variety": {
+              "id": "00000000-0000-4000-8000-000000000503",
+              "name": "Local"
+            },
+            "grade": {
+              "id": "00000000-0000-4000-8000-000000000601",
+              "name": "FAQ"
+            },
+            "minPrice": 1600,
+            "maxPrice": 2000,
+            "modalPrice": 1800,
+            "priceUnit": "Rs./Quintal",
+            "sourceDataset": "CURRENT_PRICE",
+            "sourceResourceId": "9ef84268-d588-465a-a308-a864a43d0070",
+            "ingestedAt": "2026-09-30T00:32:05Z",
+            "freshnessStatus": "RECENT",
+            "attribution": "Source: Ministry of Agriculture & FW / DMI / data.gov.in"
+          }
+        }
+      ],
+      "noDataReason": null,
+      "sourceStatus": {
+        "sourceDataset": "CURRENT_PRICE",
+        "lastSuccessfulSyncAt": "2026-10-03T00:32:40Z",
+        "latestSyncFailed": false
+      }
+    }
+  }
+}

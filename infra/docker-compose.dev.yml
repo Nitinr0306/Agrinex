@@ -1,0 +1,44 @@
+# AgriNex - local override of the root docker-compose.yml (ADR-0021 item 2): the full stack on this machine over
+# plain HTTP, for checking the images and the edge before a deployment. Never used on a deployment.
+#
+# From the repository root, with the local environment file:
+#   docker compose --env-file infra/.env -f docker-compose.yml -f infra/docker-compose.dev.yml up -d --build
+# Then open http://localhost:8088 (or AGRINEX_DOCKER_HTTP_PORT).
+#
+# It uses its own Compose project ("agrinex") and volume, separate from infra/docker-compose.yml ("agrinex-dev"),
+# so the IDE-based development database is never touched. Ports are published on 127.0.0.1 only and default
+# away from 5432 and 5433, which other local databases use.
+#
+# Departures from ADR-0021 item 2, recorded in docs/operations/DEPLOYMENT_GUIDE.md: no demo profile, because no
+# demo fixtures exist (ADR-0028), and the backend and frontend ports are those of this machine's free ports.
+
+services:
+  agrinex-db:
+    ports:
+      - "127.0.0.1:${AGRINEX_DOCKER_DB_PORT:-5434}:5432"
+
+  agrinex-redis:
+    ports:
+      - "127.0.0.1:${AGRINEX_DOCKER_REDIS_PORT:-6380}:6379"
+
+  agrinex-backend:
+    environment:
+      # The local profile (the "local" document of application.yml) also allows http://localhost:3000 in CORS (ADR-0017 item 2);
+      # it replaces the "prod" that the root file pins, together with the production-only values below.
+      SPRING_PROFILES_ACTIVE: local
+      AGRINEX_PUBLIC_ORIGIN: http://localhost:${AGRINEX_DOCKER_HTTP_PORT:-8088}
+      AGRINEX_EMAIL_PROVIDER: ${AGRINEX_EMAIL_PROVIDER:-none}
+    ports:
+      - "127.0.0.1:${AGRINEX_DOCKER_BACKEND_PORT:-8090}:8080"
+
+  agrinex-frontend:
+    ports:
+      - "127.0.0.1:${AGRINEX_DOCKER_FRONTEND_PORT:-3010}:3000"
+
+  agrinex-nginx:
+    environment:
+      AGRINEX_DOMAIN: localhost
+    ports: !override
+      - "127.0.0.1:${AGRINEX_DOCKER_HTTP_PORT:-8088}:80"
+    volumes: !override
+      - ./infra/nginx/dev:/etc/nginx/templates:ro

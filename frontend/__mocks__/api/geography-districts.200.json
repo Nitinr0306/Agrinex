@@ -1,0 +1,39 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "listDistricts",
+  "scenario": "Districts with synthetic centroids (real centroids come from Survey of India boundaries, ADR-0014).",
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/geography/states/00000000-0000-4000-8000-000000000101/districts"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0008",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-4000-8000-000000000201",
+          "name": "Test District North",
+          "stateId": "00000000-0000-4000-8000-000000000101",
+          "centroid": {
+            "lat": 20.104532,
+            "lon": 73.918274
+          }
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000202",
+          "name": "Test District South",
+          "stateId": "00000000-0000-4000-8000-000000000101",
+          "centroid": {
+            "lat": 19.412781,
+            "lon": 74.506012
+          }
+        }
+      ]
+    }
+  }
+}

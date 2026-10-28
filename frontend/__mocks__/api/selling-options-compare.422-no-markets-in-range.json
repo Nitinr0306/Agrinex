@@ -1,0 +1,44 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "compareSellingOptions",
+  "scenario": "No VERIFIED, active market within 10 km (spec §16; ADR-0023). The UI offers to increase the distance (spec §25).",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/selling-options/compare",
+    "body": {
+      "commodityId": "00000000-0000-4000-8000-000000000401",
+      "quantity": 500,
+      "quantityUnit": "KG",
+      "originLat": 20.104532,
+      "originLon": 73.918274,
+      "maxDistanceKm": 10
+    }
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0017",
+      "Content-Type": "application/problem+json"
+    },
+    "body": {
+      "type": "/problems/no-markets-in-range",
+      "title": "Insufficient data",
+      "status": 422,
+      "detail": "No market lies within 10 km of the origin.",
+      "code": "NO_MARKETS_IN_RANGE",
+      "correlationId": "mock-correlation-0017",
+      "errors": [],
+      "instance": "/api/v1/selling-options/compare"
+    }
+  }
+}

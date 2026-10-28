@@ -1,0 +1,33 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "refreshSession",
+  "scenario": "The refresh token is expired, revoked or reused; the client must sign in again and never retry.",
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/auth/refresh",
+    "headers": {
+      "Origin": "https://agrinex.invalid",
+      "Cookie": "__Secure-agrinex_refresh=mock-expired-token"
+    }
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0005",
+      "Content-Type": "application/problem+json",
+      "WWW-Authenticate": "Bearer realm=\"agrinex\"",
+      "Set-Cookie": "__Secure-agrinex_refresh=; Max-Age=0; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict"
+    },
+    "body": {
+      "type": "/problems/refresh-token-invalid",
+      "title": "Session cannot be refreshed",
+      "status": 401,
+      "detail": "The session has ended. Sign in again.",
+      "code": "REFRESH_TOKEN_INVALID",
+      "correlationId": "mock-correlation-0005",
+      "errors": [],
+      "instance": "/api/v1/auth/refresh"
+    }
+  }
+}

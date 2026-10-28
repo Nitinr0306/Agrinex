@@ -1,0 +1,30 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "confirmEmailVerification",
+  "scenario": "The verification link was already used (the email is verified), has expired, or was replaced: 422 (ADR-0048).",
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/auth/email-verification/confirm",
+    "body": {
+      "token": "MOCKverifyTOKENsyntheticXXXXXXXXXXXXXXXXXXX"
+    }
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0082",
+      "Content-Type": "application/problem+json"
+    },
+    "body": {
+      "type": "/problems/email-verification-token-invalid",
+      "title": "Verification link invalid or expired",
+      "status": 422,
+      "detail": "The verification link is invalid, expired or already used.",
+      "code": "EMAIL_VERIFICATION_TOKEN_INVALID",
+      "correlationId": "mock-correlation-0082",
+      "errors": [],
+      "instance": "/api/v1/auth/email-verification/confirm"
+    }
+  }
+}

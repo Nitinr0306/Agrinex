@@ -1,0 +1,55 @@
+{
+  "synthetic": true,
+  "notice": "SYNTHETIC TEST DATA for frontend mock mode and contract tests. Not government data: every market, price, date, forecast and account in this file is invented. Never present it as real (spec P10, §31 RULE 5). Screens rendered from mocks are prototypes and must be labelled as such (CLAUDE.md §M).",
+  "operationId": "compareSellingOptions",
+  "scenario": "The origin is not the centroid of any district (for example a device location): rejected, and nothing is recorded (spec §28; ADR-0039).",
+  "context": {
+    "today": "2026-10-03",
+    "timeZone": "Asia/Kolkata",
+    "freshnessDays": {
+      "fresh": 1,
+      "recent": 4,
+      "stale": 10
+    }
+  },
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/selling-options/compare",
+    "body": {
+      "commodityId": "00000000-0000-4000-8000-000000000401",
+      "quantity": 500,
+      "quantityUnit": "KG",
+      "originLat": 20.118734,
+      "originLon": 73.927461,
+      "maxDistanceKm": 150
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "X-Correlation-Id": "mock-correlation-0020",
+      "Content-Type": "application/problem+json"
+    },
+    "body": {
+      "type": "/problems/validation-failed",
+      "title": "Validation failed",
+      "status": 400,
+      "detail": "The origin must be the centroid of a district.",
+      "code": "VALIDATION_FAILED",
+      "correlationId": "mock-correlation-0020",
+      "errors": [
+        {
+          "field": "originLat",
+          "code": "INVALID_VALUE",
+          "message": "originLat and originLon must be a district centroid from listDistricts"
+        },
+        {
+          "field": "originLon",
+          "code": "INVALID_VALUE",
+          "message": "originLat and originLon must be a district centroid from listDistricts"
+        }
+      ],
+      "instance": "/api/v1/selling-options/compare"
+    }
+  }
+}

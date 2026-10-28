@@ -1,0 +1,31 @@
+"Commodity-wise, Market-wise Daily Report (Weighted Average) on: 01-Oct-2026"
+
+Market Center,Arrivals,Unit of Arrivals,Variety,Minimum Price,Maximum Price,Modal Price,Unit of Price,Grade
+Commodity Group Name : Beverages
+Chicory(Chikori/Kasni)
+State/UT Name : Gujarat
+Dhanera APMC,0.11000000000000001,Metric Tonnes,Chikori,24500.0,30000.0,27250.0,Rs./Quintal,Local
+Total,0.11,Metric Tonnes,,,,27250.0,Rs./Quintal,
+State/UT Name : Uttar Pradesh
+Divai APMC,27.685,Metric Tonnes,Other,2650.0,2650.0,2650.0,Rs./Quintal,FAQ
+Etah APMC,30.43,Metric Tonnes,Other,3000.0,3000.0,3000.0,Rs./Quintal,FAQ
+Haathras APMC,35.42,Metric Tonnes,Other,2800.0,2800.0,2800.0,Rs./Quintal,FAQ
+Mathura APMC,50.41,Metric Tonnes,Other,3000.0,3000.0,3000.0,Rs./Quintal,FAQ
+Total,143.94,Metric Tonnes,,,,2883.47,Rs./Quintal,
+Grand Total,144.05,Metric Tonnes,,,,2902.08,Rs./Quintal,
+Cocoa
+State/UT Name : Keralam
+Pulpally Market,2.0,Metric Tonnes,Cocoa,14500.0,14700.0,14600.0,Rs./Quintal,Local
+Total,2.0,Metric Tonnes,,,,14600.0,Rs./Quintal,
+Grand Total,2.0,Metric Tonnes,,,,14600.0,Rs./Quintal,
+Coffee
+State/UT Name : Keralam
+Kalpetta Market,30.3,Metric Tonnes,Other,21100.0,21300.0,21200.0,Rs./Quintal,FAQ
+Mananthavady Market,3.8,Metric Tonnes,Other,21000.0,21000.0,21000.0,Rs./Quintal,Local
+Pulpally Market,3.0,Metric Tonnes,Other,20800.0,21000.0,20900.0,Rs./Quintal,Local
+Sultan bathery Market,0.1,Metric Tonnes,Other,21295.0,21300.0,21300.0,Rs./Quintal,Local
+Total,37.2,Metric Tonnes,,,,21155.65,Rs./Quintal,
+Grand Total,37.2,Metric Tonnes,,,,21155.65,Rs./Quintal,
+
+Note:
+Weighted Average Price = ∑(arrival quantity * modal price) / ∑arrival quantity

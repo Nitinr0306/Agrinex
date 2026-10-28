@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ApiErrorResponse",
+  "description": "The single error body of the AgriNex API: the schema spec §10 names `ApiErrorResponse`, shaped as RFC 9457 Problem Details and served as application/problem+json (ADR-0022 item 4). Every non-2xx response of /api/v1 uses it. It never contains stack traces, SQL, internal class names, secrets, tokens or credentials (spec §28; CLAUDE.md §K). `code` is the stable, machine-readable identifier and the frontend's key for localized messages (ADR-0022 item 11). Each code has one fixed HTTP status, problem type URI and title, enforced below. The catalogue with meanings is in docs/api/API_CONVENTIONS.md. Clients must ignore members they do not recognize (RFC 9457 §3.2) and treat an unknown `code` by its HTTP status.",
+  "x-agrinex-contract-version": "1.0.0",
+  "$ref": "#/$defs/ApiErrorResponse",
+  "$defs": {
+    "ErrorCode": {
+      "description": "Stable top-level error code (ADR-0022 item 4). UPPER_SNAKE. Values may be added in a minor contract version; clients fall back to the HTTP status for unknown values.",
+      "type": "string",
+      "enum": [
+        "MALFORMED_REQUEST",
+        "VALIDATION_FAILED",
+        "UNAUTHORIZED",
+        "INVALID_CREDENTIALS",
+        "REFRESH_TOKEN_INVALID",
+        "FORBIDDEN",
+        "ORIGIN_NOT_ALLOWED",
+        "NOT_FOUND",
+        "METHOD_NOT_ALLOWED",
+        "NOT_ACCEPTABLE",
+        "CONFLICT",
+        "UNSUPPORTED_MEDIA_TYPE",
+        "NO_MARKETS_IN_RANGE",
+        "UNSUPPORTED_PRICE_UNIT",
+        "REFERENCE_NOT_FOUND",
+        "ESTIMATE_OUT_OF_RANGE",
+        "PASSWORD_RESET_TOKEN_INVALID",
+        "EMAIL_VERIFICATION_TOKEN_INVALID",
+        "RATE_LIMITED",
+        "INTERNAL_ERROR",
+        "SERVICE_UNAVAILABLE"
+      ],
+      "x-agrinex-extensible": true
+    },
+    "FieldErrorCode": {
+      "description": "Stable code of one field-level problem. UPPER_SNAKE. Values may be added in a minor contract version.",
+      "type": "string",
+      "enum": [
+        "REQUIRED",
+        "INVALID_TYPE",
+        "INVALID_FORMAT",
+        "INVALID_VALUE",
+        "OUT_OF_RANGE",
+        "TOO_SHORT",
+        "TOO_LONG",
+        "PRECISION_EXCEEDED",
+        "INVALID_RANGE",
+        "NOT_ALLOWED",
+        "UNKNOWN_FIELD",
+        "NOT_FOUND",
+        "ALREADY_EXISTS"
+      ],
+      "x-agrinex-extensible": true
+    },
+    "FieldError": {
+      "description": "One problem with one request field (ADR-0022 item 4).",
+      "type": "object",
+      "properties": {
+        "field": {
+          "description": "The request body property (dot-separated path for nested properties, [n] for array items), or the name of the query or path parameter. For a rule that relates two fields, the later field of the pair.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "code": { "$ref": "#/$defs/FieldErrorCode" },
+        "message": {
+          "description": "English explanation for developers and logs. Clients show a localized message chosen by `code` and `field`.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      },
+      "required": ["field", "code", "message"],
+      "additionalProperties": false
+    },
+    "ApiErrorResponse": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "RFC 9457 problem type: a relative URI reference with the full path /problems/<code in kebab case> (RFC 9457 §3.1.1 allows non-resolvable and relative type URIs). One fixed value per code. Clients identify problems by `code`.",
+          "type": "string",
+          "format": "uri-reference",
+          "pattern": "^/problems/[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "title": {
+          "description": "Fixed English summary of the problem type (RFC 9457 §3.1.3). One fixed value per code.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "status": {
+          "description": "The HTTP status code of the response (RFC 9457 §3.1.2).",
+          "type": "integer",
+          "minimum": 400,
+          "maximum": 599
+        },
+        "detail": {
+          "description": "Optional English explanation of this occurrence. Safe for display to developers; never contains internals or personal data of others. Absent for INTERNAL_ERROR and SERVICE_UNAVAILABLE, so that no internal detail can leak.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "instance": {
+          "description": "Optional: the request path that produced the problem, without the query string.",
+          "type": "string",
+          "format": "uri-reference",
+          "maxLength": 500
+        },
+        "code": { "$ref": "#/$defs/ErrorCode" },
+        "correlationId": {
+          "description": "Server-generated identifier of the request, equal to the X-Correlation-Id response header and written to the structured logs (spec §27). Quote it when reporting a problem.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9-]{8,100}$"
+        },
+        "errors": {
+          "description": "Field-level problems. Non-empty for VALIDATION_FAILED, REFERENCE_NOT_FOUND and ESTIMATE_OUT_OF_RANGE; may name the conflicting field for CONFLICT; otherwise empty.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/FieldError" }
+        }
+      },
+      "required": ["type", "title", "status", "code", "correlationId", "errors"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "code": { "enum": ["VALIDATION_FAILED", "REFERENCE_NOT_FOUND", "ESTIMATE_OUT_OF_RANGE"] } }, "required": ["code"] },
+          "then": { "properties": { "errors": { "minItems": 1 } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "MALFORMED_REQUEST" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 400 }, "type": { "const": "/problems/malformed-request" }, "title": { "const": "Malformed request" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "VALIDATION_FAILED" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 400 }, "type": { "const": "/problems/validation-failed" }, "title": { "const": "Validation failed" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "UNAUTHORIZED" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 401 }, "type": { "const": "/problems/unauthorized" }, "title": { "const": "Unauthorized" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "INVALID_CREDENTIALS" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 401 }, "type": { "const": "/problems/invalid-credentials" }, "title": { "const": "Invalid credentials" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "REFRESH_TOKEN_INVALID" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 401 }, "type": { "const": "/problems/refresh-token-invalid" }, "title": { "const": "Session cannot be refreshed" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "FORBIDDEN" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 403 }, "type": { "const": "/problems/forbidden" }, "title": { "const": "Forbidden" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "ORIGIN_NOT_ALLOWED" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 403 }, "type": { "const": "/problems/origin-not-allowed" }, "title": { "const": "Origin not allowed" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "NOT_FOUND" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 404 }, "type": { "const": "/problems/not-found" }, "title": { "const": "Not found" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "METHOD_NOT_ALLOWED" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 405 }, "type": { "const": "/problems/method-not-allowed" }, "title": { "const": "Method not allowed" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "NOT_ACCEPTABLE" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 406 }, "type": { "const": "/problems/not-acceptable" }, "title": { "const": "Not acceptable" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "CONFLICT" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 409 }, "type": { "const": "/problems/conflict" }, "title": { "const": "Conflict" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "UNSUPPORTED_MEDIA_TYPE" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 415 }, "type": { "const": "/problems/unsupported-media-type" }, "title": { "const": "Unsupported media type" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "NO_MARKETS_IN_RANGE" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 422 }, "type": { "const": "/problems/no-markets-in-range" }, "title": { "const": "Insufficient data" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "UNSUPPORTED_PRICE_UNIT" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 422 }, "type": { "const": "/problems/unsupported-price-unit" }, "title": { "const": "Unsupported price unit" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "REFERENCE_NOT_FOUND" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 422 }, "type": { "const": "/problems/reference-not-found" }, "title": { "const": "Referenced resource not found" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "ESTIMATE_OUT_OF_RANGE" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 422 }, "type": { "const": "/problems/estimate-out-of-range" }, "title": { "const": "Estimate out of range" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "PASSWORD_RESET_TOKEN_INVALID" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 422 }, "type": { "const": "/problems/password-reset-token-invalid" }, "title": { "const": "Reset link invalid or expired" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "EMAIL_VERIFICATION_TOKEN_INVALID" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 422 }, "type": { "const": "/problems/email-verification-token-invalid" }, "title": { "const": "Verification link invalid or expired" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "RATE_LIMITED" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 429 }, "type": { "const": "/problems/rate-limited" }, "title": { "const": "Too many requests" } } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "INTERNAL_ERROR" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 500 }, "type": { "const": "/problems/internal-error" }, "title": { "const": "Internal error" } }, "not": { "required": ["detail"] } }
+        },
+        {
+          "if": { "properties": { "code": { "const": "SERVICE_UNAVAILABLE" } }, "required": ["code"] },
+          "then": { "properties": { "status": { "const": 503 }, "type": { "const": "/problems/service-unavailable" }, "title": { "const": "Service unavailable" } }, "not": { "required": ["detail"] } }
+        }
+      ]
+    }
+  }
+}
